@@ -1,0 +1,25 @@
+{% load staticfiles %}<!DOCTYPE html>
+<html>
+<head>
+	<title>{% block head_title %}title{% endblock %}</title>
+	<meta charset="utf-8" />
+	<link href="{% static 'css/style.css' %}" rel="stylesheet" />
+	{% block extraheaders %}{% endblock %}
+	{% block extrastyle %}{% endblock %}
+</head>
+<body>
+	{% block body %}
+		<h1>{% block site_title %}title{% endblock %}</h1>
+		{% block content %}
+		{% endblock %}
+	{% endblock %}
+
+	<script src="{% static "django_ajax_utils/js/utils.js" %}"></script>
+	<script src="{% static "django_ajax_utils/js/utils_ajax.js" %}"></script>
+	<script src="{% static "django_ajax_utils/js/reactor.js" %}"></script>
+	<script src="{% static "django_ajax_utils/js/run_utils.js" %}"></script>
+
+	{% block extrajs %}
+	{% endblock %}
+</body>
+</html>

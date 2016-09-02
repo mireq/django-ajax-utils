@@ -1,0 +1,6 @@
+include LICENSE
+include README.rst
+include django_ajax_utils/static/django_ajax_utils/*
+include django_ajax_utils/locale/*/LC_MESSAGES/django.mo
+include django_ajax_utils/locale/*/LC_MESSAGES/django.po
+recursive-include django_ajax_utils/templates *

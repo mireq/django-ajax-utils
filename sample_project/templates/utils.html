@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block head_title %}Home{% endblock %}
+{% block site_title %}Utils{% endblock %}
+
+{% block content %}
+
+<h2>Misc</h2>
+
+<p>Has property (replacement for <code>Object.prototype.hasOwnProperty)</code>:</p>
+
+<pre class="run">
+var obj = {'property': true};
+
+dumpVar(_.has(obj, 'property'));
+</pre>
+
+{% endblock %}
