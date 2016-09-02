@@ -247,4 +247,36 @@ _.insertAfter(between, i1);
 dumpVar(parent.childNodes[1].innerHTML);
 </pre>
 
+<h2>Data</h2>
+
+<p><code>_.getData</code>, <code>_.setData</code></p>
+
+<pre class="run">
+var element = _.elem('DIV', {'data-variable-name': 'text'});
+
+dumpVar(_.getData(element, 'variableName'));
+_.setData(element, 'variableName', 'new text');
+dumpVar(_.getData(element, 'variableName'));
+</pre>
+
+<h2>Forms</h2>
+
+<form id="example_form" action="#">
+	<div class="formrow">
+		<label for="id_username">Username</label>
+		<input id="id_usernamee" type="text" name="username" />
+	</div>
+	<div class="formrow">
+		<label for="id_password">Password</label>
+		<input id="id_passworde" type="text" name="password" />
+	</div>
+</form>
+
+<p><code>_.serializeForm</code></p>
+
+<pre class="run">
+var formElement = _.id('example_form');
+dumpVar(_.serializeForm(formElement, {raw: true}));
+</pre>
+
 {% endblock %}

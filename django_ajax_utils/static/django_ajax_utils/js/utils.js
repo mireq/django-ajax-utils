@@ -455,4 +455,325 @@ window._utils.elem = elem;
 window._utils.insertAfter = insertAfter;
 
 
+// data
+var getData, setData;
+if (el.dataset === undefined) {
+	var generateDataName = function(name) {
+		return name.replace(/([A-Z])/g, '-$1').toLowerCase();
+	};
+
+	getData = function(element, name) {
+		return element.getAttribute('data-' + generateDataName(name));
+	};
+
+	setData = function(element, name, value) {
+		element.setAttribute('data-' + generateDataName(name), value);
+	};
+}
+else {
+	getData = function(element, name) {
+		return element.dataset[name];
+	};
+
+	setData = function(element, name, value) {
+		element.dataset[name] = value;
+	};
+}
+
+_utils.getData = getData;
+_utils.setData = setData;
+
+
+// resize listener
+
+var resizeListenerElements = [];
+var resizeListenerData = [];
+var resizeListenerTimer;
+
+var checkResize = function() {
+	for (var i = 0, leni = resizeListenerElements.length; i < leni; i++) {
+		var element = resizeListenerElements[i];
+		var lastSize = resizeListenerData[i].lastSize;
+		var newWidth = element.offsetWidth;
+		var newHeight = element.offsetHeight;
+		if (lastSize === undefined || lastSize[0] != newWidth || lastSize[1] != newHeight) {
+			triggerEvent(element, 'resized', [newWidth, newHeight]);
+		}
+		lastSize = [newWidth, newHeight];
+		resizeListenerData[i].lastSize = lastSize;
+	}
+};
+
+bindEvent(window, 'resize', checkResize);
+
+function ResizeListener(element) {
+	if (resizeListenerTimer === undefined) {
+		resizeListenerTimer = setInterval(checkResize, 250);
+	}
+
+	resizeListenerElements.push(element);
+	resizeListenerData.push({});
+
+	this.cancel = function() {
+		var idx = resizeListenerElements.indexOf(element);
+		if (idx > -1) {
+			resizeListenerElements.splice(idx, 1);
+			resizeListenerData.splice(idx, 1);
+		}
+		if (resizeListenerElements.length === 0 && resizeListenerTimer) {
+			clearInterval(resizeListenerTimer);
+			resizeListenerTimer = undefined;
+		}
+	};
+}
+
+var getViewportSize = function() {
+	var w = window;
+	var d = document;
+	var e = d.documentElement;
+	var g = d.getElementsByTagName('body')[0];
+	var x = w.innerWidth || e.clientWidth || g.clientWidth;
+	var y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+	return [x, y];
+};
+
+
+window._utils.ResizeListener = ResizeListener;
+window._utils.getViewportSize = getViewportSize;
+
+
+// scroll
+var findVerticalPos = function(element) {
+	var curtop = 0;
+	do {
+		curtop += element.offsetTop || 0;
+		element = element.offsetParent;
+	} while(element);
+	return curtop;
+};
+
+var scrollToElement = function(element) {
+	if (window.scroll) {
+		var posOffset = 0;
+		if (window.innerHeight !== undefined) {
+			posOffset = window.innerHeight / 2;
+		}
+		window.scroll(0, Math.max(window.findVerticalPos(element) - posOffset, 0));
+	}
+};
+
+var getScroll = function(){
+	if(window.pageYOffset !== undefined){
+		return [pageXOffset, pageYOffset];
+	}
+	else {
+		var sx, sy;
+		var d = document.documentElement;
+		var b = document.body;
+		sx = d.scrollLeft || b.scrollLeft || 0;
+		sy = d.scrollTop || b.scrollTop || 0;
+		return [sx, sy];
+	}
+};
+
+window._utils.findVerticalPos = findVerticalPos;
+window._utils.scrollToElement = scrollToElement;
+window._utils.getScroll = getScroll;
+
+
+// debounce
+var debounce = function(fn, delay) {
+	var timer = null;
+	return function () {
+		var context = this, args = arguments;
+		clearTimeout(timer);
+		timer = setTimeout(function () {
+			fn.apply(context, args);
+		}, delay);
+	};
+};
+
+window._utils.debounce = debounce;
+
+
+// script loader
+
+var loaderJs = (function () {
+	var head = document.getElementsByTagName('head')[0];
+	var loadedPaths = [];
+	var registeredPaths = [];
+	var waitingCallbacks = [];
+
+	var scriptIsReady = function(state) {
+		return (state === 'loaded' || state === 'complete' || state === 'uninitialized' || !state);
+	};
+
+	var fireCallbacks = function() {
+		var firedCallbacks = [];
+		forEach(waitingCallbacks, function(callback, i) {
+			var fn = callback[0];
+			var paths = callback[1];
+			if (every(paths, function(path) { return loadedPaths.indexOf(path) !== -1; })) {
+				firedCallbacks.push(i);
+				fn();
+			}
+		});
+		firedCallbacks.reverse();
+		for (var i = 0; i < firedCallbacks.length; ++i) {
+			waitingCallbacks.splice(firedCallbacks[i], 1);
+		}
+	};
+
+	return function(paths, callback) {
+		var missingPaths = [];
+
+		forEach(paths, function(path) {
+			if (registeredPaths.indexOf(path) === -1) {
+				missingPaths.push(path);
+				registeredPaths.push(path);
+			}
+		});
+
+		waitingCallbacks.push([callback, paths]);
+
+		forEach(missingPaths, function(path) {
+			var script = document.createElement('SCRIPT');
+			script.src = path;
+			script.onreadystatechange = script.onload = function(path) {
+				return function() {
+					if (scriptIsReady(script.readyState)) {
+						loadedPaths.push(path);
+						setTimeout(fireCallbacks, 0);
+					}
+				};
+			}(path);
+			head.appendChild(script);
+		});
+
+		setTimeout(fireCallbacks, 0);
+	};
+}());
+
+window._utils.loaderJs = loaderJs;
+
+var execEmbeddedScripts = function(element) {
+	var flatNodesList = [];
+	var flatNodes = function(root) {
+		flatNodesList.push(root);
+		if (root.childNodes) {
+			forEach(root.childNodes, flatNodes);
+		}
+	};
+	flatNodes(element);
+
+	forEach(flatNodesList, function(element) {
+		if (element.nodeName && element.nodeName.toUpperCase() === 'SCRIPT') {
+			var type = element.getAttribute('type');
+			if (!type || type.toLowerCase() === 'text/javascript') {
+				var scriptData = (element.text || element.textContent || element.innerHTML || "" );
+				eval(scriptData); // jshint ignore:line
+			}
+		}
+	});
+};
+
+window._utils.execEmbeddedScripts = execEmbeddedScripts;
+
+
+// forms
+
+var serializeForm = function(formElement, options) {
+	var q = [];
+	var o = {raw: false};
+	if (options) {
+		for (var k in options) { if (options.hasOwnProperty(k)) o[k] = options[k]; }
+	}
+	var raw = o.raw;
+	var addParameter;
+	if (raw) {
+		addParameter = function(name, value) {
+			q.push([name, value]);
+		};
+	}
+	else {
+		addParameter = function(name, value) {
+			q.push(name + '=' + encodeURIComponent(value));
+		};
+	}
+
+	var elements = formElement.elements;
+	_utils.forEach(elements, function(element) {
+		if (element.name === '' || element.disabled) {
+			return;
+		}
+
+		switch (element.nodeName.toLowerCase()) {
+			case 'input':
+				switch (element.type) {
+					case 'text':
+					case 'hidden':
+					case 'password':
+					case 'button':
+					case 'number':
+					case 'email':
+						addParameter(element.name, element.value);
+						break;
+					case 'checkbox':
+					case 'radio':
+						if (element.checked) {
+							addParameter(element.name, element.value);
+						}
+						break;
+					case 'file':
+					case 'reset':
+					case 'submit':
+						break;
+				}
+				break;
+			case 'textarea':
+				addParameter(element.name, element.value);
+				break;
+			case 'select':
+				switch (element.type) {
+					case 'select-one':
+						addParameter(element.name, element.value);
+						break;
+					case 'select-multiple':
+						_utils.forEach(formElement.options, function(option) {
+							if (option.selected) {
+								addParameter(element.name, option.value);
+							}
+						});
+						break;
+				}
+				break;
+			case 'button':
+				break;
+		}
+	});
+
+	if (raw) {
+		return q;
+	}
+	else {
+		return q.join('&');
+	}
+};
+
+var getUrlParameterByName = function(name, url) {
+	var location = url || window.location;
+	var nameReg = nameReg.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+	var regex = new RegExp("[\\?&]" + nameReg + "=([^&#]*)");
+	var results = regex.exec(location);
+	return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, " "));
+};
+
+window._utils.serializeForm = serializeForm;
+window._utils.getUrlParameterByName = getUrlParameterByName;
+
+
+if (!Function.prototype.bind) {
+	Function.prototype.bind=function(b){if(typeof this!=="function"){throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");}function c(){}var a=[].slice,f=a.call(arguments,1),e=this,d=function(){return e.apply(this instanceof c?this:b||window,f.concat(a.call(arguments)));};c.prototype=this.prototype;d.prototype=new c();return d;}; // jshint ignore:line
+}
+
 }());
