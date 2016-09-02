@@ -14,7 +14,7 @@ var runable = function(runElement) {
 
 	var runnableBlock = _.elem('DIV', {'class': 'runnable-block'});
 	var actions = _.elem('DIV', {'class': 'actions'});
-	var run = _.elem('A', {'class': 'run', 'href': '#', 'title': 'run'}, 'Run');
+	var run = _.elem('A', {'class': 'action-run', 'href': '#', 'title': 'Run'}, 'Run');
 	var scriptOutput = _.elem('PRE', {'class': 'output'});
 	scriptOutput.style.display = 'none';
 	_.insertAfter(runnableBlock, runElement);

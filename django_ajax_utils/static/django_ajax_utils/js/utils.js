@@ -40,7 +40,13 @@ var checkFeatures = function(features) {
 			case "ajax":
 				return window.XMLHttpRequest !== undefined;
 			case "history_push":
-				return window.history && window.history.pushState;
+				if (window.history && window.history.pushState) {
+					return true;
+				}
+				else {
+					return false;
+				}
+				break;
 			case "touch":
 				return "ontouchstart" in window;
 			default:
@@ -238,11 +244,23 @@ var triggerLoad = function(element) {
 	window._utils.triggerEvent(document.body, 'contentloaded', element);
 };
 
+var unbindOnLoad = function(callback) {
+	if (document.body) {
+		window._utils.unbindEvent(document.body, 'contentloaded', callback);
+	}
+	else {
+		document.addEventListener("DOMContentLoaded", function(event) {
+			window._utils.unbindEvent(document.body, 'contentloaded', callback);
+		});
+	}
+};
+
 window._utils.triggerEvent = triggerEvent;
 window._utils.bindEvent = bindEvent;
 window._utils.unbindEvent = unbindEvent;
 window._utils.onLoad = onLoad;
 window._utils.triggerLoad = triggerLoad;
+window._utils.unbindOnLoad = unbindOnLoad;
 
 // dom
 var el = document.createElement('DIV');

@@ -10,9 +10,11 @@
 <p><code>_.has</code> (replacement for <code>Object.prototype.hasOwnProperty)</code>:</p>
 
 <pre class="run">
-var obj = {'property': true};
+var obj = {'property': true, 'hasOwnProperty': function() { return  true }};
 
-dumpVar(_.has(obj, 'property'));
+dumpVar(_.has(obj, 'property')); // has property
+dumpVar(_.has(obj, 'notExisting')); // not existing property
+dumpVar(obj.hasOwnProperty('notExisting')); // wrong
 </pre>
 
 <p><code>_.isEqual</code></p>
@@ -22,8 +24,8 @@ var a = {'prop': 'x'};
 var b = {'prop': 'y'};
 var aCopy = {'prop': 'x'};
 
-dumpVar(_.isEqual(a, b));
-dumpVar(_.isEqual(a, aCopy));
+dumpVar(_.isEqual(a, b)); // not equal
+dumpVar(_.isEqual(a, aCopy)); // equal
 </pre>
 
 <p><code>_.deepCopy</code></p>
@@ -44,6 +46,93 @@ var b = _.lightCopy(a);
 
 dumpVar(a === b); // a is not same object as b
 dumpVar(a.prop === b.prop); // properties are same
+</pre>
+
+<p><code>_.checkFeatures</code></p>
+
+<pre class="run">
+dumpVar(_.checkFeatures(['ajax']));
+dumpVar(_.checkFeatures(['history_push']));
+dumpVar(_.checkFeatures(['touch']));
+</pre>
+
+<h2>Cookies</h2>
+
+<pre class="run">
+_.setCookie('time', new Date().getTime()); // session cookie
+// _.setCookie('time', new Date().getTime(), 7); - expires in 7 days
+dumpVar(_.getCookie('time'));
+</pre>
+
+<h2>Iteration</h2>
+
+<p><code>forEach</code></p>
+
+<pre class="run">
+var a = [1, 2, 3];
+_.forEach(a, function(element, idx) { dumpVar(element); });
+
+// works with HTMLCollection
+_.forEach(document.getElementsByClassName('run'), function(element, idx) { dumpVar(element.textContent.length); });
+</pre>
+
+<p><code>map</code></p>
+
+<pre class="run">
+var a = [1, 2, 3, 4];
+dumpVar(_.map(a, function(x) { return x*x; }));
+</pre>
+
+<p><code>some</code></p>
+
+<pre class="run">
+var a = [1, 2, 3, 4];
+_.some(a, function(x) { dumpVar(x); return x == 2; /* break on 2 */ });
+</pre>
+
+<p><code>every</code></p>
+
+<pre class="run">
+var a = [1, 2, 3, 4];
+_.every(a, function(x) { dumpVar(x); return x != 2; /* break on 2 */ });
+</pre>
+
+<p><code>filter</code></p>
+
+<pre class="run">
+var a = ['', 'test', '', 'test2'];
+dumpVar(_.filter(a, function(x) { return x.length; /* not empty strings */ }));
+</pre>
+
+<h2>Events</h2>
+
+<p><code>bindEvent</code>, <code>triggerEvent</code>, <code>unbindEvent</code></p>
+
+<pre class="run">
+var onCustomEvent = function(event) {
+	dumpVar(event.memo);
+}
+
+var element = document.createElement('DIV');
+
+_.bindEvent(element, "custom", onCustomEvent);
+_.triggerEvent(element, "custom", "Custom element triggered");
+_.unbindEvent(element, onCustomEvent);
+</pre>
+
+<p><code>onLoad</code>, <code>triggerLoad</code>, <code>unbindOnLoad</code></p>
+
+<pre class="run">
+var onLoad = function(event) {
+	dumpVar(event.memo.tagName); // event.memo == loaded element
+};
+
+_.onLoad(onLoad);
+
+var dynamicElement = document.createElement('DIV');
+document.body.appendChild(dynamicElement);
+_.triggerLoad(dynamicElement); // call for dynamic created element
+_.unbindOnLoad(onLoad);
 </pre>
 
 {% endblock %}

@@ -86,12 +86,12 @@ code {
 	right: 8px;
 }
 
-.runnable-block .actions .run {
+.runnable-block .actions .action-run {
 	overflow: hidden;
 	text-indent: 9999px;
 }
 
-.runnable-block .actions .run:before {
+.runnable-block .actions .action-run:before {
 	content: '▶';
 	display: block;
 	float: right;
