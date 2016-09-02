@@ -7,12 +7,43 @@
 
 <h2>Misc</h2>
 
-<p>Has property (replacement for <code>Object.prototype.hasOwnProperty)</code>:</p>
+<p><code>_.has</code> (replacement for <code>Object.prototype.hasOwnProperty)</code>:</p>
 
 <pre class="run">
 var obj = {'property': true};
 
 dumpVar(_.has(obj, 'property'));
+</pre>
+
+<p><code>_.isEqual</code></p>
+
+<pre class="run">
+var a = {'prop': 'x'};
+var b = {'prop': 'y'};
+var aCopy = {'prop': 'x'};
+
+dumpVar(_.isEqual(a, b));
+dumpVar(_.isEqual(a, aCopy));
+</pre>
+
+<p><code>_.deepCopy</code></p>
+
+<pre class="run">
+var a = {'prop': {}};
+var b = _.deepCopy(a);
+
+dumpVar(a === b); // a is not same object as b
+dumpVar(a.prop === b.prop); // properties are not same
+</pre>
+
+<p><code>_.lightCopy</code></p>
+
+<pre class="run">
+var a = {'prop': {}};
+var b = _.lightCopy(a);
+
+dumpVar(a === b); // a is not same object as b
+dumpVar(a.prop === b.prop); // properties are same
 </pre>
 
 {% endblock %}

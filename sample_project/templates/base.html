@@ -9,15 +9,17 @@
 </head>
 <body>
 	{% block body %}
-		<h1>{% block site_title %}title{% endblock %}</h1>
-		{% block content %}
-		{% endblock %}
+		<div class="wrap">
+			<h1>{% block site_title %}title{% endblock %}</h1>
+			{% block content %}
+			{% endblock %}
+		</div>
 	{% endblock %}
 
 	<script src="{% static "django_ajax_utils/js/utils.js" %}"></script>
 	<script src="{% static "django_ajax_utils/js/utils_ajax.js" %}"></script>
 	<script src="{% static "django_ajax_utils/js/reactor.js" %}"></script>
-	<script src="{% static "django_ajax_utils/js/run_utils.js" %}"></script>
+	<script src="{% static "js/run_utils.js" %}"></script>
 
 	{% block extrajs %}
 	{% endblock %}
