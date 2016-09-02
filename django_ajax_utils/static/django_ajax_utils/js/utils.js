@@ -322,6 +322,29 @@ else {
 	};
 }
 
+var getElementById = function(parent, id) {
+	if (id === undefined) {
+		return document.getElementById(parent);
+	}
+	else {
+		var element = document.getElementById(id);
+		if (isParentOf(element, parent)) {
+			return element;
+		}
+		else {
+			return null;
+		}
+	}
+};
+
+var getElementsByTagName = function(parent, tag) {
+	if (tag === undefined) {
+		tag = parent;
+		parent = document.body;
+	}
+	return parent.getElementsByTagName(tag);
+};
+
 var getElementsByClassName;
 if (el.getElementsByClassName === undefined) {
 	getElementsByClassName = function(parent, cls) {
@@ -348,29 +371,6 @@ else {
 		return parent.getElementsByClassName(cls);
 	};
 }
-
-var getElementsByTagName = function(parent, tag) {
-	if (tag === undefined) {
-		tag = parent;
-		parent = document.body;
-	}
-	return parent.getElementsByTagName(tag);
-};
-
-var getElementById = function(parent, id) {
-	if (id === undefined) {
-		return document.getElementById(parent);
-	}
-	else {
-		var element = document.getElementById(id);
-		if (isParentOf(element, parent)) {
-			return element;
-		}
-		else {
-			return null;
-		}
-	}
-};
 
 var isNode = function(o) {
 	return (
@@ -443,9 +443,9 @@ window._utils.hasClass = hasClass;
 window._utils.addClass = addClass;
 window._utils.removeClass = removeClass;
 window._utils.toggleClass = toggleClass;
-window._utils.cls = getElementsByClassName;
+window._utils.id = getElementById;
 window._utils.tag = getElementsByTagName;
-window._utils.id = function(id) { return document.getElementById(id); };
+window._utils.cls = getElementsByClassName;
 window._utils.isNode = isNode;
 window._utils.isElement = isElement;
 window._utils.isParentOf = isParentOf;

@@ -66,7 +66,7 @@ dumpVar(_.getCookie('time'));
 
 <h2>Iteration</h2>
 
-<p><code>forEach</code></p>
+<p><code>_.forEach</code></p>
 
 <pre class="run">
 var a = [1, 2, 3];
@@ -76,28 +76,28 @@ _.forEach(a, function(element, idx) { dumpVar(element); });
 _.forEach(document.getElementsByClassName('run'), function(element, idx) { dumpVar(element.textContent.length); });
 </pre>
 
-<p><code>map</code></p>
+<p><code>_.map</code></p>
 
 <pre class="run">
 var a = [1, 2, 3, 4];
 dumpVar(_.map(a, function(x) { return x*x; }));
 </pre>
 
-<p><code>some</code></p>
+<p><code>_.some</code></p>
 
 <pre class="run">
 var a = [1, 2, 3, 4];
 _.some(a, function(x) { dumpVar(x); return x == 2; /* break on 2 */ });
 </pre>
 
-<p><code>every</code></p>
+<p><code>_.every</code></p>
 
 <pre class="run">
 var a = [1, 2, 3, 4];
 _.every(a, function(x) { dumpVar(x); return x != 2; /* break on 2 */ });
 </pre>
 
-<p><code>filter</code></p>
+<p><code>_.filter</code></p>
 
 <pre class="run">
 var a = ['', 'test', '', 'test2'];
@@ -106,7 +106,7 @@ dumpVar(_.filter(a, function(x) { return x.length; /* not empty strings */ }));
 
 <h2>Events</h2>
 
-<p><code>bindEvent</code>, <code>triggerEvent</code>, <code>unbindEvent</code></p>
+<p><code>_.bindEvent</code>, <code>_.triggerEvent</code>, <code>_.unbindEvent</code></p>
 
 <pre class="run">
 var onCustomEvent = function(event) {
@@ -120,7 +120,7 @@ _.triggerEvent(element, "custom", "Custom element triggered");
 _.unbindEvent(element, onCustomEvent);
 </pre>
 
-<p><code>onLoad</code>, <code>triggerLoad</code>, <code>unbindOnLoad</code></p>
+<p><code>_.onLoad</code>, <code>_.triggerLoad</code>, <code>_.unbindOnLoad</code></p>
 
 <pre class="run">
 var onLoad = function(event) {
@@ -133,6 +133,118 @@ var dynamicElement = document.createElement('DIV');
 document.body.appendChild(dynamicElement);
 _.triggerLoad(dynamicElement); // call for dynamic created element
 _.unbindOnLoad(onLoad);
+</pre>
+
+<h2>DOM</h2>
+
+<p><code>_.escapeHTML</code></p>
+
+<pre class="run">
+dumpVar(_.escapeHTML('&amp;&lt;&gt;&quot;\''));
+</pre>
+
+<p><code>_.hasClass</code>, <code>_.addClass</code>, <code>_.removeClass</code>, <code>_.toggleClass</code></p>
+
+<pre class="run">
+var element = document.createElement('DIV');
+
+_.addClass(element, 'klass');
+dumpVar(_.hasClass(element, 'klass'));
+_.removeClass(element, 'klass');
+dumpVar(_.hasClass(element, 'klass'));
+_.toggleClass(element, 'klass');
+dumpVar(_.hasClass(element, 'klass'));
+</pre>
+
+<p><code>_.id</code></p>
+
+<pre class="run">
+var element = document.createElement('ARTICLE');
+element.setAttribute('id', 'test');
+document.body.appendChild(element);
+
+dumpVar(_.id('test').tagName);
+
+document.body.removeChild(element);
+
+dumpVar(_.id('test'));
+</pre>
+
+<p><code>_.cls</code></p>
+
+<pre class="run">
+var a1 = document.createElement('ARTICLE');
+var a2 = document.createElement('NAV');
+_.addClass(a1, 'testclass');
+_.addClass(a2, 'testclass');
+document.body.appendChild(a1);
+document.body.appendChild(a2);
+
+_.forEach(_.cls(document.body, 'testclass'), function(element) {
+	dumpVar(element.tagName);
+});
+
+_.forEach(_.cls('testclass'), function(element) { // parent not required
+	dumpVar(element.tagName);
+});
+
+document.body.removeChild(a1);
+document.body.removeChild(a2);
+</pre>
+
+<p><code>_.tag</code></p>
+
+<pre class="run">
+dumpVar(_.tag(document.body, 'PRE').length);
+dumpVar(_.tag('PRE').length); // parent not required
+</pre>
+
+<p><code>_.isNode</code>, <code>_.isElement</code>, <code>_.isParentOf</code></p>
+
+<pre class="run">
+var node = document.createTextNode('...');
+var element = document.createElement('DIV');
+
+dumpVar(_.isNode(node));
+dumpVar(_.isNode(element));
+dumpVar(_.isElement(node));
+dumpVar(_.isElement(element));
+</pre>
+
+<p><code>_.isParentOf</code>, <code>_.findParent</code>, <code>_.findParentByCls</code></p>
+
+<pre class="run">
+var parent = document.createElement('DIV');
+parent.className = 'parent';
+var child = document.createElement('DIV');
+child.className = 'child';
+parent.appendChild(child);
+
+dumpVar(_.isParentOf(child, parent));
+dumpVar(_.findParent(child, function(element) { return _.hasClass(element, 'parent'); }).className);
+dumpVar(_.findParentByCls(child, 'parent').className);
+</pre>
+
+<p><code>_.elem</code></p>
+
+<pre class="run">
+var element = _.elem('A', {'href': '#', 'class': 'link'}, 'Link text');
+dumpVar(element.innerHTML);
+</pre>
+
+<p><code>_.insertAfter</code></p>
+
+<pre class="run">
+var parent = _.elem('UL');
+var i1 = _.elem('LI', undefined, "Text");
+var i2 = _.elem('LI', undefined, "Text2");
+parent.appendChild(i1);
+parent.appendChild(i2);
+
+var between = _.elem('LI', undefined, "Between");
+_.insertAfter(between, i1);
+
+dumpVar(parent.childNodes[1].innerHTML);
 </pre>
 
 {% endblock %}
