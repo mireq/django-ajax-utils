@@ -95,6 +95,7 @@ pre {
 	color: #444;
 	padding: 16px;
 	border-radius: 3px;
+	overflow-x: scroll;
 }
 
 pre.output {
@@ -119,13 +120,11 @@ code {
 }
 
 .runnable-block .actions .action-run {
-	overflow: hidden;
-	text-indent: 9999px;
+	color: #888;
+	text-decoration: none;
 }
 
-.runnable-block .actions .action-run:before {
-	content: '▶';
-	display: block;
-	float: right;
-	color: #888;
+.runnable-block .actions .action-run:hover {
+	color: #6b8fc7;
+	text-decoration: none;
 }

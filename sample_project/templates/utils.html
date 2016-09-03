@@ -116,7 +116,7 @@ var onCustomEvent = function(event) {
 var element = document.createElement('DIV');
 
 _.bindEvent(element, "custom", onCustomEvent);
-_.triggerEvent(element, "custom", "Custom element triggered");
+_.triggerEvent(element, "custom", "Custom event triggered");
 _.unbindEvent(element, onCustomEvent);
 </pre>
 
