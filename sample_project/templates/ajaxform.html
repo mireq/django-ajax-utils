@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block head_title %}Ajax form{% endblock %}
+{% block site_title %}Ajax form{% endblock %}
+
+{% block content %}
+	<form action="{{ request.path }}" method="post">
+		{% csrf_token %}
+		{% include "includes/form_loop.html" %}
+		<div class="submit-row">
+			<div class="positive">
+				<button type="submit">Save</button>
+			</div>
+		</div>
+	</form>
+{% endblock %}

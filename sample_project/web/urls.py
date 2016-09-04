@@ -9,4 +9,5 @@ from . import views
 urlpatterns = [
 	url(r'^$', views.home, name='home'),
 	url(r'^utils/$', views.utils, name='utils'),
+	url(r'^ajaxform/$', views.ajaxform, name='ajaxform'),
 ]

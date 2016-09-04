@@ -4,14 +4,11 @@ body, html {
 	font-size: 16px;
 	margin: 0;
 	padding: 0;
+	font-family: sans-serif;
 }
 
 .wrap {
 	padding: 8px 16px;
-}
-
-p, h1, h2, h3, h4, h5, h6 {
-	font-family: "DejaVu Sans",Arial,sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -63,13 +60,15 @@ textarea {
 	padding: 8px 10px;
 	display: block;
 	border: 1px solid #ccc;
-	box-shadow: inset 0 1px 3px #eee;
-	border-radius: 4px;
+	color: #333;
+	border: 1px solid #e6e6e6;
+	box-shadow: inset 0 1px 3px #f6f6f6;
+	border-radius: 0px;
 	vertical-align: middle;
 	box-sizing: border-box;
 	margin: 4px 0;
-	box-sizing: border-box;
 	width: 100%;
+	margin-bottom: 8px;
 }
 
 input[type="text"]:focus,
@@ -109,6 +108,72 @@ pre.output {
 code {
 	font-family: monospace;
 	color: #822;
+}
+
+form {
+	padding: 0;
+	margin: 8px -16px;
+	border-top: 1px solid #ededed;
+	border-bottom: 1px solid #ededed;
+	background: #fcfcfc;
+}
+
+button {
+	box-shadow: inset 0px 1px 0px 0px #b5c7e3;
+	background: linear-gradient(to bottom, #6b8fc7 5%, #6489c4 100%);
+	border: 1px solid #4673b9;
+	background-color: #6b8fc7;
+	padding: 8px 16px;
+	margin: 0 0 8px 0;
+	line-height: 1.4;
+	color: white;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+button::-moz-focus-inner {
+	padding: 0;
+	border: 0
+}
+
+.form-row {
+	overflow: hidden;
+	padding: 8px 16px;
+	margin: 0;
+}
+
+.form-row.has-errors input[type="text"],
+.form-row.has-errors input[type="password"],
+.form-row.has-errors select,
+.form-row.has-errors textarea {
+	border-color: #ee5555;
+}
+
+.errors {
+	list-style: none;
+	padding: 8px 16px;
+	border-top: 1px solid #ffd9d9;
+	border-bottom: 1px solid #ffd9d9;
+	color: maroon;
+	background: #ffe6e6;
+	margin-bottom: -1px;
+}
+
+.form-row.errors {
+	margin: 0 -16px;
+}
+
+.submit-row {
+	padding: 16px 16px 8px 16px;
+	margin: 0 0 -8px 0;
+	overflow: hidden;
+	background: white;
+	border-top: 1px solid #ededed;
+	border-bottom: 1px solid #ededed;
+}
+
+.submit-row .positive {
+	float: right;
 }
 
 .runnable-block {
