@@ -138,7 +138,7 @@ button::-moz-focus-inner {
 
 .form-row {
 	overflow: hidden;
-	padding: 8px 16px;
+	padding: 16px;
 	margin: 0;
 }
 
@@ -151,7 +151,7 @@ button::-moz-focus-inner {
 
 .errors {
 	list-style: none;
-	padding: 8px 16px;
+	padding: 16px;
 	border-top: 1px solid #ffd9d9;
 	border-bottom: 1px solid #ffd9d9;
 	color: maroon;
@@ -159,7 +159,7 @@ button::-moz-focus-inner {
 	margin-bottom: -1px;
 }
 
-.form-row.errors {
+.form-row .errors {
 	margin: 0 -16px;
 }
 
