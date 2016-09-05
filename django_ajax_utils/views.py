@@ -102,15 +102,21 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 		if isinstance(form, forms.BaseFormSet):
 			add_formset_status(form)
 		else:
-			form_data['valid'] = self.__format_valid_fields(form, form_data)
+			form_data.update(self.__format_fields_status(form, form_data))
 		return form_data
 
-	def __format_valid_fields(self, form, form_data):
+	def __format_fields_status(self, form, form_data):
 		valid = []
+		empty = []
 		if hasattr(form, 'cleaned_data'):
 			for name, field in form.fields.items():
 				fieldname = form[name].id_for_label
+				if field.widget.value_from_datadict(form.data, form.files, form.add_prefix(name)) in field.empty_values:
+					empty.append(fieldname)
 				if fieldname in form_data['errors'] or not name in form.cleaned_data or form.cleaned_data[name] in field.empty_values:
 					continue
 				valid.append(fieldname)
-		return valid
+		return {
+			'valid': valid,
+			'empty': empty,
+		}

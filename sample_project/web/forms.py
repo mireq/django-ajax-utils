@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.core import validators
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -18,7 +19,7 @@ class PasswordInput(forms.PasswordInput):
 
 class SignupForm(forms.Form):
 	username = forms.CharField(label=_("Username"), widget=TextInput)
-	password1 = forms.CharField(label=_("Password"), widget=PasswordInput)
+	password1 = forms.CharField(label=_("Password"), widget=PasswordInput, validators=[validators.MinLengthValidator(3)])
 	password2 = forms.CharField(label=_("Password confirmation"), widget=PasswordInput)
 
 	def clean(self):

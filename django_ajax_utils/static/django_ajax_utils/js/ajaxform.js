@@ -70,6 +70,7 @@ var submitDisabler = function(formElement) {
 
 var ajaxform = function(formElement, options) {
 	var self = {};
+	var preserveErrors = {__all__: true};
 	var clickedButton;
 	var o = _.lightCopy(options);
 	self.options = o;
@@ -113,7 +114,7 @@ var ajaxform = function(formElement, options) {
 		}
 	});
 
-	var processFormSubmit = function(data) {
+	var processFormSubmit = function(data, event, opts) {
 		var key;
 
 		o.processDataExtra(data, formElement, o.formName);
@@ -145,8 +146,16 @@ var ajaxform = function(formElement, options) {
 			var formData = data.forms[o.formName];
 			o.processFormStatusExtra(formElement, formData, o.formName);
 
+			if (!opts.onlyValidate) {
+				preserveErrors = {__all__: true};
+			}
+
 			for (key in formData.errors) {
 				if (_.has(formData.errors, key)) {
+					if (opts.onlyValidate && !preserveErrors[key] && formData.empty.indexOf(key) !== -1) {
+						continue;
+					}
+
 					var errorList = formData.errors[key];
 					var errorsElement = _.elem('ul', {'class': 'errors'});
 					if (_.has(errorContainers, key)) {
@@ -159,6 +168,7 @@ var ajaxform = function(formElement, options) {
 						errorsElement.appendChild(_.elem('li', {}, error.message));
 					});
 
+					preserveErrors[key] = true;
 					row = _.findParent(errorsElement, checkFormRow);
 					if (row !== null) {
 						_.removeClass(row, 'no-errors');
@@ -243,14 +253,14 @@ var ajaxform = function(formElement, options) {
 				if (!opts.onlyValidate) {
 					disabler.enable();
 				}
-				processFormSubmit(data, event);
+				processFormSubmit(data, event, opts);
 			},
 			failFn: function(req) {
 				if (!opts.onlyValidate) {
 					disabler.enable();
 				}
 				_.triggerEvent(formElement, 'submit_fail');
-				ajaxForwardError(req);
+				_.ajaxForwardError(req);
 			}
 		});
 	};

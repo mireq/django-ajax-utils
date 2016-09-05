@@ -83,6 +83,11 @@ label {
 	margin: 8px 0 3px;
 }
 
+.required label:after {
+	content: "*";
+	color: red;
+}
+
 fieldset {
 	margin: 0;
 	padding: 5px 0 12px;
