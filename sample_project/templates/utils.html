@@ -104,6 +104,13 @@ var a = ['', 'test', '', 'test2'];
 dumpVar(_.filter(a, function(x) { return x.length; /* not empty strings */ }));
 </pre>
 
+<p><code>_.keys</code></p>
+
+<pre class="run">
+var dct = { key: 'value', key2: 'value'};
+dumpVar(_.keys(dct));
+</pre>
+
 <h2>Events</h2>
 
 <p><code>_.bindEvent</code>, <code>_.triggerEvent</code>, <code>_.unbindEvent</code></p>

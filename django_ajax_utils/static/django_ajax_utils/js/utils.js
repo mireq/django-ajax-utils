@@ -178,11 +178,22 @@ var filter = function(array, fun) {
 	}
 };
 
+var keys = function(dct) {
+	var keys = [];
+	for (var key in dct) {
+		if (has(dct, key)) {
+			keys.push(key);
+		}
+	}
+	return keys;
+};
+
 window._utils.forEach = forEach;
 window._utils.map = map;
 window._utils.some = some;
 window._utils.every = every;
 window._utils.filter = filter;
+window._utils.keys = keys;
 
 
 // events
