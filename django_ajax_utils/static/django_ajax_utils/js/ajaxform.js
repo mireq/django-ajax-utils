@@ -1,5 +1,8 @@
 (function(_) {
 
+"use strict";
+
+/* jshint loopfunc:true */
 
 var submitDisabler = function(formElement) {
 	var self = {};
@@ -74,6 +77,7 @@ var ajaxform = function(formElement, options) {
 	o.processFormStatusExtra = o.processFormStatusExtra || function(form, data, ajaxform) {}; // for captcha and etc.
 	o.nonFieldErrorsClass = o.nonFieldErrorsClass || _.getData(formElement, 'nonFieldErrorsClass') || 'non-field-errors';
 	o.fieldErrorsClass = o.fieldErrorsClass || _.getData(formElement, 'fieldErrorsClass') || 'field-errors';
+	o.rowClass = o.rowClass || _.getData(formElement, 'rowClass') || 'form-row';
 	o.formName = o.formName || _.getData(formElement, 'formName') || 'form';
 	o.onlyValidateField = o.onlyValidateField || _.getData(formElement, 'onlyValidateField') || 'only_validate';
 	if (!_.has(o, 'liveValidate')) {
@@ -84,6 +88,92 @@ var ajaxform = function(formElement, options) {
 			o.liveValidate = true;
 		}
 	}
+
+	var errorContainers = {};
+	errorContainers.__all__ = _.cls(formElement, o.nonFieldErrorsClass)[0];
+	if (!errorContainers.__all__) {
+		errorContainers.__all__ = _.elem('div', {'class': o.nonFieldErrorsClass});
+		if (formElement.childNodes.length) {
+			formElement.insertBefore(errorContainers.__all__, formElement.childNodes[0]);
+		}
+		else {
+			formElement.appendChild(errorContainers.__all__);
+		}
+	}
+	_.forEach(_.cls(formElement, 'field-errors'), function(element) {
+		var id = element.getAttribute('id');
+		if (id === null) {
+			return;
+		}
+		var idPrefix = id.substr(0, 3);
+		var idSuffix = id.substr(id.length - 7, 7);
+		if (idPrefix === "id_" && idSuffix === "_errors") {
+			var elementName = id.substr(0, id.length - 7);
+			errorContainers[elementName] = element;
+		}
+	});
+
+	var processFormSubmit = function(data) {
+		var key;
+
+		o.processDataExtra(data, formElement, o.formName);
+		if (_.has(data, 'redirect')) {
+			_.triggerEvent(formElement, 'submit_success');
+			if (_.has(_, 'loadPjax')) {
+				_.loadPjax(data.redirect);
+			}
+			else {
+				window.location = data.redirect;
+			}
+		}
+		else if (_.has(data, 'forms')) {
+			var row;
+			var checkFormRow = function(element) {
+				return _.hasClass(element, o.rowClass) || element === formElement;
+			};
+			for (key in errorContainers) {
+				if (_.has(errorContainers, key)) {
+					var err = errorContainers[key];
+					err.innerHTML = '';
+					row = _.findParent(err, checkFormRow);
+					if (row !== null) {
+						_.removeClass(row, 'has-errors');
+						_.removeClass(row, 'no-errors');
+					}
+				}
+			}
+			var formData = data.forms[o.formName];
+			o.processFormStatusExtra(formElement, formData, o.formName);
+
+			for (key in formData.errors) {
+				if (_.has(formData.errors, key)) {
+					var errorList = formData.errors[key];
+					var errorsElement = _.elem('ul', {'class': 'errors'});
+					if (_.has(errorContainers, key)) {
+						errorContainers[key].appendChild(errorsElement);
+					}
+					else {
+						errorContainers.__all__.appendChild(errorsElement);
+					}
+					_.forEach(errorList, function(error) {
+						errorsElement.appendChild(_.elem('li', {}, error.message));
+					});
+
+					row = _.findParent(errorsElement, checkFormRow);
+					if (row !== null) {
+						_.removeClass(row, 'no-errors');
+						_.addClass(row, 'has-errors');
+					}
+				}
+			}
+			_.forEach(formData.valid, function(key) {
+				row = _.findParent(errorContainers[key], checkFormRow);
+				if (row !== null) {
+					_.addClass(row, 'no-errors');
+				}
+			});
+		}
+	};
 
 	var formDataToDict = function(formData) {
 		var dct = {};
@@ -124,7 +214,6 @@ var ajaxform = function(formElement, options) {
 		opts.onlyValidate = opts.onlyValidate || false;
 
 		var data = _.serializeForm(formElement);
-		data += '&' + encodeURIComponent(o.onlyValidateField) + '=1';
 		if (opts.onlyValidate) {
 			data += '&' + encodeURIComponent(o.onlyValidateField) + '=1';
 		}

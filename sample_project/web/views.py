@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.core.urlresolvers import reverse
 from django.http.response import HttpResponseRedirect
 from django.views.generic import TemplateView, FormView
 
@@ -13,7 +14,7 @@ class AjaxFormView(AjaxFormMixin, FormView):
 
 	def form_valid(self, form):
 		if not self.only_validate_form:
-			return HttpResponseRedirect(self.request.path)
+			return HttpResponseRedirect(reverse('home'))
 		return super(AjaxFormView, self).form_valid(form)
 
 

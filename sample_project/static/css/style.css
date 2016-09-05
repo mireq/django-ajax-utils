@@ -153,6 +153,13 @@ button:disabled {
 	border-color: #ee5555;
 }
 
+.form-row.no-errors input[type="text"],
+.form-row.no-errors input[type="password"],
+.form-row.no-errors select,
+.form-row.no-errors textarea {
+	border-color: #11aa11;
+}
+
 .errors {
 	list-style: none;
 	padding: 16px;

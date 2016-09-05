@@ -21,7 +21,7 @@
 			{{ field }}
 		</span>
 		{% if field.help_text %}<p class="help">{{ field.field.help_text|safe }}</p>{% endif %}
-		<div class="field-errors">
+		<div class="field-errors" id="{{ field.auto_id }}_errors">
 			{% if field.errors %}
 				<ul class="errors">
 					{% for error in field.errors %}
