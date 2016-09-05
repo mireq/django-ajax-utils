@@ -11,6 +11,8 @@ var ajaxForwardError = function(response) {
 	}
 };
 
+_.ajaxForwardError = ajaxForwardError;
+
 if (window.XMLHttpRequest) {
 	createXMLHttpRequest = function() { return new XMLHttpRequest(); };
 }

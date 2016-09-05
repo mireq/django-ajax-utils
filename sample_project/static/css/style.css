@@ -136,6 +136,10 @@ button::-moz-focus-inner {
 	border: 0
 }
 
+button:disabled {
+	opacity: .5;
+}
+
 .form-row {
 	overflow: hidden;
 	padding: 16px;
