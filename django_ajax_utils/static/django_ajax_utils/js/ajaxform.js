@@ -114,7 +114,7 @@ var ajaxform = function(formElement, options) {
 		}
 	});
 
-	var processFormSubmit = function(data, event, opts) {
+	var processFormSubmit = function(data, event, opts, disabler) {
 		var key;
 
 		o.processDataExtra(data, formElement, o.formName);
@@ -128,6 +128,7 @@ var ajaxform = function(formElement, options) {
 			}
 		}
 		else if (_.has(data, 'forms')) {
+			disabler.enable();
 			var row;
 			var checkFormRow = function(element) {
 				return _.hasClass(element, o.rowClass) || element === formElement;
@@ -250,10 +251,7 @@ var ajaxform = function(formElement, options) {
 			url: url,
 			data: data,
 			successFn: function(data, event) {
-				if (!opts.onlyValidate) {
-					disabler.enable();
-				}
-				processFormSubmit(data, event, opts);
+				processFormSubmit(data, event, opts, disabler);
 			},
 			failFn: function(req) {
 				if (!opts.onlyValidate) {
