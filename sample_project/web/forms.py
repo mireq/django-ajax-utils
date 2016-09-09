@@ -5,6 +5,8 @@ from django import forms
 from django.core import validators
 from django.utils.translation import ugettext_lazy as _
 
+from django_ajax_utils.forms import AutoPlaceholderFormMixin
+
 
 # Hack for disable required html attribute
 class TextInput(forms.TextInput):
@@ -17,7 +19,7 @@ class PasswordInput(forms.PasswordInput):
 		return False
 
 
-class SignupForm(forms.Form):
+class SignupForm(AutoPlaceholderFormMixin, forms.Form):
 	username = forms.CharField(label=_("Username"), widget=TextInput)
 	password1 = forms.CharField(label=_("Password"), widget=PasswordInput, validators=[validators.MinLengthValidator(3)])
 	password2 = forms.CharField(label=_("Password confirmation"), widget=PasswordInput)
