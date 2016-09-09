@@ -279,12 +279,7 @@ var ajaxform = function(formElement, options) {
 	});
 
 	var submits = [];
-	_.forEach(formElement.getElementsByTagName('BUTTON'), function(element) {
-		if (element.getAttribute('type') === 'submit') {
-			submits.push(element);
-		}
-	});
-	_.forEach(formElement.getElementsByTagName('INPUT'), function(element) {
+	_.forEach(formElement.elements, function(element) {
 		if (element.getAttribute('type') === 'submit') {
 			submits.push(element);
 		}
