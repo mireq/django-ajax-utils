@@ -36,5 +36,5 @@ class SetRequiredFieldsMixin(object):
 
 	def __init__(self, *args, **kwargs):
 		super(SetRequiredFieldsMixin, self).__init__(*args, **kwargs)
-		for fieldname, is_required in self.required_fields.iteritems():
+		for fieldname, is_required in self.required_fields.items():
 			self.fields[fieldname].required = is_required
