@@ -38,3 +38,23 @@ class SetRequiredFieldsMixin(object):
 		super(SetRequiredFieldsMixin, self).__init__(*args, **kwargs)
 		for fieldname, is_required in self.required_fields.items():
 			self.fields[fieldname].required = is_required
+
+
+class SetWidgetAttrsMixin(object):
+	"""
+	Overrides widget attributes.
+
+	Example
+
+	class Foo(SetRequiredFieldsMixin, forms.ModelForm):
+		required_fields = {
+			'field1': {'maxlength': '10'},
+		}
+	"""
+
+	widget_attrs = {}
+
+	def __init__(self, *args, **kwargs):
+		super(SetWidgetAttrsMixin, self).__init__(*args, **kwargs)
+		for fieldname, attrs in self.widget_attrs.items():
+			self.fields[fieldname].widget.attrs.update(attrs)
