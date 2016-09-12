@@ -1,0 +1,12 @@
+<div id="messages_container" class="messages-container" data-animate-close="0.5">
+	{% for message in messages %}
+		<div class="message">
+			<div class="alert-box{% if message.tags == "info" %} default{% elif message.tags == "debug" %} secondary{% elif message.tags == "success" %} success {% elif message.tags == "warning" %} warning{% elif message.tags == "error" %} alert{% endif %}">
+				<div class="message-content">
+					{{ message }}
+					<a href="#" aria-hidden="true" class="close-action">&times;</a>
+				</div>
+			</div>
+		</div>
+	{% endfor%}
+</div>

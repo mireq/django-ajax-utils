@@ -211,3 +211,44 @@ button:disabled {
 	color: #6b8fc7;
 	text-decoration: none;
 }
+
+.messages-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+}
+
+.messages-container .message {
+	opacity: 1;
+	transition: all 0.5s;
+}
+
+.messages-container .message.closing {
+	opacity: 0;
+}
+
+.alert-box {
+	padding: 12px;
+	position: relative;
+}
+
+.alert-box.success {
+	border: 1px solid #3a945b;
+	background: #43ac6a;
+	color: white;
+}
+
+.alert-box .close-action {
+	position: absolute;
+	top: 50%;
+	right: 8px;
+	color: #333333;
+	font-size: 120%;
+	line-height: .9;
+	margin-top: -0.5em;
+	opacity: 0.3;
+	padding: 0 6px 4px;
+	text-decoration: none;
+}
+

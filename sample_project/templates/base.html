@@ -8,6 +8,7 @@
 	{% block extrastyle %}{% endblock %}
 </head>
 <body>
+	{% include "partials/messages.html" %}
 	{% block body %}
 		<div class="wrap">
 			<h1>{% block site_title %}title{% endblock %}</h1>
@@ -20,6 +21,7 @@
 	<script src="{% static "django_ajax_utils/js/utils_ajax.js" %}"></script>
 	<script src="{% static "django_ajax_utils/js/reactor.js" %}"></script>
 	<script src="{% static "django_ajax_utils/js/ajaxform.js" %}"></script>
+	<script src="{% static "django_ajax_utils/js/messages.js" %}"></script>
 	<script src="{% static "js/run_utils.js" %}"></script>
 
 	{% block extrajs %}

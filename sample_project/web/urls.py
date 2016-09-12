@@ -7,7 +7,8 @@ from . import views
 
 
 urlpatterns = [
-	url(r'^$', views.home, name='home'),
-	url(r'^utils/$', views.utils, name='utils'),
-	url(r'^ajaxform/$', views.ajaxform, name='ajaxform'),
+	url(r'^$', views.home_view, name='home'),
+	url(r'^utils/$', views.utils_view, name='utils'),
+	url(r'^ajaxform/$', views.ajaxform_view, name='ajaxform'),
+	url(r'^messages/$', views.messages_view, name='messages'),
 ]

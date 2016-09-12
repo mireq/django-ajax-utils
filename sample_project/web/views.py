@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponseRedirect
 from django.views.generic import TemplateView, FormView
@@ -18,6 +19,13 @@ class AjaxFormView(AjaxFormMixin, FormView):
 		return super(AjaxFormView, self).form_valid(form)
 
 
-home = TemplateView.as_view(template_name='home.html')
-utils = TemplateView.as_view(template_name='utils.html')
-ajaxform = AjaxFormView.as_view(template_name='ajaxform.html')
+class MessagesView(TemplateView):
+	def get(self, request, *args, **kwargs):
+		messages.success(self.request, "Success message")
+		return super(MessagesView, self).get(request, *args, **kwargs)
+
+
+home_view = TemplateView.as_view(template_name='home.html')
+utils_view = TemplateView.as_view(template_name='utils.html')
+ajaxform_view = AjaxFormView.as_view(template_name='ajaxform.html')
+messages_view = MessagesView.as_view(template_name='messages.html')
