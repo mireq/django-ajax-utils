@@ -68,6 +68,58 @@ var submitDisabler = function(formElement) {
 };
 
 
+var ajaxformMiddleware = (function() {
+	var self = {};
+	var callbacks = {
+		response: {},
+		formData: {}
+	};
+
+	var registerCallback = function(callbackType, name, fn) {
+		callbacks[callbackType][name] = fn;
+	};
+
+	var unregisterCallback = function(callbackType, name) {
+		delete callbacks[callbackType][name];
+	};
+
+	var callCallbacks = function(callbackType, args) {
+		var callbackList = callbacks[callbackType];
+		for (var key in callbackList) {
+			if (_.has(callbackList, key)) {
+				callbackList[key].apply(self, args);
+			}
+		}
+	};
+
+	self.onResponseBind = function(name, fn) {
+		return registerCallback('response', name, fn);
+	};
+
+	self.onResponseUnbind = function(name) {
+		return registerCallback('response', name);
+	};
+
+	self.onResponse = function() {
+		return callCallbacks('response', arguments);
+	};
+
+	self.onFormDataBind = function(name, fn) {
+		return registerCallback('formData', name, fn);
+	};
+
+	self.onFormDataUnbind = function(name) {
+		return registerCallback('formData', name);
+	};
+
+	self.onFormData = function() {
+		return callCallbacks('formData', arguments);
+	};
+
+	return self;
+}());
+
+
 var ajaxform = function(formElement, options) {
 	var self = {};
 	var preserveErrors = {__all__: true};
@@ -118,6 +170,7 @@ var ajaxform = function(formElement, options) {
 		var key;
 
 		o.processDataExtra(data, formElement, o.formName);
+		ajaxformMiddleware.onResponse(data, formElement, o.formName);
 		if (_.has(data, 'redirect')) {
 			_.triggerEvent(formElement, 'submit_success');
 			if (_.has(_, 'loadPjax')) {
@@ -146,6 +199,7 @@ var ajaxform = function(formElement, options) {
 			}
 			var formData = data.forms[o.formName];
 			o.processFormStatusExtra(formElement, formData, o.formName);
+			ajaxformMiddleware.onFormData(formElement, formData, o.formName);
 
 			if (!opts.onlyValidate) {
 				preserveErrors = {__all__: true};
@@ -295,6 +349,10 @@ var register = function(element) {
 		ajaxform(formElement);
 	});
 };
+
+
+window._utils.ajaxform = ajaxform;
+window._utils.ajaxformMiddleware = ajaxformMiddleware;
 
 
 _.onLoad(function(e) { register(e.memo); });
