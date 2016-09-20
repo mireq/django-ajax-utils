@@ -238,6 +238,9 @@ var ajaxform = function(formElement, options) {
 				}
 			});
 		}
+		else {
+			disabler.enable();
+		}
 	};
 
 	var formDataToDict = function(formData) {
