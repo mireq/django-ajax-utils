@@ -70,10 +70,9 @@ var submitDisabler = function(formElement) {
 
 var ajaxformMiddleware = (function() {
 	var self = {};
-	var callbacks = {
-		response: {},
-		formData: {}
-	};
+	var callbacks = {};
+
+	var middlewares = ['Response', 'FormData', 'BeforeValidate', 'BeforeSend'];
 
 	var registerCallback = function(callbackType, name, fn) {
 		callbacks[callbackType][name] = fn;
@@ -92,29 +91,28 @@ var ajaxformMiddleware = (function() {
 		}
 	};
 
-	self.onResponseBind = function(name, fn) {
-		return registerCallback('response', name, fn);
+	var makeBindFunction = function(middleware) {
+		return function(name, fn) {
+			return registerCallback(middleware, name, fn);
+		};
+	};
+	var makeUnbindFunction = function(middleware) {
+		return function(name) {
+			return unregisterCallback(middleware, name);
+		};
+	};
+	var makeTriggerFunction = function(middleware) {
+		return function() {
+			return callCallbacks(middleware, arguments);
+		};
 	};
 
-	self.onResponseUnbind = function(name) {
-		return registerCallback('response', name);
-	};
-
-	self.onResponse = function() {
-		return callCallbacks('response', arguments);
-	};
-
-	self.onFormDataBind = function(name, fn) {
-		return registerCallback('formData', name, fn);
-	};
-
-	self.onFormDataUnbind = function(name) {
-		return registerCallback('formData', name);
-	};
-
-	self.onFormData = function() {
-		return callCallbacks('formData', arguments);
-	};
+	_.forEach(middlewares, function(key) {
+		callbacks[key] = {};
+		self['on' + key + 'Bind'] = makeBindFunction(key);
+		self['on' + key + 'Unbind'] = makeUnbindFunction(key);
+		self['on' + key] = makeTriggerFunction(key);
+	});
 
 	return self;
 }());
@@ -299,7 +297,11 @@ var ajaxform = function(formElement, options) {
 
 		var url = formElement.getAttribute('action');
 		var disabler = submitDisabler(formElement);
-		if (!opts.onlyValidate) {
+		if (opts.onlyValidate) {
+			ajaxformMiddleware.onBeforeValidate(data, formElement, o.formName);
+		}
+		else {
+			ajaxformMiddleware.onBeforeSend(data, formElement, o.formName);
 			disabler.disable();
 		}
 
