@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 
 import json
 
-import six
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.utils import six
 
 
 class JSONField(models.TextField):
@@ -17,6 +17,12 @@ class JSONField(models.TextField):
 			return json.loads(value)
 		except ValueError:
 			pass
+
+	def to_python(self, value):
+		if isinstance(value, six.string_types):
+			return json.loads(value)
+		else:
+			return value
 
 	def get_db_prep_save(self, value, connection, **kwargs):
 		if value == '':
