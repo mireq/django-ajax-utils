@@ -1,7 +1,7 @@
 <div id="messages_container" class="messages-container" data-animate-close="0.5">
 	{% for message in messages %}
 		<div class="message">
-			<div class="alert-box {{ message.tags }}">
+			<div class="message-box {{ message.tags }}">
 				<div class="message-content">
 					{{ message }}
 					<a href="#" aria-hidden="true" class="close-action">&times;</a>

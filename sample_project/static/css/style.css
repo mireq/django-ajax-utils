@@ -232,37 +232,37 @@ button:disabled {
 	max-height: 0px;
 }
 
-.alert-box {
+.message-box {
 	padding: 12px;
 	position: relative;
 	margin-bottom: 2px;
 }
 
-.alert-box.info {
+.message-box.info {
 	border: 1px solid #0078a0;
 	background: #008cba;
 	color: white;
 }
 
-.alert-box.success {
+.message-box.success {
 	border: 1px solid #3a945b;
 	background: #43ac6a;
 	color: white;
 }
 
-.alert-box.warning {
+.message-box.warning {
 	border: 1px solid #de770f;
 	background: #f08a24;
 	color: white;
 }
 
-.alert-box.error {
+.message-box.error {
 	border: 1px solid #de2d0f;
 	background: #f04124;
 	color: white;
 }
 
-.alert-box .close-action {
+.message-box .close-action {
 	position: absolute;
 	top: 50%;
 	right: 8px;

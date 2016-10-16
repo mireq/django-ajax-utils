@@ -5,3 +5,16 @@
 
 {% block content %}
 {% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript">
+//<![CDATA[
+(function(_) {
+	_.messageShow({
+		messageText: 'Dynamic info message',
+		cls: 'info',
+	});
+}(_utils));
+//]]>
+</script>
+{% endblock %}
