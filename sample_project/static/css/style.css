@@ -197,13 +197,22 @@ button:disabled {
 
 .runnable-block .actions {
 	position: absolute;
-	top: 8px;
-	right: 8px;
+	top: 1px;
+	right: 1px;
 }
 
 .runnable-block .actions .action-run {
 	color: #888;
 	text-decoration: none;
+	background: #eee;
+	font-size: 20px;
+	vertical-align: middle;
+	width: 32px;
+	height: 32px;
+	line-height: 32px;
+	display: block;
+	text-align: center;
+	vertical-align: middle;
 }
 
 .runnable-block .actions .action-run:hover {
