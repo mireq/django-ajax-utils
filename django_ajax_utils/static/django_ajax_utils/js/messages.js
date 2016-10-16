@@ -79,7 +79,8 @@ var messageConstruct = function(options) {
 		msgContent.innerHTML = options.messageHTML;
 	}
 	if (options.includeClose) {
-		var closeAction = _.elem('A', {'href': '#', 'aria-hidden': 'true', 'class': 'close-action'}, '⨉');
+		var closeAction = _.elem('A', {'href': '#', 'aria-hidden': 'true', 'class': 'close-action'});
+		closeAction.innerHTML = '&times;';
 		msgContent.appendChild(closeAction);
 	}
 	msgBox.appendChild(msgContent);
