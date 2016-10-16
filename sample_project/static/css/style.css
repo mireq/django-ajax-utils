@@ -215,10 +215,13 @@ button:disabled {
 .messages-container .message {
 	opacity: 1;
 	transition: all 0.5s;
+	overflow: hidden;
+	max-height: 60px;
 }
 
 .messages-container .message.closing {
 	opacity: 0;
+	max-height: 0px;
 }
 
 .alert-box {
