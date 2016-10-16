@@ -42,6 +42,7 @@ class MessagesForm(forms.Form):
 	LEVEL_CHOICES = (
 		(constants.DEBUG, "Debug"),
 		(constants.INFO, "Info"),
+		(constants.SUCCESS, "Success"),
 		(constants.WARNING, "Warning"),
 		(constants.ERROR, "Error"),
 	)
