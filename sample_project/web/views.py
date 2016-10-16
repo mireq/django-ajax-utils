@@ -21,7 +21,10 @@ class AjaxFormView(AjaxFormMixin, FormView):
 
 class MessagesView(TemplateView):
 	def get(self, request, *args, **kwargs):
+		messages.info(self.request, "Info message")
 		messages.success(self.request, "Success message")
+		messages.warning(self.request, "Warning message")
+		messages.error(self.request, "Error message")
 		return super(MessagesView, self).get(request, *args, **kwargs)
 
 
