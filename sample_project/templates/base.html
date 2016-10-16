@@ -13,8 +13,10 @@
 	{% block body %}
 		<div class="wrap">
 			<h1>{% block site_title %}title{% endblock %}</h1>
-			{% block content %}
-			{% endblock %}
+			<div id="main_content">
+				{% block content %}
+				{% endblock %}
+			</div>
 		</div>
 	{% endblock %}
 

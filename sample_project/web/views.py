@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from django.http.response import HttpResponseRedirect
 from django.views.generic import TemplateView, FormView
 
-from .forms import SignupForm
+from .forms import SignupForm, MessagesForm
 from django_ajax_utils.views import AjaxFormMixin
 
 
@@ -19,13 +19,17 @@ class AjaxFormView(AjaxFormMixin, FormView):
 		return super(AjaxFormView, self).form_valid(form)
 
 
-class MessagesView(TemplateView):
+class MessagesView(FormView):
+	form_class = MessagesForm
+
 	def get(self, request, *args, **kwargs):
-		messages.info(self.request, "Info message")
-		messages.success(self.request, "Success message")
-		messages.warning(self.request, "Warning message")
-		messages.error(self.request, "Error message")
+		messages.info(self.request, "Test message")
 		return super(MessagesView, self).get(request, *args, **kwargs)
+
+	def form_valid(self, form):
+		data = form.cleaned_data
+		messages.add_message(self.request, level=data['level'], message=data['message'])
+		return self.render_to_response(self.get_context_data(form=form))
 
 
 home_view = TemplateView.as_view(template_name='home.html')

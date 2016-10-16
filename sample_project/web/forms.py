@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.contrib.messages import constants
 from django.core import validators
 from django.utils.translation import ugettext_lazy as _
 
@@ -35,3 +36,15 @@ class SignupForm(AutoPlaceholderFormMixin, SetWidgetAttrsMixin, forms.Form):
 
 		if password1 and password2 and password1 != password2:
 			raise forms.ValidationError(_("The two password fields didn't match."))
+
+
+class MessagesForm(forms.Form):
+	LEVEL_CHOICES = (
+		(constants.DEBUG, "Debug"),
+		(constants.INFO, "Info"),
+		(constants.WARNING, "Warning"),
+		(constants.ERROR, "Error"),
+	)
+
+	message = forms.CharField()
+	level = forms.ChoiceField(choices=LEVEL_CHOICES, initial=constants.INFO)
