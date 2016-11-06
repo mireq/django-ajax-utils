@@ -6,14 +6,20 @@ import threading
 
 from django.template import TemplateDoesNotExist
 from django.template.loaders.base import Loader as BaseLoader
+from django.utils.deprecation import MiddlewareMixin
 
 
 _local = threading.local()
 
 
 class Middleware(object):
-	def process_request(self, request):
+	def __init__(self, get_response):
+		self.get_response = get_response
+
+	def __call__(self, request):
 		_local.request = request
+		response = self.get_response(request)
+		return response
 
 
 class Loader(BaseLoader):
