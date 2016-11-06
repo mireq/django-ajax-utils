@@ -50,7 +50,7 @@ var requestDone = function() {
 	}
 };
 
-var pjaxFallback = function(response, url, options) {
+var pjaxFallback = function(response, url) {
 	document.open();
 	document.write(response.responseText); // jshint ignore:line
 	document.close();
@@ -59,11 +59,12 @@ var pjaxFallback = function(response, url, options) {
 	}
 };
 
-var processPjax = function(response, url, options) {
+var processPjax = function(response, url) {
 	if (response.redirect !== undefined) {
 		window.location = response.redirect;
 		return;
 	}
+	console.log(response);
 };
 
 if (isSupported) {
@@ -88,10 +89,10 @@ if (isSupported) {
 					return;
 				}
 				if (response.is_pjax) {
-					processPjax(response, options.url, pjaxOptions);
+					processPjax(response, options.url);
 				}
 				else {
-					pjaxFallback(res, options.url, pjaxOptions);
+					pjaxFallback(res, options.url);
 				}
 				requestDone();
 			},
@@ -99,7 +100,7 @@ if (isSupported) {
 				if (ignoreLink) {
 					return;
 				}
-				pjaxFallback(response, options.url, pjaxOptions);
+				pjaxFallback(response, options.url);
 				requestDone();
 			},
 			headersFn: function(response) {

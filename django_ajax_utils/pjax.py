@@ -1,15 +1,23 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import json
 import os
 import threading
 
+from django.http.response import HttpResponse
 from django.template import TemplateDoesNotExist
 from django.template.loaders.base import Loader as BaseLoader
-from django.utils.deprecation import MiddlewareMixin
+from django.utils.encoding import force_text
 
 
 _local = threading.local()
+
+
+def is_pjax(request):
+	if not request:
+		return False
+	return request.META.get('HTTP_X_PJAX') == 'true'
 
 
 class Middleware(object):
@@ -19,6 +27,27 @@ class Middleware(object):
 	def __call__(self, request):
 		_local.request = request
 		response = self.get_response(request)
+		if is_pjax(request):
+			if response.status_code == 200:
+				pjax_holders = getattr(request, '_pjax_holders', {})
+				blocks = {}
+				for block_name, content in pjax_holders.items():
+					blocks[block_name] = ''.join(content)
+
+				json_data = {
+					'is_pjax': True,
+					'content': force_text(response.getvalue()),
+					'blocks': blocks,
+				}
+				response = HttpResponse(json.dumps(json_data).encode('utf-8'), content_type="application/json")
+
+			if response.status_code in (301, 302):
+				json_data = {
+					'is_pjax': True,
+					'redirect': response.url,
+				}
+				response = HttpResponse(json.dumps(json_data).encode('utf-8'), content_type="application/json")
+
 		return response
 
 
@@ -32,15 +61,10 @@ class Loader(BaseLoader):
 	def pjax_template_name(self, template_name):
 		return '_pjax'.join(os.path.splitext(template_name))
 
-	def is_pjax(self, request):
-		if not request:
-			return False
-		return request.META.get('HTTP_X_PJAX') == 'true'
-
 	def load_template_source(self, template_name, template_dirs=None):
-		if self.is_pjax(getattr(_local, 'request', None)):
+		if is_pjax(getattr(_local, 'request', None)):
 			try:
-				return self.direct_load_template(self.ajax_template_name(template_name), template_dirs)
+				return self.direct_load_template(self.pjax_template_name(template_name), template_dirs)
 			except TemplateDoesNotExist:
 				return self.direct_load_template(template_name, template_dirs)
 		else:
