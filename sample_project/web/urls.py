@@ -11,4 +11,5 @@ urlpatterns = [
 	url(r'^utils/$', views.utils_view, name='utils'),
 	url(r'^ajaxform/$', views.ajaxform_view, name='ajaxform'),
 	url(r'^messages/$', views.messages_view, name='messages'),
+	url(r'^pjax/$', views.pjax_view, name='pjax'),
 ]

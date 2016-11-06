@@ -4,9 +4,5 @@
 {% block site_title %}Examples{% endblock %}
 
 {% block content %}
-	<ul>
-		<li><a href="{% url "utils" %}">Simple javascript utility</a></li>
-		<li><a href="{% url "ajaxform" %}">Ajax form</a></li>
-		<li><a href="{% url "messages" %}">Messages</a></li>
-	</ul>
+	{% include "partials/menu.html" %}
 {% endblock %}

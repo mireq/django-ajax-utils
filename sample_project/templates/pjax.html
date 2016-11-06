@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block head_title %}PJAX (Pushstate AJAX){% endblock %}
+{% block site_title %}PJAX (Pushstate AJAX){% endblock %}
+
+{% block content %}
+	{% include "partials/menu.html" %}
+{% endblock %}
+
+{% block extrajs %}
+	<script src="{% static "django_ajax_utils/js/pjax.js" %}"></script>
+	<script type="text/javascript" charset="utf-8">
+//<![CDATA[
+	(function(_) {
+		_.pjax.autoRegister({
+			loadingCls: 'loading'
+		});
+	}(_utils));
+//]]>
+	</script>
+{% endblock %}

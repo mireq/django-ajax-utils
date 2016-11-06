@@ -35,7 +35,7 @@ class Loader(BaseLoader):
 	def is_pjax(self, request):
 		if not request:
 			return False
-		return request.is_ajax()
+		return request.META.get('HTTP_X_PJAX') == 'true'
 
 	def load_template_source(self, template_name, template_dirs=None):
 		if self.is_pjax(getattr(_local, 'request', None)):
