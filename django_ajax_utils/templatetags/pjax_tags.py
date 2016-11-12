@@ -23,6 +23,7 @@ class PjaxBlockNode(template.Node):
 		if is_pjax(request):
 			if not hasattr(request, '_pjax_holders'):
 				raise ImproperlyConfigured("Middleware django_ajax_utils.pjax.Middleware not enabled")
+			request._pjax_holders.setdefault(self.block_name, [])
 			request._pjax_holders[self.block_name].append(output)
 			return ''
 		return output

@@ -31,6 +31,27 @@ var checkFormSupported = function(element) {
 	return true;
 };
 
+var execEmbeddedScripts = function(element) {
+	var flatNodesList = [];
+	var flatNodes = function(root) {
+		flatNodesList.push(root);
+		if (root.childNodes) {
+			_.forEach(root.childNodes, flatNodes);
+		}
+	};
+	flatNodes(element);
+
+	_.forEach(flatNodesList, function(element) {
+		if (element.nodeName && element.nodeName.toUpperCase() === 'SCRIPT') {
+			var type = element.getAttribute('type');
+			if (!type || type.toLowerCase() === 'text/javascript') {
+				var scriptData = (element.text || element.textContent || element.innerHTML || "" );
+				eval(scriptData); // jshint ignore:line
+			}
+		}
+	});
+};
+
 var register = function(element) {
 	var links = element.getElementsByTagName('A');
 	var forms = element.getElementsByTagName('FORM');
@@ -54,8 +75,20 @@ var pjaxFallback = function(response, url) {
 	document.open();
 	document.write(response.responseText); // jshint ignore:line
 	document.close();
-	if (options.history) {
-		window.history.replaceState({is_pjax: true}, null, url);
+	window.history.replaceState({is_pjax: true}, null, url);
+};
+
+var pushUrl = function(url) {
+	if (firstrun) {
+		window.history.replaceState({is_pjax: true, url: window.location + ''}, null, window.location);
+		firstrun = false;
+	}
+	window.history.pushState({is_pjax: true, url: url}, null, url);
+	window.scrollTo(0, 0);
+
+	var base = document.getElementsByTagName('BASE')[0];
+	if (base !== undefined) {
+		base.href = (url.split('?')[0]).split('#')[0];
 	}
 };
 
@@ -75,17 +108,52 @@ var processPjax = function(response, url) {
 	if (extrajsBlock !== undefined) {
 		do {
 			match = extrajsRx.exec(extrajsBlock);
-			extrajs.append(match[1]);
+			if (match !== null) {
+				extrajs.push(match[1]);
+			}
 		} while (match !== null);
 	}
 	if (extrastyleBlock !== undefined) {
 		do {
 			match = extrastyleRx.exec(extrastyleBlock);
-			extrastyle.append(match[1]);
+			if (match !== null) {
+				extrastyle.push(match[1]);
+			}
 		} while (match !== null);
 	}
 
-	console.log(response.blocks);
+	_.loaderJs(extrajs, function() {
+		pushUrl(url);
+		var pjaxContainer = _.id(opts.pjaxContainerId);
+		pjaxContainer.innerHTML = response.content;
+		execEmbeddedScripts(pjaxContainer);
+		_.triggerLoad(pjaxContainer);
+
+
+		/*
+
+		_.tag(document, 'title')[0].innerHTML = response.blocks.head_title;
+		_.tag(document, 'body')[0].className = response.blocks.bodyclass;
+
+		eval(response.blocks.extrajs_eval_after); // jshint ignore:line
+
+		_.triggerLoad(bodyContainer);
+		*/
+	});
+
+	_.forEach(extrastyle, function(item) {
+		if (extrastyleCode.indexOf(item) !== -1) {
+			return;
+		}
+		extrastyleCode.push(item);
+		var el = document.createElement('HTML');
+		el.innerHTML = "<html><head>" + item + "</head><body></body></html>";
+		var links = el.getElementsByTagName('LINK');
+		_.forEach(links, function(link) {
+			var newLink = link.cloneNode();
+			document.getElementsByTagName('head')[0].appendChild(newLink);
+		});
+	});
 };
 
 if (isSupported) {
