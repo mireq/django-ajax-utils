@@ -15,7 +15,10 @@
 //<![CDATA[
 	(function(_) {
 		_.pjax.autoRegister({
-			loadingCls: 'loading'
+			bodyLoadingCls: 'loading',
+			pjaxContainerId: 'main_container',
+			extrajsBlock: 'extrajs',
+			extrastyleBlock: 'extrastyle',
 		});
 	}(_utils));
 //]]>

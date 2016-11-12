@@ -39,14 +39,14 @@ var register = function(element) {
 };
 
 var requestStart = function() {
-	if (opts.loadingCls !== undefined) {
-		_.addClass(document.body, opts.loadingCls);
+	if (opts.bodyLoadingCls !== undefined) {
+		_.addClass(document.body, opts.bodyLoadingCls);
 	}
 };
 
 var requestDone = function() {
-	if (opts.loadingCls !== undefined) {
-		_.removeClass(document.body, opts.loadingCls);
+	if (opts.bodyLoadingCls !== undefined) {
+		_.removeClass(document.body, opts.bodyLoadingCls);
 	}
 };
 
@@ -64,7 +64,28 @@ var processPjax = function(response, url) {
 		window.location = response.redirect;
 		return;
 	}
-	console.log(response);
+	var extrajsRx = /src="([^"]*)"/g;
+	var extrastyleRx = /<link([^>]*)>/g;
+	var extrajsBlock = response.blocks[opts.extrajsBlock];
+	var extrastyleBlock = response.blocks[opts.extrastyleBlock];
+	var extrajs = [];
+	var extrastyle = [];
+	var match;
+
+	if (extrajsBlock !== undefined) {
+		do {
+			match = extrajsRx.exec(extrajsBlock);
+			extrajs.append(match[1]);
+		} while (match !== null);
+	}
+	if (extrastyleBlock !== undefined) {
+		do {
+			match = extrastyleRx.exec(extrastyleBlock);
+			extrastyle.append(match[1]);
+		} while (match !== null);
+	}
+
+	console.log(response.blocks);
 };
 
 if (isSupported) {
@@ -73,7 +94,10 @@ if (isSupported) {
 		opts = _.lightCopy(options);
 		opts.checkLinkSupported = opts.checkLinkSupported || checkLinkSupported;
 		opts.checkFormSupported = opts.checkFormSupported || checkFormSupported;
-		opts.loadingCls = opts.loadingCls || 'loading';
+		opts.bodyLoadingCls = opts.bodyLoadingCls || 'loading';
+		opts.pjaxContainerId = opts.pjaxContainerId || 'pjax_container';
+		opts.extrajsBlock = opts.extrajsBlock || 'pjax_container';
+		opts.extrastyleBlock = opts.extrastyleBlock || 'pjax_container';
 		_.onLoad(function(e) { register(e.memo); });
 	};
 	pjax.load = function(link) {
