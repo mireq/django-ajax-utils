@@ -129,16 +129,13 @@ var processPjax = function(response, url) {
 		execEmbeddedScripts(pjaxContainer);
 		_.triggerLoad(pjaxContainer);
 
+		if (opts.titleBlock !== undefined && response.blocks[opts.titleBlock] !== undefined) {
+			_.tag(document, 'title')[0].innerHTML = response.blocks[opts.titleBlock];
+		}
 
-		/*
-
-		_.tag(document, 'title')[0].innerHTML = response.blocks.head_title;
-		_.tag(document, 'body')[0].className = response.blocks.bodyclass;
-
-		eval(response.blocks.extrajs_eval_after); // jshint ignore:line
-
-		_.triggerLoad(bodyContainer);
-		*/
+		if (opts.onLoaded !== undefined) {
+			opts.onLoaded(response, url);
+		}
 	});
 
 	_.forEach(extrastyle, function(item) {
@@ -166,6 +163,8 @@ if (isSupported) {
 		opts.pjaxContainerId = opts.pjaxContainerId || 'pjax_container';
 		opts.extrajsBlock = opts.extrajsBlock || 'pjax_container';
 		opts.extrastyleBlock = opts.extrastyleBlock || 'pjax_container';
+		opts.titleBlock = opts.titleBlock || undefined;
+		opts.onLoaded = opts.onLoaded || undefined;
 		_.onLoad(function(e) { register(e.memo); });
 	};
 	pjax.load = function(link) {

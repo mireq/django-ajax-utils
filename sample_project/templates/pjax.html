@@ -19,6 +19,10 @@
 			pjaxContainerId: 'main_content',
 			extrajsBlock: 'extrajs',
 			extrastyleBlock: 'extrastyle',
+			titleBlock: 'head_title',
+			onLoaded: function(response, url) {
+				console.log(response);
+			}
 		});
 	}(_utils));
 //]]>
