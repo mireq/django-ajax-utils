@@ -144,6 +144,15 @@ button:disabled {
 	opacity: .5;
 }
 
+body.loading, body.loading * {
+	cursor: wait;
+}
+
+body.loading {
+	opacity: .5;
+	pointer-events: none;
+}
+
 .form-row {
 	overflow: hidden;
 	padding: 16px;
