@@ -60,6 +60,8 @@ DATABASES = {
 	}
 }
 
+PJAX_INCLUDE_URLPATTERNS = [r'.*']
+PJAX_EXCLUDE_URLPATTERNS = [r'^admin:.*$']
 
 LANGUAGE_CODE = 'en-us'
 
@@ -70,7 +72,6 @@ USE_I18N = False
 USE_L10N = False
 
 USE_TZ = False
-
 
 STATIC_URL = '/static/'
 

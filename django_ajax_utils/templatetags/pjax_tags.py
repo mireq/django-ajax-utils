@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django import template
+from django.core.exceptions import ImproperlyConfigured
 
 from django_ajax_utils.pjax import is_pjax
 
@@ -18,9 +19,11 @@ class PjaxBlockNode(template.Node):
 		output = self.nodelist.render(context)
 		if not 'request' in context:
 			return output
-		if is_pjax(context['request']):
-			context['PJAX_HOLDERS'].setdefault(self.block_name, [])
-			context['PJAX_HOLDERS'][self.block_name].append(output)
+		request = context['request']
+		if is_pjax(request):
+			if not hasattr(request, '_pjax_holders'):
+				raise ImproperlyConfigured("Middleware django_ajax_utils.pjax.Middleware not enabled")
+			request._pjax_holders[self.block_name].append(output)
 			return ''
 		return output
 

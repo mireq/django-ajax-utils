@@ -4,20 +4,45 @@ from __future__ import unicode_literals
 import json
 import os
 import threading
+from django.conf import settings
 
 from django.http.response import HttpResponse
 from django.template import TemplateDoesNotExist
 from django.template.loaders.base import Loader as BaseLoader
 from django.utils.encoding import force_text
+import re
 
 
 _local = threading.local()
+_pjax_cache = {'include': None, 'exclude': None}
+
+
+def pjax_supported(request):
+	if _pjax_cache['include'] is None:
+		_pjax_cache['include'] = [
+			re.compile(pattern) for pattern in getattr(settings, 'PJAX_INCLUDE_URLPATTERNS', [])
+		]
+		_pjax_cache['exclude'] = [
+			re.compile(pattern) for pattern in getattr(settings, 'PJAX_EXCLUDE_URLPATTERNS', [])
+		]
+	view_name = request.resolver_match.view_name
+	is_included = False
+	is_excluded = False
+	for pattern in _pjax_cache['include']:
+		if pattern.match(view_name):
+			is_included = True
+			break
+	for pattern in _pjax_cache['exclude']:
+		if pattern.match(view_name):
+			is_excluded = True
+			break
+	return is_included and not is_excluded
 
 
 def is_pjax(request):
 	if not request:
 		return False
-	return request.META.get('HTTP_X_PJAX') == 'true'
+	return request.META.get('HTTP_X_PJAX') == 'true' and pjax_supported(request)
 
 
 class Middleware(object):
@@ -26,6 +51,7 @@ class Middleware(object):
 
 	def __call__(self, request):
 		_local.request = request
+		setattr(request, '_pjax_holders', {})
 		response = self.get_response(request)
 		if is_pjax(request):
 			if response.status_code == 200:
