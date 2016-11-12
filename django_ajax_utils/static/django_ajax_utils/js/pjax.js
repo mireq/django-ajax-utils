@@ -11,7 +11,7 @@ var registerPjaxLink = function(element) {
 		if (!opts.checkLinkSupported(element)) {
 			return;
 		}
-		pjax.load(element.getAttribute('href'));
+		pjax.load(element.getAttribute('href'), { history: true });
 		e.preventDefault();
 	});
 };
@@ -71,11 +71,13 @@ var requestDone = function() {
 	}
 };
 
-var pjaxFallback = function(response, url) {
+var pjaxFallback = function(response, url, options) {
 	document.open();
 	document.write(response.responseText); // jshint ignore:line
 	document.close();
-	window.history.replaceState({is_pjax: true}, null, url);
+	if (options.history) {
+		window.history.replaceState({is_pjax: true}, null, url);
+	}
 };
 
 var pushUrl = function(url) {
@@ -92,7 +94,7 @@ var pushUrl = function(url) {
 	}
 };
 
-var processPjax = function(response, url) {
+var processPjax = function(response, url, options) {
 	if (response.redirect !== undefined) {
 		window.location = response.redirect;
 		return;
@@ -153,6 +155,13 @@ var processPjax = function(response, url) {
 	});
 };
 
+var popState = function(e) {
+	if (e.state === null || !e.state.is_pjax) {
+		return;
+	}
+	pjax.load(e.state.url, { history: false });
+};
+
 if (isSupported) {
 	pjax.autoRegister = function(options) {
 		options = options || {};
@@ -167,8 +176,15 @@ if (isSupported) {
 		opts.onLoaded = opts.onLoaded || undefined;
 		_.onLoad(function(e) { register(e.memo); });
 	};
-	pjax.load = function(link) {
+	pjax.load = function(link, options) {
 		var ignoreLink = false;
+		var pjaxOptions = options || {};
+		if (pjaxOptions.history === undefined) {
+			pjaxOptions.history = true;
+		}
+		if (options.history) {
+			pushUrl(link);
+		}
 		requestStart();
 		_.xhrSend({
 			url: link,
@@ -180,10 +196,10 @@ if (isSupported) {
 					return;
 				}
 				if (response.is_pjax) {
-					processPjax(response, options.url);
+					processPjax(response, options.url, pjaxOptions);
 				}
 				else {
-					pjaxFallback(res, options.url);
+					pjaxFallback(res, options.url, pjaxOptions);
 				}
 				requestDone();
 			},
@@ -191,7 +207,7 @@ if (isSupported) {
 				if (ignoreLink) {
 					return;
 				}
-				pjaxFallback(response, options.url);
+				pjaxFallback(response, options.url, pjaxOptions);
 				requestDone();
 			},
 			headersFn: function(response) {
@@ -204,6 +220,7 @@ if (isSupported) {
 			}
 		});
 	};
+	_.bindEvent(window, 'popstate', popState);
 }
 else {
 	pjax.autoRegister = function(options) {
