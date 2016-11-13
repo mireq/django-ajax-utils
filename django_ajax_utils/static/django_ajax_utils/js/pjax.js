@@ -19,16 +19,27 @@ var registerPjaxLink = function(element) {
 var registerPjaxForm = function(element) {
 };
 
+var checkUrlSupported = function(url) {
+	// very simple check for local URLs
+	if ((url[0] === '/' && url[1] !== '/') || url.search('://') === -1) {
+		return true;
+	}
+	else {
+		return false;
+	}
+};
+
 var checkLinkSupported = function(element) {
-	return true;
+	return opts.checkUrlSupported(element.getAttribute('href'));
 };
 
 var checkFormSupported = function(element) {
 	var method = element.getAttribute('method');
+	var action = element.getAttribute('action');
 	if (method.toLowerCase() == 'post') {
 		return false;
 	}
-	return true;
+	return opts.checkUrlSupported(action);
 };
 
 var execEmbeddedScripts = function(element) {
@@ -167,6 +178,7 @@ if (isSupported) {
 		opts = _.lightCopy(options);
 		opts.checkLinkSupported = opts.checkLinkSupported || checkLinkSupported;
 		opts.checkFormSupported = opts.checkFormSupported || checkFormSupported;
+		opts.checkUrlSupported = opts.checkUrlSupported || checkUrlSupported;
 		opts.bodyLoadingCls = opts.bodyLoadingCls || 'loading';
 		opts.pjaxContainerId = opts.pjaxContainerId || 'pjax_container';
 		opts.extrajsBlock = opts.extrajsBlock || 'pjax_container';

@@ -18,6 +18,9 @@
 		extrajsBlock: 'extrajs',
 		extrastyleBlock: 'extrastyle',
 		titleBlock: 'head_title',
+		checkUrlSupported: function(url) {
+			return url.match(/^\/pjax\/.*$/);
+		},
 		onLoaded: function(response, url) {
 			showMessages(response);
 		}
