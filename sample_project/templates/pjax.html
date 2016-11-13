@@ -1,15 +1,26 @@
-{% extends "base.html" %}
-
-{% load staticfiles %}
-
-{% block head_title %}PJAX (Pushstate AJAX){% endblock %}
-{% block site_title %}PJAX (Pushstate AJAX){% endblock %}
+{% extends "pjax_page.html" %}
 
 {% block content %}
-	{% include "partials/pjax_menu.html" %}
-{% endblock %}
-
-{% block extrajs %}
-	<script src="{% static "django_ajax_utils/js/pjax.js" %}"></script>
-	<script src="{% static "js/pjax_init.js" %}"></script>
+{{ block.super }}
+<pre>
+_.pjax.autoRegister({
+	pjaxContainerId: 'main_content', // container with content
+	bodyLoadingCls: 'loading', // loading class for body (optional)
+	extrajsBlock: 'extrajs', // this named block contains extra scripts (optional)
+	extrastyleBlock: 'extrastyle', // this named block contains extra style (optional)
+	titleBlock: 'head_title', // this named block contains page title (optional)
+	checkUrlSupported: function(url) { // cheecks if URL is supported (optional)
+		return true;
+	},
+	checkLinkSupported: function(element) { // cheecks if link is supported (optional)
+		return _.hasClass(element, 'pjax'); // only links with class pjax
+	},
+	checkFormSupported: function(element) { // cheecks if form is supported (optional)
+		return element.getAttribute('method').toLowerCase() === 'get'; // only forms with get method
+	},
+	onLoaded: function(response, url) { // proccess extra data (optional)
+		console.log(response.blocks);
+	}
+});
+</pre>
 {% endblock %}

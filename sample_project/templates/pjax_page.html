@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block head_title %}PJAX (Pushstate AJAX){% endblock %}
+{% block site_title %}PJAX (Pushstate AJAX){% endblock %}
+
+{% block content %}
+	{% include "partials/pjax_menu.html" %}
+{% endblock %}
+
+{% block extrajs %}
+	<script src="{% static "django_ajax_utils/js/pjax.js" %}"></script>
+	<script src="{% static "js/pjax_init.js" %}"></script>
+{% endblock %}
