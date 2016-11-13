@@ -80,20 +80,6 @@ var pjaxFallback = function(response, url, options) {
 	}
 };
 
-var pushUrl = function(url) {
-	if (firstrun) {
-		window.history.replaceState({is_pjax: true, url: window.location + ''}, null, window.location);
-		firstrun = false;
-	}
-	window.history.pushState({is_pjax: true, url: url}, null, url);
-	window.scrollTo(0, 0);
-
-	var base = document.getElementsByTagName('BASE')[0];
-	if (base !== undefined) {
-		base.href = (url.split('?')[0]).split('#')[0];
-	}
-};
-
 var processPjax = function(response, url, options) {
 	if (response.redirect !== undefined) {
 		window.location = response.redirect;
@@ -154,6 +140,20 @@ var processPjax = function(response, url, options) {
 	});
 };
 
+var pushState = function(url) {
+	if (firstrun) {
+		window.history.replaceState({is_pjax: true, url: window.location + ''}, null, window.location);
+		firstrun = false;
+	}
+	window.history.pushState({is_pjax: true, url: url}, null, url);
+	window.scrollTo(0, 0);
+
+	var base = document.getElementsByTagName('BASE')[0];
+	if (base !== undefined) {
+		base.href = (url.split('?')[0]).split('#')[0];
+	}
+};
+
 var popState = function(e) {
 	if (e.state === null || !e.state.is_pjax) {
 		return;
@@ -182,7 +182,7 @@ if (isSupported) {
 			pjaxOptions.history = true;
 		}
 		if (pjaxOptions.history) {
-			pushUrl(link);
+			pushState(link);
 		}
 		requestStart();
 		_.xhrSend({
