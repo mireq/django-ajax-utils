@@ -1,4 +1,17 @@
 (function(_) {
+	var showMessages = function(response) {
+		_.id('messages_container').innerHTML = '';
+		var container = document.createElement('DIV');
+		container.innerHTML = response.blocks.messages;
+		var messages = _.tag(container, 'LI');
+		_.forEach(messages, function(message) {
+			_.messageShow({
+				messageText: message.innerHTML,
+				cls: message.className,
+			});
+		});
+	};
+
 	_.pjax.autoRegister({
 		bodyLoadingCls: 'loading',
 		pjaxContainerId: 'main_content',
@@ -6,16 +19,7 @@
 		extrastyleBlock: 'extrastyle',
 		titleBlock: 'head_title',
 		onLoaded: function(response, url) {
-			_.id('messages_container').innerHTML = '';
-			var container = document.createElement('DIV');
-			container.innerHTML = response.blocks.messages;
-			var messages = _.tag(container, 'LI');
-			_.forEach(messages, function(message) {
-				_.messageShow({
-					messageText: message.innerHTML,
-					cls: message.className,
-				});
-			});
+			showMessages(response);
 		}
 	});
 }(_utils));
