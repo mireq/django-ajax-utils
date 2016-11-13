@@ -1,0 +1,45 @@
+{% extends "pjax.html" %}
+
+{% block content %}
+{{ block.super }}
+
+<p>base_pjax.html</p>
+
+<pre>
+{% verbatim %}...
+{% pjaxblock messages %}
+	&lt;ul&gt;
+		{% for message in messages %}
+			&lt;li class="{{ message.tags }}"&gt;
+				{{ message }}
+			&lt;/li&gt;
+		{% endfor %}
+	&lt;/ul&gt;
+{% endpjaxblock %}
+{% endverbatim %}
+</pre>
+
+<p>pjax_init.js</p>
+
+<pre>
+(function(_) {
+	var showMessages = function(response) {
+		_.id('messages_container').innerHTML = '';
+		var container = document.createElement('DIV'); // temporary div for parsing
+		container.innerHTML = response.blocks.messages; // using messages block
+		var messages = _.tag(container, 'LI');
+		_.forEach(messages, function(message) {
+			_.messageShow({
+				messageText: message.innerHTML,
+				cls: message.className,
+			});
+		});
+	};
+
+	_.pjax.autoRegister({
+		...
+		onLoaded: showMessages
+	});
+}(_utils));
+</pre>
+{% endblock %}

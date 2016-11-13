@@ -32,12 +32,15 @@ class MessagesView(FormView):
 		return self.render_to_response(self.get_context_data(form=form))
 
 
-class PJAXView(TemplateView):
-	pass
+class PjaxMessagesView(TemplateView):
+	def get(self, request, *args, **kwargs):
+		messages.info(self.request, "Test message")
+		return super(PjaxMessagesView, self).get(request, *args, **kwargs)
 
 
 home_view = TemplateView.as_view(template_name='home.html')
 utils_view = TemplateView.as_view(template_name='utils.html')
 ajaxform_view = AjaxFormView.as_view(template_name='ajaxform.html')
 messages_view = MessagesView.as_view(template_name='messages.html')
-pjax_view = PJAXView.as_view(template_name='pjax.html')
+pjax_view = TemplateView.as_view(template_name='pjax.html')
+pjax_messages_view = PjaxMessagesView.as_view(template_name='pjax_messages.html')
