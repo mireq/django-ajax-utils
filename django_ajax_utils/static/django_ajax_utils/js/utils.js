@@ -643,6 +643,7 @@ var loaderJs = (function () {
 			forEach(scripts, function(script) {
 				if (script.hasAttribute('src')) {
 					loadedPaths.push(script.getAttribute('src'));
+					registeredPaths.push(script.getAttribute('src'));
 				}
 			});
 		}
