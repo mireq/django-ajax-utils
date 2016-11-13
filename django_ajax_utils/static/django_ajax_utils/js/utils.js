@@ -611,7 +611,7 @@ window._utils.debounce = debounce;
 
 var loaderJs = (function () {
 	var head = document.getElementsByTagName('head')[0];
-	var loadedPaths = [];
+	var loadedPaths;
 	var registeredPaths = [];
 	var waitingCallbacks = [];
 
@@ -637,6 +637,15 @@ var loaderJs = (function () {
 
 	return function(paths, callback) {
 		var missingPaths = [];
+		if (loadedPaths === undefined) {
+			loadedPaths = [];
+			var scripts = window._utils.tag('SCRIPT');
+			forEach(scripts, function(script) {
+				if (script.hasAttribute('src')) {
+					loadedPaths.push(script.getAttribute('src'));
+				}
+			});
+		}
 
 		forEach(paths, function(path) {
 			if (registeredPaths.indexOf(path) === -1) {
