@@ -11,7 +11,7 @@ var registerPjaxLink = function(element) {
 		if (!opts.checkLinkSupported(element)) {
 			return;
 		}
-		pjax.load(element.getAttribute('href'), { history: true });
+		pjax.load(element.getAttribute('href'));
 		e.preventDefault();
 	});
 };
@@ -125,7 +125,6 @@ var processPjax = function(response, url, options) {
 	}
 
 	_.loaderJs(extrajs, function() {
-		pushUrl(url);
 		var pjaxContainer = _.id(opts.pjaxContainerId);
 		pjaxContainer.innerHTML = response.content;
 		execEmbeddedScripts(pjaxContainer);
@@ -182,7 +181,7 @@ if (isSupported) {
 		if (pjaxOptions.history === undefined) {
 			pjaxOptions.history = true;
 		}
-		if (options.history) {
+		if (pjaxOptions.history) {
 			pushUrl(link);
 		}
 		requestStart();
