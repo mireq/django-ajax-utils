@@ -38,8 +38,15 @@ class PjaxMessagesView(TemplateView):
 		return super(PjaxMessagesView, self).get(request, *args, **kwargs)
 
 
-class PjaxFormsView(FormView):
+class PjaxFormsView(AjaxFormMixin, FormView):
 	form_class = MessagesForm
+
+	def form_valid(self, form):
+		if self.only_validate_form:
+			return self.render_to_response(self.get_context_data(form=form))
+		data = form.cleaned_data
+		messages.add_message(self.request, level=data['level'], message=data['message'])
+		return HttpResponseRedirect(self.request.path)
 
 
 home_view = TemplateView.as_view(template_name='home.html')
