@@ -4,8 +4,33 @@
 
 {% block content %}
 {{ block.super }}
+<h2>GET</h2>
 
-<form id="messages_form" action="{{ request.path }}" method="post" class="ajaxform">
+{% if request.GET.message %}
+	{% with level=request.GET.level %}
+		<div class="messages-container">
+			<div class="message">
+				<div class="message-box{% if level == "10" %} debug{% endif %}{% if level == "20" %} info{% endif %}{% if level == "25" %} success{% endif %}{% if level == "30" %} warning{% endif %}{% if level == "40" %} error{% endif %}">
+					<div class="message-content">
+						{{ request.GET.message }}
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endwith %}
+{% endif %}
+
+<form action="{{ request.path }}" method="get">
+	{% include "includes/form_loop.html" %}
+	<div class="submit-row">
+		<div class="positive">
+			<button type="submit">Show</button>
+		</div>
+	</div>
+</form>
+
+<h2>POST</h2>
+<form action="{{ request.path }}" method="post" class="ajaxform">
 	{% csrf_token %}
 	{% include "includes/form_loop.html" %}
 	<div class="submit-row">

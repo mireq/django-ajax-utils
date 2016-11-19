@@ -17,6 +17,15 @@ var registerPjaxLink = function(element) {
 };
 
 var registerPjaxForm = function(element) {
+	_.bindEvent(element, 'submit', function(e) {
+		var link = element.getAttribute('action');
+		if (!opts.checkFormSupported(element)) {
+			return;
+		}
+		var formData = _.serializeForm(element);
+		pjax.load(link + '?' + formData);
+		e.preventDefault();
+	});
 };
 
 var checkUrlSupported = function(url) {
