@@ -13,4 +13,5 @@ urlpatterns = [
 	url(r'^messages/$', views.messages_view, name='messages'),
 	url(r'^pjax/$', views.pjax_view, name='pjax'),
 	url(r'^pjax/messages/$', views.pjax_messages_view, name='pjax_messages'),
+	url(r'^pjax/forms/$', views.pjax_forms_view, name='pjax_forms'),
 ]

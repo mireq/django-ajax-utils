@@ -6,7 +6,11 @@
 {% block site_title %}PJAX (Pushstate AJAX){% endblock %}
 
 {% block content %}
-	{% include "partials/pjax_menu.html" %}
+	<ul>
+		<li><a href="{% url "pjax" %}">PJAX (Pushstate AJAX) - index</a></li>
+		<li><a href="{% url "pjax_messages" %}">Messages</a></li>
+		<li><a href="{% url "pjax_forms" %}">Forms</a></li>
+	</ul>
 {% endblock %}
 
 {% block extrajs %}

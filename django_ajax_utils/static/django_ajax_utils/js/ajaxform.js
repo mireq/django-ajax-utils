@@ -68,69 +68,22 @@ var submitDisabler = function(formElement) {
 };
 
 
-var ajaxformMiddleware = (function() {
-	var self = {};
-	var callbacks = {};
-
-	var middlewares = ['Response', 'FormData', 'BeforeValidate', 'BeforeSend'];
-
-	var registerCallback = function(callbackType, name, fn) {
-		callbacks[callbackType][name] = fn;
-	};
-
-	var unregisterCallback = function(callbackType, name) {
-		delete callbacks[callbackType][name];
-	};
-
-	var callCallbacks = function(callbackType, args) {
-		var callbackList = callbacks[callbackType];
-		for (var key in callbackList) {
-			if (_.has(callbackList, key)) {
-				callbackList[key].apply(self, args);
-			}
-		}
-	};
-
-	var makeBindFunction = function(middleware) {
-		return function(name, fn) {
-			return registerCallback(middleware, name, fn);
-		};
-	};
-	var makeUnbindFunction = function(middleware) {
-		return function(name) {
-			return unregisterCallback(middleware, name);
-		};
-	};
-	var makeTriggerFunction = function(middleware) {
-		return function() {
-			return callCallbacks(middleware, arguments);
-		};
-	};
-
-	_.forEach(middlewares, function(key) {
-		callbacks[key] = {};
-		self['on' + key + 'Bind'] = makeBindFunction(key);
-		self['on' + key + 'Unbind'] = makeUnbindFunction(key);
-		self['on' + key] = makeTriggerFunction(key);
-	});
-
-	return self;
-}());
-
-
 var ajaxform = function(formElement, options) {
 	var self = {};
 	var preserveErrors = {__all__: true};
 	var clickedButton;
 	var o = _.lightCopy(options);
 	self.options = o;
-	o.processDataExtra = o.processDataExtra || function(form, data, ajaxform) {};
 	o.processFormStatusExtra = o.processFormStatusExtra || function(form, data, ajaxform) {}; // for captcha and etc.
 	o.nonFieldErrorsClass = o.nonFieldErrorsClass || _.getData(formElement, 'nonFieldErrorsClass') || 'non-field-errors';
 	o.fieldErrorsClass = o.fieldErrorsClass || _.getData(formElement, 'fieldErrorsClass') || 'field-errors';
 	o.rowClass = o.rowClass || _.getData(formElement, 'rowClass') || 'form-row';
 	o.formName = o.formName || _.getData(formElement, 'formName') || 'form';
 	o.onlyValidateField = o.onlyValidateField || _.getData(formElement, 'onlyValidateField') || 'only_validate';
+	o.onResponse = o.onResponse || function() {};
+	o.onFormData = o.onFormData || function() {};
+	o.onBeforeValidate = o.onBeforeValidate || function() {};
+	o.onBeforeSend = o.onBeforeSend || function() {};
 	if (!_.has(o, 'liveValidate')) {
 		if (_.getData(formElement, 'liveValidate') === 'false') {
 			o.liveValidate = false;
@@ -167,16 +120,12 @@ var ajaxform = function(formElement, options) {
 	var processFormSubmit = function(data, event, opts, disabler) {
 		var key;
 
-		o.processDataExtra(data, formElement, o.formName);
-		ajaxformMiddleware.onResponse(data, formElement, o.formName);
+		if (o.onResponse(data, formElement, o.formName, disabler) === false) {
+			return;
+		}
 		if (_.has(data, 'redirect')) {
 			_.triggerEvent(formElement, 'submit_success');
-			if (_.has(_, 'loadPjax')) {
-				_.loadPjax(data.redirect);
-			}
-			else {
-				window.location = data.redirect;
-			}
+			window.location = data.redirect;
 		}
 		else if (_.has(data, 'forms')) {
 			disabler.enable();
@@ -197,7 +146,7 @@ var ajaxform = function(formElement, options) {
 			}
 			var formData = data.forms[o.formName];
 			o.processFormStatusExtra(formElement, formData, o.formName);
-			ajaxformMiddleware.onFormData(formElement, formData, o.formName);
+			o.onFormData(formElement, formData, o.formName);
 
 			if (!opts.onlyValidate) {
 				preserveErrors = {__all__: true};
@@ -298,10 +247,10 @@ var ajaxform = function(formElement, options) {
 		var url = formElement.getAttribute('action');
 		var disabler = submitDisabler(formElement);
 		if (opts.onlyValidate) {
-			ajaxformMiddleware.onBeforeValidate(data, formElement, o.formName);
+			o.onBeforeValidate(data, formElement, o.formName);
 		}
 		else {
-			ajaxformMiddleware.onBeforeSend(data, formElement, o.formName);
+			o.onBeforeSend(data, formElement, o.formName);
 			disabler.disable();
 		}
 
@@ -349,18 +298,7 @@ var ajaxform = function(formElement, options) {
 };
 
 
-var register = function(element) {
-	_.forEach(_.cls(element, 'ajaxform'), function(formElement) {
-		ajaxform(formElement);
-	});
-};
-
-
 window._utils.ajaxform = ajaxform;
-window._utils.ajaxformMiddleware = ajaxformMiddleware;
-
-
-_.onLoad(function(e) { register(e.memo); });
 
 
 }(_utils));
