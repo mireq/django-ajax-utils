@@ -28,11 +28,11 @@ def pjax_supported(request):
 	view_name = request.resolver_match.view_name
 	is_included = False
 	is_excluded = False
-	for pattern in _pjax_cache['include']:
+	for pattern in _pjax_cache['include']: # pylint: disable=not-an-iterable
 		if pattern.match(view_name):
 			is_included = True
 			break
-	for pattern in _pjax_cache['exclude']:
+	for pattern in _pjax_cache['exclude']: # pylint: disable=not-an-iterable
 		if pattern.match(view_name):
 			is_excluded = True
 			break
@@ -107,3 +107,9 @@ class Loader(BaseLoader):
 			except AttributeError:
 				pass
 		raise TemplateDoesNotExist(template_name)
+
+	def get_template_sources(self, *args, **kwargs):
+		sources = []
+		for template_loader in self.other_template_loaders:
+			sources += template_loader.get_template_sources(*args, **kwargs)
+		return sources
