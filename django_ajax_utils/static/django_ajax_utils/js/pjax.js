@@ -206,39 +206,44 @@ if (isSupported) {
 			pushState(link);
 		}
 		requestStart();
-		_.xhrSend({
-			url: link,
-			extraHeaders: {
-				'X-PJAX': 'true'
-			},
-			successFn: function(response, res, options) {
-				if (ignoreLink) {
-					return;
+		if (pjaxOptions.response === undefined) {
+			_.xhrSend({
+				url: link,
+				extraHeaders: {
+					'X-PJAX': 'true'
+				},
+				successFn: function(response, res, options) {
+					if (ignoreLink) {
+						return;
+					}
+					if (response.is_pjax) {
+						processPjax(response, options.url, pjaxOptions);
+					}
+					else {
+						pjaxFallback(res, options.url, pjaxOptions);
+					}
+					requestDone();
+				},
+				failFn: function(response, options) {
+					if (ignoreLink) {
+						return;
+					}
+					pjaxFallback(response, options.url, pjaxOptions);
+					requestDone();
+				},
+				headersFn: function(response) {
+					var contentType = response.getResponseHeader('content-type');
+					if (contentType.indexOf('application/json') !== 0 && contentType.indexOf('text/html') !== 0) {
+						window.location = link;
+						ignoreLink = true;
+						return;
+					}
 				}
-				if (response.is_pjax) {
-					processPjax(response, options.url, pjaxOptions);
-				}
-				else {
-					pjaxFallback(res, options.url, pjaxOptions);
-				}
-				requestDone();
-			},
-			failFn: function(response, options) {
-				if (ignoreLink) {
-					return;
-				}
-				pjaxFallback(response, options.url, pjaxOptions);
-				requestDone();
-			},
-			headersFn: function(response) {
-				var contentType = response.getResponseHeader('content-type');
-				if (contentType.indexOf('application/json') !== 0 && contentType.indexOf('text/html') !== 0) {
-					window.location = link;
-					ignoreLink = true;
-					return;
-				}
-			}
-		});
+			});
+		}
+		else {
+			processPjax(pjaxOptions.response, link, pjaxOptions);
+		}
 	};
 	_.bindEvent(window, 'popstate', popState);
 }
