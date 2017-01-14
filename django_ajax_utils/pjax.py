@@ -120,9 +120,3 @@ class Loader(BaseLoader):
 			except AttributeError:
 				pass
 		raise TemplateDoesNotExist(template_name)
-
-	def get_template_sources(self, *args, **kwargs):
-		sources = []
-		for template_loader in self.other_template_loaders:
-			sources += template_loader.get_template_sources(*args, **kwargs)
-		return sources
