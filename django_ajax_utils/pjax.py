@@ -87,6 +87,19 @@ class Loader(BaseLoader):
 	def pjax_template_name(self, template_name):
 		return '_pjax'.join(os.path.splitext(template_name))
 
+	def get_template_sources(self, template_name, *args, **kwargs):
+		sources = []
+		if is_pjax(getattr(_local, 'request', None)):
+			pjax_template = self.pjax_template_name(template_name)
+			for template_loader in self.other_template_loaders:
+				sources += template_loader.get_template_sources(pjax_template, *args, **kwargs)
+		for template_loader in self.other_template_loaders:
+			sources += template_loader.get_template_sources(template_name, *args, **kwargs)
+		return sources
+
+	def get_contents(self, origin):
+		return origin.loader.get_contents(origin)
+
 	def load_template_source(self, template_name, template_dirs=None):
 		if is_pjax(getattr(_local, 'request', None)):
 			try:
