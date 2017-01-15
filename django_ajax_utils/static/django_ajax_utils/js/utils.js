@@ -731,14 +731,6 @@ var serializeForm = function(formElement, options) {
 		switch (element.nodeName.toLowerCase()) {
 			case 'input':
 				switch (element.type) {
-					case 'text':
-					case 'hidden':
-					case 'password':
-					case 'button':
-					case 'number':
-					case 'email':
-						addParameter(element.name, element.value);
-						break;
 					case 'checkbox':
 					case 'radio':
 						if (element.checked) {
@@ -748,6 +740,9 @@ var serializeForm = function(formElement, options) {
 					case 'file':
 					case 'reset':
 					case 'submit':
+						break;
+					default:
+						addParameter(element.name, element.value);
 						break;
 				}
 				break;
