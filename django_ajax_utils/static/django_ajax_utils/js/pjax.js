@@ -233,7 +233,7 @@ if (isSupported) {
 				},
 				headersFn: function(response) {
 					var contentType = response.getResponseHeader('content-type');
-					if (contentType.indexOf('application/json') !== 0 && contentType.indexOf('text/html') !== 0) {
+					if (contentType === null || (contentType.indexOf('application/json') !== 0 && contentType.indexOf('text/html') !== 0)) {
 						window.location = link;
 						ignoreLink = true;
 						return;
