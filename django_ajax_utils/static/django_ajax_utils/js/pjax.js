@@ -11,6 +11,9 @@ var registerPjaxLink = function(element) {
 		if (!opts.checkLinkSupported(element)) {
 			return;
 		}
+		if (!opts.checkUrlSupported(element.getAttribute('href'))) {
+			return;
+		}
 		pjax.load(element.getAttribute('href'));
 		e.preventDefault();
 	});
@@ -39,7 +42,7 @@ var checkUrlSupported = function(url) {
 };
 
 var checkLinkSupported = function(element) {
-	return opts.checkUrlSupported(element.getAttribute('href'));
+	return true;
 };
 
 var checkFormSupported = function(element) {
