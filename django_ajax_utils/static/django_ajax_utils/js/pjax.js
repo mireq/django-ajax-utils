@@ -36,6 +36,9 @@ var checkUrlSupported = function(url) {
 	if (!url) {
 		return false;
 	}
+	if (url[0] === '#') {
+		return false;
+	}
 	if ((url[0] === '/' && url[1] !== '/') || url.search('://') === -1) {
 		return true;
 	}
