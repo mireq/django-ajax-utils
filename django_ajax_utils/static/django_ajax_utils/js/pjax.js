@@ -33,6 +33,9 @@ var registerPjaxForm = function(element) {
 
 var checkUrlSupported = function(url) {
 	// very simple check for local URLs
+	if (!url) {
+		return false;
+	}
 	if ((url[0] === '/' && url[1] !== '/') || url.search('://') === -1) {
 		return true;
 	}
