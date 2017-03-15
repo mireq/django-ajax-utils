@@ -25,6 +25,8 @@ def pjax_supported(request):
 		_pjax_cache['exclude'] = [
 			re.compile(pattern) for pattern in getattr(settings, 'PJAX_EXCLUDE_URLPATTERNS', [])
 		]
+	if request.resolver_match is None:
+		return False
 	view_name = request.resolver_match.view_name
 	is_included = False
 	is_excluded = False
