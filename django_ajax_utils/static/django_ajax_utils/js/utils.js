@@ -595,13 +595,20 @@ window._utils.getScroll = getScroll;
 // debounce
 var debounce = function(fn, delay) {
 	var timer = null;
-	return function () {
+	var closure = function () {
 		var context = this, args = arguments;
 		clearTimeout(timer);
 		timer = setTimeout(function () {
 			fn.apply(context, args);
 		}, delay);
 	};
+	var instant = function() {
+		var context = this, args = arguments;
+		clearTimeout(timer);
+		fn.apply(context, args);
+	};
+	closure.instant = instant;
+	return closure;
 };
 
 window._utils.debounce = debounce;

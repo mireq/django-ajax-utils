@@ -82,7 +82,7 @@ var ajaxformBase = function(formElement, options) {
 	self.initial = undefined;
 
 	// === Events ===
-	self.onInputChanged = self.options.onInputChanged || function(e) {};
+	self.onInputChanged = self.options.onInputChanged || function(e, instant) {};
 	self.onFormSubmit = self.options.onFormSubmit || function(e) {};
 	self.onFormSubmitSuccess = self.options.onFormSubmitSuccess || function(data, e) {};
 	self.onFormSubmitFail = self.options.onFormSubmitFail || function(response) {};
@@ -92,8 +92,14 @@ var ajaxformBase = function(formElement, options) {
 	self.onResponse = self.options.onResponse || function(data, onlyValidate, ajaxform) {};
 	self.onValidate = self.options.onValidate || function(data, onlyValidate, ajaxform) {};
 
-	var onInputChanged = function(e) {
-		self.onInputChanged(e);
+	var onInputChanged = function(e, instant) {
+		self.onInputChanged(e, instant);
+	};
+	var onInputChangedInstant = function(e) {
+		self.onInputChanged(e, true);
+	};
+	var onInputChangedDelayed = function(e) {
+		self.onInputChanged(e, false);
 	};
 	var onFormSubmit = function(e) {
 		if (self.submitButton === undefined) {
@@ -113,10 +119,10 @@ var ajaxformBase = function(formElement, options) {
 			return;
 		}
 		self.inputs.push(input);
-		_.bindEvent(input, 'change', onInputChanged);
+		_.bindEvent(input, 'change', onInputChangedInstant);
 		if (self.options.liveValidate) {
-			_.bindEvent(input, 'input', onInputChanged);
-			_.bindEvent(input, 'keyup', onInputChanged);
+			_.bindEvent(input, 'input', onInputChangedDelayed);
+			_.bindEvent(input, 'keyup', onInputChangedDelayed);
 		}
 	};
 
@@ -126,7 +132,7 @@ var ajaxformBase = function(formElement, options) {
 			return;
 		}
 		self.inputs.splice(idx, 1);
-		_.unbindEvent(input, 'change', onInputChanged);
+		_.unbindEvent(input, 'change', onInputChangedInstant);
 		if (self.options.liveValidate) {
 			_.unbindEvent(input, 'input', onInputChanged);
 			_.unbindEvent(input, 'keyup', onInputChanged);
@@ -312,7 +318,7 @@ var ajaxform = function(formElement, options) {
 	var disabler = submitDisabler(formElement);
 	var preserveErrors = {__all__: true};
 
-	var validateDelayed = _.debounce(self.validate, 1000);
+	var validate= _.debounce(self.validate, 1000);
 
 	var errorIdToName = function(id) {
 		var match = id.match(/(id_.*)_errors/);
@@ -345,8 +351,13 @@ var ajaxform = function(formElement, options) {
 		errorContainers[elementName] = element;
 	});
 
-	self.onInputChanged = function(e) {
-		validateDelayed(e);
+	self.onInputChanged = function(e, instant) {
+		if (instant) {
+			validate.instant(e);
+		}
+		else {
+			validate(e);
+		}
 	};
 
 	self.onFormSubmit = function(e) {
