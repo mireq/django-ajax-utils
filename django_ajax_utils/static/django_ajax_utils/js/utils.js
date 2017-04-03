@@ -702,71 +702,81 @@ window._utils.execEmbeddedScripts = execEmbeddedScripts;
 
 
 // forms
+var serializeFormElement = function(element) {
+	var q = [];
+	var addParameter = function(name, value) {
+		q.push([name, value]);
+	};
+
+	if (element.name === '' || element.disabled) {
+		return [];
+	}
+
+	switch (element.nodeName.toLowerCase()) {
+		case 'input':
+			switch (element.type) {
+				case 'checkbox':
+				case 'radio':
+					if (element.checked) {
+						addParameter(element.name, element.value);
+					}
+					break;
+				case 'file':
+				case 'reset':
+				case 'submit':
+					break;
+				default:
+					addParameter(element.name, element.value);
+					break;
+			}
+			break;
+		case 'textarea':
+			addParameter(element.name, element.value);
+			break;
+		case 'select':
+			switch (element.type) {
+				case 'select-one':
+					addParameter(element.name, element.value);
+					break;
+				case 'select-multiple':
+					_utils.forEach(formElement.options, function(option) {
+						if (option.selected) {
+							addParameter(element.name, option.value);
+						}
+					});
+					break;
+			}
+			break;
+		case 'button':
+			break;
+	}
+	return q;
+};
 
 var serializeForm = function(formElement, options) {
-	var q = [];
-	var o = {raw: false};
-	if (options) {
-		for (var k in options) { if (options.hasOwnProperty(k)) o[k] = options[k]; }
-	}
-	var raw = o.raw;
+	var o = _.lightCopy(options || {});
+	var q;
 	var addParameter;
-	if (raw) {
+
+	if (o.raw) {
 		addParameter = function(name, value) {
 			q.push([name, value]);
 		};
 	}
 	else {
 		addParameter = function(name, value) {
-			q.push(name + '=' + encodeURIComponent(value));
+			q.push(encodeURIComponent(name) + '=' + encodeURIComponent(value));
 		};
 	}
 
-	var elements = formElement.elements;
-	_utils.forEach(elements, function(element) {
-		if (element.name === '' || element.disabled) {
-			return;
-		}
-
-		switch (element.nodeName.toLowerCase()) {
-			case 'input':
-				switch (element.type) {
-					case 'checkbox':
-					case 'radio':
-						if (element.checked) {
-							addParameter(element.name, element.value);
-						}
-						break;
-					case 'file':
-					case 'reset':
-					case 'submit':
-						break;
-					default:
-						addParameter(element.name, element.value);
-						break;
-				}
-				break;
-			case 'textarea':
-				addParameter(element.name, element.value);
-				break;
-			case 'select':
-				switch (element.type) {
-					case 'select-one':
-						addParameter(element.name, element.value);
-						break;
-					case 'select-multiple':
-						_utils.forEach(formElement.options, function(option) {
-							if (option.selected) {
-								addParameter(element.name, option.value);
-							}
-						});
-						break;
-				}
-				break;
-			case 'button':
-				break;
-		}
+	_utils.forEach(formElement.elements, function(element) {
+		_.forEach(_.serializeFormElement(element), function(name_value) {
+			var name = name_value[0];
+			var value = name_value[0];
+			addParameter(name, value);
+		});
 	});
+
 
 	if (raw) {
 		return q;
@@ -784,6 +794,7 @@ var getUrlParameterByName = function(name, url) {
 	return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, " "));
 };
 
+window._utils.serializeFormElement = serializeFormElement;
 window._utils.serializeForm = serializeForm;
 window._utils.getUrlParameterByName = getUrlParameterByName;
 

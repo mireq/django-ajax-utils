@@ -68,131 +68,195 @@ var submitDisabler = function(formElement) {
 };
 
 
-var ajaxform = function(formElement, options) {
+var ajaxformBase = function(formElement, options) {
 	var self = {};
-	var preserveErrors = {__all__: true};
-	var clickedButton;
-	var o = _.lightCopy(options);
-	self.options = o;
-	o.processFormStatusExtra = o.processFormStatusExtra || function(form, data, ajaxform) {}; // for captcha and etc.
-	o.nonFieldErrorsClass = o.nonFieldErrorsClass || _.getData(formElement, 'nonFieldErrorsClass') || 'non-field-errors';
-	o.fieldErrorsClass = o.fieldErrorsClass || _.getData(formElement, 'fieldErrorsClass') || 'field-errors';
-	o.rowClass = o.rowClass || _.getData(formElement, 'rowClass') || 'form-row';
-	o.formName = o.formName || _.getData(formElement, 'formName') || 'form';
-	o.onlyValidateField = o.onlyValidateField || _.getData(formElement, 'onlyValidateField') || 'only_validate';
-	o.onResponse = o.onResponse || function() {};
-	o.onFormData = o.onFormData || function() {};
-	o.onBeforeValidate = o.onBeforeValidate || function() {};
-	o.onBeforeSend = o.onBeforeSend || function() {};
-	if (!_.has(o, 'liveValidate')) {
-		if (_.getData(formElement, 'liveValidate') === 'false') {
-			o.liveValidate = false;
-		}
-		else {
-			o.liveValidate = true;
-		}
-	}
 
-	var errorContainers = {};
-	errorContainers.__all__ = _.cls(formElement, o.nonFieldErrorsClass)[0];
-	if (!errorContainers.__all__) {
-		errorContainers.__all__ = _.elem('div', {'class': o.nonFieldErrorsClass});
-		if (formElement.childNodes.length) {
-			formElement.insertBefore(errorContainers.__all__, formElement.childNodes[0]);
+	self.formElement = formElement;
+	self.options = _.lightCopy(options || {});
+	self.options.liveValidate = self.options.liveValidate || false;
+	self.options.onlyValidateField = self.options.onlyValidateField || _.getData(formElement, 'onlyValidateField') || 'only_validate';
+	self.options.formName = self.options.formName || _.getData(formElement, 'formName') || 'form';
+	self.inputs = [];
+	self.submits = [];
+	self.submitButton = undefined;
+	self.initial = undefined;
+
+	// === Events ===
+	self.onInputChanged = self.options.onInputChanged || function(e) {};
+	self.onFormSubmit = self.options.onFormSubmit || function(e) {};
+	self.onFormSubmitSuccess = self.options.onFormSubmitSuccess || function(data, e) {};
+	self.onFormSubmitFail = self.options.onFormSubmitFail || function(response) {};
+	// query is mutable
+	self.onBeforeValidate = self.options.onBeforeValidate || function(query, formElement, formName) {};
+	self.onBeforeSend = self.options.onBeforeSend || function(query, formElement, formName) {};
+	self.onResponse = self.options.onResponse || function(data, onlyValidate, ajaxform) {};
+	self.onValidate = self.options.onValidate || function(data, onlyValidate, ajaxform) {};
+
+	var onInputChanged = function(e) {
+		self.onInputChanged(e);
+	};
+	var onFormSubmit = function(e) {
+		if (self.submitButton === undefined) {
+			self.submitButton = self.submits[0];
 		}
-		else {
-			formElement.appendChild(errorContainers.__all__);
-		}
-	}
-	_.forEach(_.cls(formElement, 'field-errors'), function(element) {
-		var id = element.getAttribute('id');
-		if (id === null) {
+		self.onFormSubmit(e);
+		self.submitButton = undefined;
+	};
+
+	var setSubmitButton = function() {
+		self.submitButton = this;
+	};
+
+	var registerInput = function(input) {
+		var idx = self.inputs.indexOf(input);
+		if (idx !== -1) {
 			return;
 		}
-		var idPrefix = id.substr(0, 3);
-		var idSuffix = id.substr(id.length - 7, 7);
-		if (idPrefix === "id_" && idSuffix === "_errors") {
-			var elementName = id.substr(0, id.length - 7);
-			errorContainers[elementName] = element;
-		}
-	});
-
-	var processFormSubmit = function(data, event, opts, disabler) {
-		var key;
-
-		if (o.onResponse(data, formElement, o.formName, disabler) === false) {
-			return;
-		}
-		if (_.has(data, 'redirect')) {
-			_.triggerEvent(formElement, 'submit_success');
-			window.location = data.redirect;
-		}
-		else if (_.has(data, 'forms')) {
-			disabler.enable();
-			var row;
-			var checkFormRow = function(element) {
-				return _.hasClass(element, o.rowClass) || element === formElement;
-			};
-			for (key in errorContainers) {
-				if (_.has(errorContainers, key)) {
-					var err = errorContainers[key];
-					err.innerHTML = '';
-					row = _.findParent(err, checkFormRow);
-					if (row !== null) {
-						_.removeClass(row, 'has-errors');
-						_.removeClass(row, 'no-errors');
-					}
-				}
-			}
-			var formData = data.forms[o.formName];
-			o.processFormStatusExtra(formElement, formData, o.formName);
-			o.onFormData(formElement, formData, o.formName);
-
-			if (!opts.onlyValidate) {
-				preserveErrors = {__all__: true};
-			}
-
-			for (key in formData.errors) {
-				if (_.has(formData.errors, key)) {
-					if (opts.onlyValidate && !preserveErrors[key] && formData.empty.indexOf(key) !== -1) {
-						continue;
-					}
-
-					var errorList = formData.errors[key];
-					var errorsElement = _.elem('ul', {'class': 'errors'});
-					if (_.has(errorContainers, key)) {
-						errorContainers[key].appendChild(errorsElement);
-					}
-					else {
-						errorContainers.__all__.appendChild(errorsElement);
-					}
-					_.forEach(errorList, function(error) {
-						errorsElement.appendChild(_.elem('li', {}, error.message));
-					});
-
-					preserveErrors[key] = true;
-					row = _.findParent(errorsElement, checkFormRow);
-					if (row !== null) {
-						_.removeClass(row, 'no-errors');
-						_.addClass(row, 'has-errors');
-					}
-				}
-			}
-			_.forEach(formData.valid, function(key) {
-				row = _.findParent(errorContainers[key], checkFormRow);
-				if (row !== null) {
-					_.addClass(row, 'no-errors');
-				}
-			});
-		}
-		else {
-			disabler.enable();
+		self.inputs.push(input);
+		_.bindEvent(input, 'change', onInputChanged);
+		if (self.options.liveValidate) {
+			_.bindEvent(input, 'input', onInputChanged);
+			_.bindEvent(input, 'keyup', onInputChanged);
 		}
 	};
 
-	var formDataToDict = function(formData) {
+	var unregisterInput = function(input) {
+		var idx = self.inputs.indexOf(input);
+		if (idx === -1) {
+			return;
+		}
+		self.inputs.splice(idx, 1);
+		_.unbindEvent(input, 'change', onInputChanged);
+		if (self.options.liveValidate) {
+			_.unbindEvent(input, 'input', onInputChanged);
+			_.unbindEvent(input, 'keyup', onInputChanged);
+		}
+	};
+
+	var registerSubmit = function(submit) {
+		var idx = self.submits.indexOf(submit);
+		if (idx !== -1) {
+			return;
+		}
+		self.submits.push(submit);
+		_.bindEvent(submit, 'click', setSubmitButton);
+	};
+
+	var unregisterSubmit = function(submit) {
+		var idx = self.submits.indexOf(submit);
+		if (idx === -1) {
+			return;
+		}
+		self.submits.splice(idx, 1);
+		_.unbindEvent(submit, 'click', setSubmitButton);
+	};
+
+	var submitForm = function(onlyValidate) {
+		var data = self.getFormData();
+		if (onlyValidate) {
+			data.push([self.options.onlyValidateField], '1');
+		}
+		if (self.submitButton !== undefined && self.submitButton.name) {
+			data.push([self.submitButton.name, self.submitButton.value]);
+		}
+
+		if (onlyValidate) {
+			self.onBeforeValidate(data, formElement, self.options.formName);
+		}
+		else {
+			self.onBeforeSend(data, formElement, self.options.formName);
+		}
+
+		var query = [];
+		_.forEach(data, function(name_value) {
+			query.push(encodeURIComponent(name_value[0]) + '=' + encodeURIComponent(name_value[1]));
+		});
+		query = query.join('&');
+
+		var url = formElement.getAttribute('action');
+		_.xhrSend({
+			method: 'POST',
+			url: url,
+			data: query,
+			successFn: function(data, e) {
+				if (onlyValidate) {
+					processFormSubmit(data, e, onlyValidate);
+				}
+				else {
+					if (self.onFormSubmitSuccess(data, e) !== false) {
+						processFormSubmit(data, e, onlyValidate);
+					}
+				}
+			},
+			failFn: function(req) {
+				if (onlyValidate) {
+					_.ajaxForwardError(req);
+				}
+				else {
+					if (self.onFormSubmitFail(req) !== false) {
+						_.ajaxForwardError(req);
+					}
+				}
+			}
+		});
+	};
+
+	var processFormSubmit = function(data, event, onlyValidate) {
+		if (self.onResponse(data, onlyValidate, self) === false) {
+			return;
+		}
+		if (_.has(data, 'redirect')) {
+			if (_.has(_, 'pjax')) {
+				_.pjax.load(data.redirect);
+			}
+			else {
+				window.location = data.redirect;
+			}
+		}
+		if (_.has(data, 'forms')) {
+			var formData = data.forms[self.options.formName];
+			if (formData === undefined) {
+				return;
+			}
+			self.onValidate(formData, onlyValidate, self);
+		}
+	};
+
+	// Register input or submit element
+	self.registerElement = function(element) {
+		if (element.getAttribute('type') === 'submit') {
+			registerSubmit(element);
+		}
+		else {
+			registerInput(element);
+		}
+	};
+
+	// Unregister input or submit element
+	self.unregisterElement = function(element) {
+		if (element.getAttribute('type') === 'submit') {
+			unregisterSubmit(element);
+		}
+		else {
+			unregisterInput(element);
+		}
+	};
+
+	// Get form data in array of key-value pairs
+	self.getFormData = function() {
+		var q = [];
+		_.forEach(self.inputs, function(input) {
+			_.forEach(_.serializeFormElement(input), function(name_value) {
+				q.push(name_value);
+			});
+		});
+		return q;
+	};
+
+	// Get form data in dictionary (field name: value list)
+	self.getFormDict = function() {
 		var dct = {};
-		_.forEach(formData, function(item) {
+		_.forEach(self.getFormData(), function(item) {
 			var key = item[0];
 			var val = item[1];
 			if (!_.has(dct, key)) {
@@ -203,11 +267,17 @@ var ajaxform = function(formElement, options) {
 		return dct;
 	};
 
-	self.initial = _.serializeForm(formElement, {raw: true});
+	self.submit = function() {
+		submitForm();
+	};
 
-	self.getChanges = function() {
-		var currentData = formDataToDict(_.serializeForm(formElement, {raw: true}));
-		var initialData = formDataToDict(self.initial);
+	self.validate = function() {
+		submitForm(true);
+	};
+
+	self.getChanges = function(initial, current) {
+		var initialData = initial;
+		var currentData = current || sellf.getFormDict();
 		var allFields = _.keys(currentData);
 		var changes = [];
 
@@ -224,81 +294,134 @@ var ajaxform = function(formElement, options) {
 		};
 	};
 
-	self.submitForm = function(options) {
-		var opts = _.lightCopy(options) || {};
-		opts.onlyValidate = opts.onlyValidate || false;
+	_.forEach(formElement.elements, self.registerElement);
+	_.bindEvent(formElement, 'submit', onFormSubmit);
 
-		var data = _.serializeForm(formElement);
-		if (opts.onlyValidate) {
-			data += '&' + encodeURIComponent(o.onlyValidateField) + '=1';
-		}
-		if (!clickedButton) {
-			clickedButton = submits[0];
-		}
-		if (clickedButton) {
-			var name = clickedButton.name;
-			var value = clickedButton.value;
-			if (name) {
-				data += '&' + encodeURIComponent(name) + '=' + encodeURIComponent(value);
-			}
-		}
-		clickedButton = undefined;
-
-		var url = formElement.getAttribute('action');
-		var disabler = submitDisabler(formElement);
-		if (opts.onlyValidate) {
-			o.onBeforeValidate(data, formElement, o.formName);
-		}
-		else {
-			o.onBeforeSend(data, formElement, o.formName);
-			disabler.disable();
-		}
-
-		_.xhrSend({
-			method: 'POST',
-			url: url,
-			data: data,
-			successFn: function(data, event) {
-				processFormSubmit(data, event, opts, disabler);
-			},
-			failFn: function(req) {
-				if (!opts.onlyValidate) {
-					disabler.enable();
-				}
-				_.triggerEvent(formElement, 'submit_fail');
-				_.ajaxForwardError(req);
-			}
-		});
-	};
-
-	var inputChanged = function() {
-		self.submitForm({onlyValidate: true});
-	};
-	var inputChangedDelayed = _.debounce(inputChanged, 2000);
-
-	_.forEach(formElement.elements, function(element) {
-		_.bindEvent(element, 'change', inputChanged);
-		if (o.liveValidate) {
-			_.bindEvent(element, 'input', inputChangedDelayed);
-			_.bindEvent(element, 'keyup', inputChangedDelayed);
-		}
-	});
-
-	var submits = [];
-	_.forEach(formElement.elements, function(element) {
-		if (element.getAttribute('type') === 'submit') {
-			submits.push(element);
-		}
-	});
-	_.forEach(submits, function(element) {
-		_.bindEvent(element, 'click', function() { clickedButton = this; });
-	});
-	_.bindEvent(formElement, 'submit', function(e) { self.submitForm(); e.preventDefault(); });
 	return self;
 };
 
 
-window._utils.ajaxform = ajaxform;
+var ajaxform = function(formElement, options) {
+	var o = _.lightCopy(options);
+	o.nonFieldErrorsClass = o.nonFieldErrorsClass || _.getData(formElement, 'nonFieldErrorsClass') || 'non-field-errors';
+	o.fieldErrorsClass = o.fieldErrorsClass || _.getData(formElement, 'fieldErrorsClass') || 'field-errors';
+	o.rowClass = o.rowClass || _.getData(formElement, 'rowClass') || 'form-row';
+	if (!_.has(o, 'liveValidate')) { o.liveValidate = (_.getData(formElement, 'liveValidate') !== 'false'); }
+
+	var self = ajaxformBase(formElement, o);
+	var disabler = submitDisabler(formElement);
+	var preserveErrors = {__all__: true};
+
+	var validateDelayed = _.debounce(self.validate, 1000);
+
+	var errorIdToName = function(id) {
+		var match = id.match(/(id_.*)_errors/);
+		if (match === null) {
+			return null;
+		}
+		return match[1];
+	};
+
+	var errorContainers = {};
+	errorContainers.__all__ = _.cls(formElement, o.nonFieldErrorsClass)[0];
+	if (!errorContainers.__all__) {
+		errorContainers.__all__ = _.elem('div', {'class': o.nonFieldErrorsClass});
+		if (formElement.childNodes.length) {
+			formElement.insertBefore(errorContainers.__all__, formElement.childNodes[0]);
+		}
+		else {
+			formElement.appendChild(errorContainers.__all__);
+		}
+	}
+	_.forEach(_.cls(formElement, o.fieldErrorsClass), function(element) {
+		var id = element.getAttribute('id');
+		if (id === null) {
+			return;
+		}
+		var elementName = errorIdToName(id);
+		if (elementName === null) {
+			return;
+		}
+		errorContainers[elementName] = element;
+	});
+
+	self.onInputChanged = function(e) {
+		validateDelayed(e);
+	};
+
+	self.onFormSubmit = function(e) {
+		self.submit();
+		disabler.disable();
+		e.preventDefault();
+	};
+
+	self.onFormSubmitSuccess = function(data) {
+		disabler.enable();
+	};
+
+	self.onFormSubmitFail = function(response) {
+		disabler.enable();
+	};
+
+	self.onValidate = function(formData, onlyValidate) {
+		var row, key;
+		var checkFormRow = function(element) {
+			return _.hasClass(element, o.rowClass) || element === formElement;
+		};
+		for (key in errorContainers) {
+			if (_.has(errorContainers, key)) {
+				var err = errorContainers[key];
+				err.innerHTML = '';
+				row = _.findParent(err, checkFormRow);
+				if (row !== null) {
+					_.removeClass(row, 'has-errors');
+					_.removeClass(row, 'no-errors');
+				}
+			}
+			if (!onlyValidate) {
+				preserveErrors = {__all__: true};
+			}
+		}
+		for (key in formData.errors) {
+			if (_.has(formData.errors, key)) {
+				if (onlyValidate && !preserveErrors[key] && formData.empty.indexOf(key) !== -1) {
+					continue;
+				}
+
+				var errorList = formData.errors[key];
+				var errorsElement = _.elem('ul', {'class': 'errors'});
+				if (_.has(errorContainers, key)) {
+					errorContainers[key].appendChild(errorsElement);
+				}
+				else {
+					errorContainers.__all__.appendChild(errorsElement);
+				}
+				_.forEach(errorList, function(error) {
+					errorsElement.appendChild(_.elem('li', {}, error.message));
+				});
+
+				preserveErrors[key] = true;
+				row = _.findParent(errorsElement, checkFormRow);
+				if (row !== null) {
+					_.removeClass(row, 'no-errors');
+					_.addClass(row, 'has-errors');
+				}
+			}
+		}
+		_.forEach(formData.valid, function(key) {
+			row = _.findParent(errorContainers[key], checkFormRow);
+			if (row !== null) {
+				_.addClass(row, 'no-errors');
+			}
+		});
+	};
+
+	return self;
+};
+
+
+window._utils.ajaxformBase = ajaxformBase;
+window._utils.ajaxform= ajaxform;
 
 
 }(_utils));
