@@ -121,8 +121,12 @@ var ajaxformBase = function(formElement, options) {
 		self.inputs.push(input);
 		_.bindEvent(input, 'change', onInputChangedInstant);
 		if (self.options.liveValidate) {
-			_.bindEvent(input, 'input', onInputChangedDelayed);
-			_.bindEvent(input, 'keyup', onInputChangedDelayed);
+			if (input.oninput === undefined) {
+				_.bindEvent(input, 'keyup', onInputChangedDelayed);
+			}
+			else {
+				_.bindEvent(input, 'input', onInputChangedDelayed);
+			}
 		}
 	};
 
@@ -134,8 +138,12 @@ var ajaxformBase = function(formElement, options) {
 		self.inputs.splice(idx, 1);
 		_.unbindEvent(input, 'change', onInputChangedInstant);
 		if (self.options.liveValidate) {
-			_.unbindEvent(input, 'input', onInputChanged);
-			_.unbindEvent(input, 'keyup', onInputChanged);
+			if (input.oninput === undefined) {
+				_.unbindEvent(input, 'keyup', onInputChanged);
+			}
+			else {
+				_.unbindEvent(input, 'input', onInputChanged);
+			}
 		}
 	};
 
