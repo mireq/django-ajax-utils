@@ -761,8 +761,8 @@ var serializeFormElement = function(element) {
 };
 
 var serializeForm = function(formElement, options) {
-	var o = _.lightCopy(options || {});
-	var q;
+	var o = lightCopy(options || {});
+	var q = [];
 	var addParameter;
 
 	if (o.raw) {
@@ -777,15 +777,15 @@ var serializeForm = function(formElement, options) {
 	}
 
 	_utils.forEach(formElement.elements, function(element) {
-		_.forEach(_.serializeFormElement(element), function(name_value) {
+		_utils.forEach(_utils.serializeFormElement(element), function(name_value) {
 			var name = name_value[0];
-			var value = name_value[0];
+			var value = name_value[1];
 			addParameter(name, value);
 		});
 	});
 
 
-	if (raw) {
+	if (o.raw) {
 		return q;
 	}
 	else {
