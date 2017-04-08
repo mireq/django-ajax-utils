@@ -51,8 +51,12 @@ def safe_json_str(json_str):
 
 
 @register.simple_tag
-def js_urlpatterns(*patterns):
-	if len(patterns) == 1 and isinstance(patterns[0], (list, tuple)):
-		patterns = patterns[0]
-	patterns = list(prepare_url_list(url_resolver))
-	return safe_json_str(json.dumps(patterns))
+def js_urlpatterns(*export_patterns):
+	if len(export_patterns) == 1 and isinstance(export_patterns[0], (list, tuple)):
+		export_patterns = export_patterns[0]
+	export_patterns = set(export_patterns)
+	if export_patterns:
+		url_patterns = [pattern for pattern in prepare_url_list(url_resolver) if pattern['name'] in export_patterns]
+	else:
+		url_patterns = list(prepare_url_list(url_resolver))
+	return safe_json_str(json.dumps(url_patterns))
