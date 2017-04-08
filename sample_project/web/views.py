@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 
 from django.contrib import messages
-from django.core.urlresolvers import reverse
 from django.http.response import HttpResponseRedirect
+from django.urls import reverse
 from django.views.generic import TemplateView, FormView
 
 from .forms import SignupForm, MessagesForm
