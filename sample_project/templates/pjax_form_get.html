@@ -4,6 +4,7 @@
 
 {% block content %}
 {{ block.super }}
+<h2>GET</h2>
 {% if request.GET.message %}
 	{% with level=request.GET.level %}
 		<div class="messages-container">
