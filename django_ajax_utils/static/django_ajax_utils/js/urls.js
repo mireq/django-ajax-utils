@@ -11,7 +11,12 @@ var urlresolver = function(urlpatterns) {
 			paramsRegex.push('\\%\\(' + param + '\\)s');
 		});
 
-		pattern = pattern.split(new RegExp(paramsRegex.join('|')));
+		if (paramsRegex.length > 0) {
+			pattern = pattern.split(new RegExp(paramsRegex.join('|')));
+		}
+		else {
+			pattern = [pattern];
+		}
 
 		var finalPattern = [];
 		_.forEach(pattern, function(piece) {
@@ -19,7 +24,7 @@ var urlresolver = function(urlpatterns) {
 			finalPattern.push(null);
 		});
 
-		if (finalPattern.length) {
+		if (finalPattern.length > 1) {
 			finalPattern.pop();
 		}
 

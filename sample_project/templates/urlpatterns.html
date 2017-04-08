@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% load js_urlpatterns staticfiles %}
+
+{% block head_title %}Urlpatterns{% endblock %}
+{% block site_title %}Urlpatterns{% endblock %}
+
+{% block content %}
+	<h2>All registered urlpatterns</h2>
+	<ul id="all_urlpatterns">
+	</ul>
+	<h2>URL resolver</h2>
+	<ul>
+		<li>Home URL: <span id="home_url"></span></li>
+		<li>Urlpatterns URL: <span id="urlpatterns_url"></span></li>
+		<li>Urlpatterns URL (with parameter): <span id="urlpatterns_url2"></span></li>
+		<li>Urlpatterns URL (alternative): <span id="urlpatterns_url3"></span></li>
+	</ul>
+{% endblock %}
+
+{% block extrajs %}
+	{{ block.super }}
+	<script src="{% static "django_ajax_utils/js/urls.js" %}"></script>
+	<script type="text/javascript" charset="utf-8">
+		//<![CDATA[
+		(function(_) {
+			var allUrlpatterns = {% js_urlpatterns %};
+			var allUrlpatternsElement = _.id('all_urlpatterns');
+			for (var pattern in allUrlpatterns) {
+				allUrlpatternsElement.appendChild(_.elem('LI', {}, pattern));
+			}
+
+			var urlpatterns = {% js_urlpatterns "home" "urlpatterns" %};
+			var resolver = _.urlresolver(urlpatterns);
+
+			_.id('home_url').appendChild(document.createTextNode(resolver.reverse('home')));
+			_.id('urlpatterns_url').appendChild(document.createTextNode(resolver.reverse('urlpatterns')));
+			_.id('urlpatterns_url2').appendChild(document.createTextNode(resolver.reverse('urlpatterns', ['param'])));
+			_.id('urlpatterns_url3').appendChild(document.createTextNode(resolver.reverse('urlpatterns', [], {param: 'param'})));
+		}(_utils));
+		//]]>
+	</script>
+{% endblock %}
