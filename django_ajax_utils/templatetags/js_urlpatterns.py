@@ -1,0 +1,58 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+import json
+
+from django import template, urls
+from django.utils import six
+from django.utils.encoding import force_text
+from django.utils.safestring import mark_safe
+
+
+register = template.Library()
+url_resolver = urls.get_resolver()
+
+
+def prepare_url_list(resolver, namespace_path='', namespace=''):
+	for url_name in resolver.reverse_dict.keys():
+		if not isinstance(url_name, six.string_types):
+			continue
+		url_name = force_text(url_name)
+		formated_patterns = []
+		for url_pattern in resolver.reverse_dict.getlist(url_name):
+			for url_format, url_params in url_pattern[0]:
+				formated_patterns.append({'pattern': namespace_path + url_format, 'params': url_params})
+		yield {'name': namespace + url_name, 'patterns': formated_patterns}
+
+	for inner_ns, (inner_ns_path, inner_resolver) in resolver.namespace_dict.items():
+		inner_ns_path = namespace_path + inner_ns_path
+		inner_ns = namespace + inner_ns + ':'
+
+		if inner_ns_path:
+			inner_resolver = urlresolvers.get_ns_resolver(inner_ns_path, inner_resolver)
+			inner_ns_path = ''
+
+		for url_pattern in prepare_url_list(inner_resolver, inner_ns_path, inner_ns):
+			yield url_pattern
+
+
+def safe_json_str(json_str):
+	# from https://gist.github.com/amacneil/5af7cd0e934f5465b695
+	unsafe_chars = {
+		'&': '\\u0026',
+		'<': '\\u003c',
+		'>': '\\u003e',
+		'\u2028': '\\u2028',
+		'\u2029': '\\u2029'
+	}
+	for (c, d) in unsafe_chars.items():
+		json_str = json_str.replace(c, d)
+	return mark_safe(json_str)
+
+
+@register.simple_tag
+def js_urlpatterns(*patterns):
+	if len(patterns) == 1 and isinstance(patterns[0], (list, tuple)):
+		patterns = patterns[0]
+	patterns = list(prepare_url_list(url_resolver))
+	return safe_json_str(json.dumps(patterns))
