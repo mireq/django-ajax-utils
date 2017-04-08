@@ -4,8 +4,6 @@
 
 {% block content %}
 {{ block.super }}
-<h2>GET</h2>
-
 {% if request.GET.message %}
 	{% with level=request.GET.level %}
 		<div class="messages-container">
@@ -28,20 +26,4 @@
 		</div>
 	</div>
 </form>
-
-<h2>POST</h2>
-<form action="{{ request.path }}" method="post" class="ajaxform">
-	{% csrf_token %}
-	{% include "includes/form_loop.html" %}
-	<div class="submit-row">
-		<div class="positive">
-			<button type="submit" data-loading-text="Sending ...">Show</button>
-		</div>
-	</div>
-</form>
-{% endblock %}
-
-{% block extrajs %}
-	{{ block.super }}
-	<script src="{% static "js/ajaxform_init.js" %}"></script>
 {% endblock %}

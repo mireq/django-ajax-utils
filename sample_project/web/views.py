@@ -38,7 +38,7 @@ class PjaxMessagesView(TemplateView):
 		return super(PjaxMessagesView, self).get(request, *args, **kwargs)
 
 
-class PjaxFormsView(AjaxFormMixin, FormView):
+class PjaxFormPostView(AjaxFormMixin, FormView):
 	form_class = MessagesForm
 
 	def form_valid(self, form):
@@ -49,10 +49,18 @@ class PjaxFormsView(AjaxFormMixin, FormView):
 		return HttpResponseRedirect(self.request.path)
 
 
+class PjaxFormGetView(AjaxFormMixin, TemplateView):
+	def get_context_data(self, **kwargs):
+		ctx = super(PjaxFormGetView, self).get_context_data(**kwargs)
+		ctx['form'] = MessagesForm()
+		return ctx
+
+
 home_view = TemplateView.as_view(template_name='home.html')
 utils_view = TemplateView.as_view(template_name='utils.html')
 ajaxform_view = AjaxFormView.as_view(template_name='ajaxform.html')
 messages_view = MessagesView.as_view(template_name='messages.html')
 pjax_view = TemplateView.as_view(template_name='pjax.html')
 pjax_messages_view = PjaxMessagesView.as_view(template_name='pjax_messages.html')
-pjax_forms_view = PjaxFormsView.as_view(template_name='pjax_forms.html')
+pjax_form_post_view = PjaxFormPostView.as_view(template_name='pjax_form_post.html')
+pjax_form_get_view = PjaxFormGetView.as_view(template_name='pjax_form_get.html')

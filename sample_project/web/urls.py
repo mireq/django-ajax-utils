@@ -13,5 +13,6 @@ urlpatterns = [
 	url(r'^messages/$', views.messages_view, name='messages'),
 	url(r'^pjax/$', views.pjax_view, name='pjax'),
 	url(r'^pjax/messages/$', views.pjax_messages_view, name='pjax_messages'),
-	url(r'^pjax/forms/$', views.pjax_forms_view, name='pjax_forms'),
+	url(r'^pjax/form/post/$', views.pjax_form_post_view, name='pjax_form_post'),
+	url(r'^pjax/form/get/$', views.pjax_form_get_view, name='pjax_form_get'),
 ]
