@@ -56,7 +56,7 @@ def js_urlpatterns(*export_patterns):
 		export_patterns = export_patterns[0]
 	export_patterns = set(export_patterns)
 	if export_patterns:
-		url_patterns = [pattern for pattern in prepare_url_list(url_resolver) if pattern['name'] in export_patterns]
+		url_patterns = {pattern['name']: pattern['patterns'] for pattern in prepare_url_list(url_resolver) if pattern['name'] in export_patterns}
 	else:
-		url_patterns = list(prepare_url_list(url_resolver))
+		url_patterns = {pattern['name']: pattern['patterns'] for pattern in prepare_url_list(url_resolver)}
 	return safe_json_str(json.dumps(url_patterns))
