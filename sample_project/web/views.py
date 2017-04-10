@@ -52,7 +52,7 @@ class PjaxFormPostView(AjaxFormMixin, FormView):
 class PjaxFormGetView(AjaxFormMixin, TemplateView):
 	def get_context_data(self, **kwargs):
 		ctx = super(PjaxFormGetView, self).get_context_data(**kwargs)
-		ctx['form'] = MessagesForm()
+		ctx['form'] = MessagesForm(self.request.GET or None)
 		return ctx
 
 
