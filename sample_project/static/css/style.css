@@ -149,7 +149,7 @@ body.loading, body.loading * {
 }
 
 body.loading {
-	opacity: .95;
+	opacity: .5;
 	pointer-events: none;
 }
 
