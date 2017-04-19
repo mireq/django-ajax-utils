@@ -148,7 +148,7 @@ var pjaxLoader = function(options) {
 		var match;
 
 		_.forEach(self.extrajsBlocks, function(block) {
-			extrajsBlocks.append(response.blocks[block]);
+			extrajsBlocks.push(response.blocks[block]);
 		});
 
 		_.forEach(extrajsBlocks, function(extrajsBlock) {
