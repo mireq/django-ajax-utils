@@ -38,8 +38,12 @@ var xhrSend = function(options) {
 		}
 	}
 	req.open(opts.method, opts.url, true);
-	req.setRequestHeader('X-CSRFToken', _utils.getCookie('csrftoken'));
-	req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+	if (!_.has(extraHeaders, 'X-CSRFToken')) {
+		req.setRequestHeader('X-CSRFToken', _utils.getCookie('csrftoken'));
+	}
+	if (!_.has(extraHeaders, 'X-Requested-With')) {
+		req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+	}
 	if (opts.method === 'POST') {
 		req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 	}

@@ -44,7 +44,7 @@ def pjax_supported(request):
 def is_pjax(request):
 	if not request:
 		return False
-	return request.META.get('HTTP_X_PJAX') == 'true' and pjax_supported(request)
+	return request.META.get('HTTP_X_REQUESTED_WITH') == 'PJAXRequest' and pjax_supported(request)
 
 
 class Middleware(object):

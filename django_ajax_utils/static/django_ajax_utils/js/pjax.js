@@ -232,7 +232,7 @@ var pjaxLoader = function(options) {
 			_.xhrSend({
 				url: url,
 				extraHeaders: {
-					'X-PJAX': 'true'
+					'X-Requested-With': 'PJAXRequest'
 				},
 				successFn: function(response, res, options) {
 					if (ignoreLink) {
