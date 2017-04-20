@@ -52,7 +52,7 @@ var pjaxLoader = function(options) {
 	var checkFormSupported = function(element, loader) {
 		var method = element.getAttribute('method');
 		var action = element.getAttribute('action');
-		if (method.toLowerCase() == 'post') {
+		if (method.toLowerCase() !== 'get') {
 			return false;
 		}
 		return self.checkUrlSupported(action, loader);
