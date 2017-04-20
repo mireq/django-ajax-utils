@@ -440,7 +440,12 @@ var elem = function(elementName, attrs, content) {
 	}
 
 	if (content !== undefined) {
-		element.appendChild(document.createTextNode(content));
+		if (isElement(content)) {
+			element.appendChild(content);
+		}
+		else {
+			element.appendChild(document.createTextNode(content));
+		}
 	}
 	return element;
 };
