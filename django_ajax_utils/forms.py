@@ -61,4 +61,5 @@ class SetWidgetAttrsMixin(object):
 	def __init__(self, *args, **kwargs):
 		super(SetWidgetAttrsMixin, self).__init__(*args, **kwargs)
 		for fieldname, attrs in self.widget_attrs.items():
-			self.fields[fieldname].widget.attrs.update(attrs)
+			if fieldname in self.fields:
+				self.fields[fieldname].widget.attrs.update(attrs)
