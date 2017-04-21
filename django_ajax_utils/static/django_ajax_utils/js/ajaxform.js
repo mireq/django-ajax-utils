@@ -83,7 +83,7 @@ var ajaxformBase = function(formElement, options) {
 
 	// === Events ===
 	self.onInputChanged = self.options.onInputChanged || function(e, instant) {};
-	self.onFormSubmit = self.options.onFormSubmit || function(e) {};
+	self.onFormSubmit = self.options.onFormSubmit || function(e) { self.submit(); e.preventDefault(); };
 	self.onFormSubmitSuccess = self.options.onFormSubmitSuccess || function(data, e) {};
 	self.onFormSubmitFail = self.options.onFormSubmitFail || function(response) {};
 	// query is mutable
