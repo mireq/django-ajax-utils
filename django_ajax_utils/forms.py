@@ -15,7 +15,7 @@ class AutoPlaceholderFormMixin(object):
 		for field in self.fields.values():
 			if not 'placeholder' in field.widget.attrs and field.label:
 				placeholder = field.help_text or field.label
-				if not isinstance(field.label, SafeText) and not isinstance(placeholder, CheckboxInput):
+				if not isinstance(field.label, SafeText) and not isinstance(field.widget, CheckboxInput):
 					field.widget.attrs['placeholder'] = placeholder
 
 
