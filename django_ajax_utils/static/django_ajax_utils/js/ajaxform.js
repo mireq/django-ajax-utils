@@ -70,19 +70,23 @@ var submitDisabler = function(formElement) {
 
 var ajaxformBase = function(formElement, options) {
 	var self = {};
+	var validate;
 
 	self.formElement = formElement;
 	self.options = _.lightCopy(options || {});
 	self.options.liveValidate = self.options.liveValidate || false;
 	self.options.onlyValidateField = self.options.onlyValidateField || _.getData(formElement, 'onlyValidateField') || 'only_validate';
 	self.options.formName = self.options.formName || _.getData(formElement, 'formName') || 'form';
+	if (self.options.validateDelay === undefined) {
+		self.options.validateDelay = 1000;
+	}
 	self.inputs = [];
 	self.submits = [];
 	self.submitButton = undefined;
 	self.initial = undefined;
 
 	// === Events ===
-	self.onInputChanged = self.options.onInputChanged || function(e, finished) {};
+	self.onInputChanged = self.options.onInputChanged || function(e, finished) { if (finished) { validate.instant(e); } else { validate(e); } };
 	self.onFormSubmit = self.options.onFormSubmit || function(e) { self.submit(); e.preventDefault(); };
 	self.onFormSubmitSuccess = self.options.onFormSubmitSuccess || function(data, e) {};
 	self.onFormSubmitFail = self.options.onFormSubmitFail || function(response) {};
@@ -308,6 +312,16 @@ var ajaxformBase = function(formElement, options) {
 		};
 	};
 
+	if (self.options.validateDelay === null) {
+		validate = self.validate;
+		validate.instant = function() {
+			self.validate();
+		};
+	}
+	else {
+		validate = _.debounce(self.validate, self.options.validateDelay);
+	}
+
 	_.forEach(formElement.elements, self.registerElement);
 	_.bindEvent(formElement, 'submit', onFormSubmit);
 
@@ -325,8 +339,6 @@ var ajaxform = function(formElement, options) {
 	var self = ajaxformBase(formElement, o);
 	var disabler = submitDisabler(formElement);
 	var preserveErrors = {__all__: true};
-
-	var validate = _.debounce(self.validate, 1000);
 
 	var errorIdToName = function(id) {
 		var match = id.match(/(id_.*)_errors/);
@@ -358,15 +370,6 @@ var ajaxform = function(formElement, options) {
 		}
 		errorContainers[elementName] = element;
 	});
-
-	self.onInputChanged = function(e, finished) {
-		if (finished) {
-			validate.instant(e);
-		}
-		else {
-			validate(e);
-		}
-	};
 
 	self.onFormSubmit = function(e) {
 		self.submit();
