@@ -38,7 +38,10 @@ class SetRequiredFieldsMixin(object):
 	def __init__(self, *args, **kwargs):
 		super(SetRequiredFieldsMixin, self).__init__(*args, **kwargs)
 		for fieldname, is_required in self.required_fields.items():
-			self.fields[fieldname].required = is_required
+			self.set_field_required(fieldname, is_required)
+
+	def set_field_required(self, fieldname, is_required):
+		self.fields[fieldname].required = is_required
 
 
 class SetWidgetAttrsMixin(object):
