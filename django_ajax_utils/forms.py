@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.forms import CheckboxInput
-from django.utils.safestring import SafeText
+from django.utils.encoding import force_text
 
 
 class AutoPlaceholderFormMixin(object):
@@ -15,7 +15,8 @@ class AutoPlaceholderFormMixin(object):
 		for field in self.fields.values():
 			if not 'placeholder' in field.widget.attrs and field.label:
 				placeholder = field.help_text or field.label
-				if not isinstance(field.label, SafeText) and not isinstance(field.widget, CheckboxInput):
+				label = force_text(field.label)
+				if not hasattr(label, '__html__') and not isinstance(field.widget, CheckboxInput):
 					field.widget.attrs['placeholder'] = placeholder
 
 
