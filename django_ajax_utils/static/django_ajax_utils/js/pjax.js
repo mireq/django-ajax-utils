@@ -2,6 +2,7 @@
 
 var isSupported = _.checkFeatures(['history_push']);
 var pjax = {};
+var extrastyleCode = [];
 var firstrun = true;
 _utils.pjax = pjax;
 
