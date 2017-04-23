@@ -559,13 +559,23 @@ window._utils.getViewportSize = getViewportSize;
 
 
 // scroll
-var findVerticalPos = function(element) {
+var findGlobalPos = function(obj) {
+	var curleft = 0;
 	var curtop = 0;
-	do {
-		curtop += element.offsetTop || 0;
-		element = element.offsetParent;
-	} while(element);
-	return curtop;
+	if (obj.offsetParent) {
+		do {
+			curleft += obj.offsetLeft;
+			curtop += obj.offsetTop;
+		} while (obj = obj.offsetParent);
+		return [curleft, curtop];
+	}
+};
+
+var findVerticalPos = function(obj) {
+	var pos = findGlobalPos(obj);
+	if (pos) {
+		return pos[1];
+	}
 };
 
 var scrollToElement = function(element) {
@@ -592,6 +602,7 @@ var getScroll = function(){
 	}
 };
 
+window._utils.findGlobalPos = findGlobalPos;
 window._utils.findVerticalPos = findVerticalPos;
 window._utils.scrollToElement = scrollToElement;
 window._utils.getScroll = getScroll;
