@@ -286,4 +286,20 @@ var formElement = _.id('example_form');
 dumpVar(_.serializeForm(formElement, {raw: true}));
 </pre>
 
+<h2>URLS</h2>
+
+<p><code>_.getUrlParameterByName</code></p>
+
+<pre class="run">
+var url = "http://example.tld/?parameter=value";
+dumpVar(_.getUrlParameterByName('parameter', url));
+</pre>
+
+<p><code>_.encodeURLParameters</code></p>
+
+<pre class="run">
+var parameters = {parameter: 'value', parameter2: 'value2'};
+dumpVar(_.encodeURLParameters(parameters));
+</pre>
+
 {% endblock %}

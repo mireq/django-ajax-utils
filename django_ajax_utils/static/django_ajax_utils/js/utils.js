@@ -566,7 +566,7 @@ var findGlobalPos = function(obj) {
 		do {
 			curleft += obj.offsetLeft;
 			curtop += obj.offsetTop;
-		} while (obj = obj.offsetParent);
+		} while (obj = obj.offsetParent); // jshint ignore:line
 		return [curleft, curtop];
 	}
 };
@@ -811,15 +811,20 @@ var serializeForm = function(formElement, options) {
 
 var getUrlParameterByName = function(name, url) {
 	var location = url || window.location;
-	var nameReg = nameReg.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+	var nameReg = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
 	var regex = new RegExp("[\\?&]" + nameReg + "=([^&#]*)");
 	var results = regex.exec(location);
 	return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, " "));
 };
 
+var encodeURLParameters = function(parameters) {
+	
+};
+
 window._utils.serializeFormElement = serializeFormElement;
 window._utils.serializeForm = serializeForm;
 window._utils.getUrlParameterByName = getUrlParameterByName;
+window._utils.encodeURLParameters = getUrlParameterByName;
 
 
 if (!Function.prototype.bind) {
