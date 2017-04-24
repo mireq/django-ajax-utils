@@ -312,8 +312,18 @@ dumpVar(_.getUrlParameterByName('parameter', url));
 <p><code>_.encodeURLParameters</code></p>
 
 <pre class="run">
-var parameters = {parameter: 'value', parameter2: 'value2'};
+var parameters = {parameter: 'value', 'special#': 'special#value',};
 dumpVar(_.encodeURLParameters(parameters));
+
+var parameters = [['multi', 1], ['multi', 2], ['multi', 3]];
+dumpVar(_.encodeURLParameters(parameters));
+</pre>
+
+<p><code>_.addURLParameters</code></p>
+
+<pre class="run">
+var parameters = {q: 'search string'};
+dumpVar(_.addURLParameters('http://google.com/', parameters));
 </pre>
 
 {% endblock %}

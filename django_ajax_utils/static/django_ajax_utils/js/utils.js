@@ -837,13 +837,37 @@ var getUrlParameterByName = function(name, url) {
 };
 
 var encodeURLParameters = function(parameters) {
-	
+	var urlParameterList = parameters;
+	if (!Array.isArray(parameters)) {
+		urlParameterList = dictToPairs(urlParameterList);
+	}
+
+	var urlComponents = [];
+	forEach(urlParameterList, function(parameter) {
+		urlComponents.push(encodeURIComponent(parameter[0]) + '=' + encodeURIComponent(parameter[1]));
+	});
+	return urlComponents.join('&');
+};
+
+var addURLParameters = function(url, parameters) {
+	var encodedParameters = encodeURLParameters(parameters);
+	var finalUrl = url;
+	if (encodedParameters.length > 0) {
+		if (finalUrl.indexOf('?') === -1) {
+			finalUrl += '?' + encodedParameters;
+		}
+		else {
+			finalUrl += '&' + encodedParameters;
+		}
+	}
+	return finalUrl;
 };
 
 window._utils.serializeFormElement = serializeFormElement;
 window._utils.serializeForm = serializeForm;
 window._utils.getUrlParameterByName = getUrlParameterByName;
-window._utils.encodeURLParameters = getUrlParameterByName;
+window._utils.encodeURLParameters = encodeURLParameters;
+window._utils.addURLParameters = addURLParameters;
 
 
 if (!Function.prototype.bind) {
