@@ -76,6 +76,13 @@ _.forEach(a, function(element, idx) { dumpVar(element); });
 _.forEach(document.getElementsByClassName('run'), function(element, idx) { dumpVar(element.textContent.length); });
 </pre>
 
+<p><code>_.forEachDict</code></p>
+
+<pre class="run">
+var a = {key: 'value'};
+_.forEachDict(a, function(key, value) { dumpVar(key + '=' + value); });
+</pre>
+
 <p><code>_.map</code></p>
 
 <pre class="run">

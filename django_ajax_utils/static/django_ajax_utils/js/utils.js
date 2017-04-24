@@ -107,7 +107,14 @@ else {
 	};
 }
 
-
+var forEachDict = function(collection, fn) {
+	for (var key in collection) {
+		if (has(collection, key)) {
+			var value = collection[key];
+			fn(key, value);
+		}
+	}
+};
 
 var map;
 if (Array.prototype.map) {
@@ -191,6 +198,7 @@ var keys = function(dct) {
 };
 
 window._utils.forEach = forEach;
+window._utils.forEachDict = forEachDict;
 window._utils.map = map;
 window._utils.some = some;
 window._utils.every = every;
