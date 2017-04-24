@@ -24,6 +24,10 @@ var runable = function(runElement) {
 	runnableBlock.appendChild(scriptOutput);
 
 	self.code = runElement.textContent;
+	var code = runElement.innerHTML;
+	code = code.replace(/(\/\/.*)$/gm, '<span class="comment">$1</span>');
+	code = code.replace('dumpVar', '<span class="std">console.log</span>');
+	runElement.innerHTML = code;
 
 	self.run = function(event) {
 		if (event !== undefined) {

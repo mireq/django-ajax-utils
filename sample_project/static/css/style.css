@@ -109,6 +109,16 @@ pre.output {
 	border: 1px solid #eee;
 }
 
+pre .std {
+	font-weight: bold;
+	color: #b08000;
+	font-weight: bold;
+}
+
+pre .comment {
+	color: #898887;
+}
+
 code {
 	font-family: monospace;
 	color: #822;
