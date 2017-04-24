@@ -116,6 +116,14 @@ var forEachDict = function(collection, fn) {
 	}
 };
 
+var dictToPairs = function(collection) {
+	var pairs = [];
+	forEachDict(collection, function(key, value) {
+		pairs.push([key, value]);
+	});
+	return pairs;
+};
+
 var map;
 if (Array.prototype.map) {
 	var coreMap = Array.prototype.map;
@@ -199,6 +207,7 @@ var keys = function(dct) {
 
 window._utils.forEach = forEach;
 window._utils.forEachDict = forEachDict;
+window._utils.dictToPairs = dictToPairs;
 window._utils.map = map;
 window._utils.some = some;
 window._utils.every = every;

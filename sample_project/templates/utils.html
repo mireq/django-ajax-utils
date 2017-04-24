@@ -80,7 +80,14 @@ _.forEach(document.getElementsByClassName('run'), function(element, idx) { dumpV
 
 <pre class="run">
 var a = {key: 'value'};
-_.forEachDict(a, function(key, value) { dumpVar(key + '=' + value); });
+.forEachDict(a, function(key, value) { dumpVar(key + '=' + value); });
+</pre>
+
+<p><code>_.dictToPairs</code></p>
+
+<pre class="run">
+var a = {key: 'value'};
+dumpVar(_.dictToPairs(a));
 </pre>
 
 <p><code>_.map</code></p>
