@@ -76,9 +76,9 @@ var pjaxLoader = function(options) {
 
 	self.bodyLoadingCls = self.options.bodyLoadingCls || 'loading';
 	self.pjaxContainerId = self.options.pjaxContainerId || 'pjax_container';
-	self.extrajsBlock = self.options.extrajsBlock || 'pjax_container';
+	self.extrajsBlock = self.options.extrajsBlock || 'extrajs';
 	self.extrajsBlocks = self.options.extrajsBlocks || [];
-	self.extrastyleBlock = self.options.extrastyleBlock || 'pjax_container';
+	self.extrastyleBlock = self.options.extrastyleBlock || 'extrastyle';
 	self.titleBlock = self.options.titleBlock || 'head_title';
 
 	self.checkLinkSupported = self.options.checkLinkSupported || checkLinkSupported;
