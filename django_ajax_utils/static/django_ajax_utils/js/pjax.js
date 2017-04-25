@@ -141,7 +141,7 @@ var pjaxLoader = function(options) {
 			return;
 		}
 		var extrajsRx = /src="([^"]*)"/g;
-		var extrastyleRx = /<link([^>]*)>/g;
+		var extrastyleRx = /<link([^>]+)>/g;
 		var extrajsBlocks = [response.blocks[self.extrajsBlock]];
 		var extrastyleBlock = response.blocks[self.extrastyleBlock];
 		var extrajs = [];
@@ -166,7 +166,7 @@ var pjaxLoader = function(options) {
 			do {
 				match = extrastyleRx.exec(extrastyleBlock);
 				if (match !== null) {
-					extrastyle.push(match[1]);
+					extrastyle.push(match[0]);
 				}
 			} while (match !== null);
 		}
