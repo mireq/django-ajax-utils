@@ -257,7 +257,7 @@ var pjaxLoader = function(options) {
 				headersFn: function(response) {
 					var contentType = response.getResponseHeader('content-type');
 					if (contentType === null || (contentType.indexOf('application/json') !== 0 && contentType.indexOf('text/html') !== 0)) {
-						window.location = link;
+						window.location = url;
 						ignoreLink = true;
 						return;
 					}
@@ -265,7 +265,7 @@ var pjaxLoader = function(options) {
 			});
 		}
 		else {
-			processPjax(pjaxOptions.response, link, pjaxOptions);
+			processPjax(pjaxOptions.response, url, pjaxOptions);
 		}
 	};
 
