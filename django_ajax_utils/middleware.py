@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-
-DUMMY_PARAMETER_NAMES = ['_dummy']
+from .settings import DUMMY_PARAMETER_NAMES
 
 
 class RemoveDummyParametersMiddleware(object):
