@@ -263,7 +263,7 @@ var ajaxformBase = function(formElement, options) {
 	// Get form data in array of key-value pairs
 	self.getFormData = function() {
 		var q = [];
-		_.forEach(self.inputs, function(input) {
+		_.forEach(self.formElement.elements, function(input) {
 			_.forEach(_.serializeFormElement(input), function(name_value) {
 				q.push(name_value);
 			});
