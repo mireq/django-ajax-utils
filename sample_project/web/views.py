@@ -65,3 +65,4 @@ pjax_messages_view = PjaxMessagesView.as_view(template_name='pjax_messages.html'
 pjax_form_post_view = PjaxFormPostView.as_view(template_name='pjax_form_post.html')
 pjax_form_get_view = PjaxFormGetView.as_view(template_name='pjax_form_get.html')
 urlpatterns_view = TemplateView.as_view(template_name='urlpatterns.html')
+form_utils_view = AjaxFormView.as_view(template_name='form_utils/base.html')

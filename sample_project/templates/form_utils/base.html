@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% load form_utils staticfiles %}
+
+{% block head_title %}Form utils{% endblock %}
+{% block site_title %}Form utils{% endblock %}
+
+{% block content %}
+	<form class="ajaxform" action="{{ request.path }}" method="post">
+		{% csrf_token %}
+		{% form form %}
+		<div class="submit-row">
+			<div class="positive">
+				<button type="submit" data-loading-text="Saving ...">Save</button>
+			</div>
+		</div>
+	</form>
+{% endblock %}
+
+{% block extrajs %}
+	{{ block.super }}
+	<script src="{% static "js/ajaxform_init.js" %}"></script>
+{% endblock %}
