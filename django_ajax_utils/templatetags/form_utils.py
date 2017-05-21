@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import types
+
 from django import template
 
 
@@ -47,8 +49,8 @@ def form(parser, token):
 	template_name = '"form_utils/layout/default.html"'
 	nodelist = None
 	if len(contents) > 2:
-		if contents[2] != 'with':
-			raise template.TemplateSyntaxError('%r tag\'s first argument should be with' % tag_name)
+		if contents[2] != 'using':
+			raise template.TemplateSyntaxError('%r tag\'s first argument should be using' % tag_name)
 		if len(contents) == 3:
 			nodelist = parser.parse(('end%s' % tag_name,))
 			parser.delete_first_token()
@@ -82,3 +84,19 @@ def formrow(context, field, template_name=None):
 	finally:
 		context.pop()
 	return output
+
+
+@register.filter
+def add_field_class(field, cls):
+	as_widget_copy = field.as_widget
+
+	def as_widget(self, widget=None, attrs=None, *args, **kwargs):
+		attrs = attrs or {}
+		attrs.setdefault('class', '')
+		attrs['class'] += ' ' + cls
+		output = as_widget_copy(widget, attrs, *args, **kwargs)
+		self.as_widget = as_widget_copy
+		return output
+
+	field.as_widget = types.MethodType(as_widget, field)
+	return field
