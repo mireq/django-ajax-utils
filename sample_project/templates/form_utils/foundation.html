@@ -13,17 +13,12 @@
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.min.css">
 {% endblock %}
 
-{% block extrajs %}
-	{{ block.super }}
-	<script src="{% static "js/ajaxform_init.js" %}"></script>
-{% endblock %}
-
 {% block body %}
 	<div class="row">
 		<div class="columns">
 			<h1>Form utils (foundation)</h1>
 
-			<form class="ajaxform" action="{{ request.path }}" method="post">{% csrf_token %}
+			<form class="ajaxform foundation" action="{{ request.path }}" method="post">{% csrf_token %}
 
 				{% form form using "form_utils/layout/foundation.html" %}
 				<button class="button" type="submit" data-loading-text="Saving ...">Save</button>

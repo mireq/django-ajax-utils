@@ -409,7 +409,7 @@ var ajaxform = function(formElement, options) {
 	};
 
 	self.clearStatus = function(fieldName) {
-		var errorContainer = self.getErrorContainer(fieldName, true);
+		var errorContainer = self.getErrorContainer(fieldName, fieldName !== '__all__');
 		if (errorContainer === null) {
 			return;
 		}
@@ -466,9 +466,69 @@ var ajaxform = function(formElement, options) {
 	return self;
 };
 
+var ajaxformFoundation = function(formElement, options) {
+	var self = ajaxform(formElement, options);
+
+	self.addErrors = function(fieldName, errorList) {
+		var errorContainer = self.getErrorContainer(fieldName);
+		if (fieldName === '__all__') {
+			var box = _.cls(errorContainer, 'alert')[0];
+			if (box === undefined) {
+				box = _.elem('div', {'class': 'alert callout'});
+				errorContainer.appendChild(box);
+			}
+			_.forEach(errorList, function(error) {
+				var errorElement = _.elem('p');
+				var icon = _.elem('i', {'class': 'fi-alert'});
+				errorElement.appendChild(icon);
+				errorElement.appendChild(document.createTextNode(' '));
+				errorElement.appendChild(document.createTextNode(error.message));
+				box.appendChild(errorElement);
+			});
+		}
+		else {
+			_.forEach(errorList, function(error) {
+				errorContainer.appendChild(_.elem('span', {'class': 'form-error is-visible'}, error.message));
+			});
+			var row = self.findFormRow(errorContainer);
+			if (row !== null) {
+				_.forEach(_.cls(row, 'foundation-field'), function(field) {
+					_.addClass(field, 'is-invalid-input');
+				});
+				_.forEach(_.tag(row, 'label'), function(label) {
+					_.addClass(label, 'is-invalid-label');
+				});
+			}
+		}
+	};
+
+	self.setValid = function(fieldName) {
+	};
+
+	self.clearStatus = function(fieldName) {
+		var errorContainer = self.getErrorContainer(fieldName, fieldName !== '__all__');
+		if (errorContainer === null) {
+			return;
+		}
+		errorContainer.innerHTML = '';
+		var row = self.findFormRow(errorContainer);
+		if (row !== null) {
+			_.forEach(_.cls(row, 'foundation-field'), function(field) {
+				_.removeClass(field, 'is-invalid-input');
+			});
+			_.forEach(_.tag(row, 'label'), function(label) {
+				_.removeClass(label, 'is-invalid-label');
+			});
+		}
+	};
+
+	return self;
+};
+
 
 window._utils.ajaxformBase = ajaxformBase;
 window._utils.ajaxform = ajaxform;
+window._utils.ajaxformFoundation = ajaxformFoundation;
 
 
 }(_utils));
