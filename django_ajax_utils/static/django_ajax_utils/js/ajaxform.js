@@ -352,42 +352,34 @@ var ajaxform = function(formElement, options) {
 		return _.hasClass(element, o.rowClass) || element === formElement;
 	};
 
-	var errorContainers = {};
-	errorContainers.__all__ = _.cls(formElement, o.nonFieldErrorsClass)[0];
-	if (!errorContainers.__all__) {
-		errorContainers.__all__ = _.elem('div', {'class': o.nonFieldErrorsClass});
-		if (formElement.childNodes.length) {
-			formElement.insertBefore(errorContainers.__all__, formElement.childNodes[0]);
+	var getFallbackErrorContainer = function() {
+		var container = _.cls(formElement, o.nonFieldErrorsClass)[0];
+		if (container === undefined) {
+			container = _.elem('div', {'class': o.nonFieldErrorsClass});
+			if (formElement.childNodes.length) {
+				formElement.insertBefore(container, formElement.childNodes[0]);
+			}
+			else {
+				formElement.appendChild(container);
+			}
 		}
-		else {
-			formElement.appendChild(errorContainers.__all__);
+		return container;
+	};
+
+	self.getErrorContainer = function(fieldName, strict) {
+		var container = _.id(fieldName + '_errors');
+		if (strict || container !== null) {
+			return container;
 		}
-	}
-	_.forEach(_.cls(formElement, o.fieldErrorsClass), function(element) {
-		var id = element.getAttribute('id');
-		if (id === null) {
-			return;
-		}
-		var elementName = errorIdToName(id);
-		if (elementName === null) {
-			return;
-		}
-		errorContainers[elementName] = element;
-	});
+		return getFallbackErrorContainer();
+	};
 
 	self.findFormRow = function(element) {
 		return _.findParent(element, checkFormRow);
 	};
 
-	self.addErrors = function(elementName, errorList) {
-		var errorContainer;
-		if (_.has(errorContainers, elementName)) {
-			errorContainer = errorContainers[elementName];
-		}
-		else {
-			errorContainer = errorContainers.__all__;
-		}
-
+	self.addErrors = function(fieldName, errorList) {
+		var errorContainer = self.getErrorContainer(fieldName);
 		var errorsElement = _.tag(errorContainer, 'ul')[0];
 		if (errorsElement === undefined) {
 			errorsElement = _.elem('ul', {'class': 'errors'});
@@ -405,16 +397,22 @@ var ajaxform = function(formElement, options) {
 		}
 	};
 
-	self.setValid = function(elementName) {
-		var errorContainer = errorContainers[elementName];
+	self.setValid = function(fieldName) {
+		var errorContainer = self.getErrorContainer(fieldName, true);
+		if (errorContainer === null) {
+			return;
+		}
 		var row = self.findFormRow(errorContainer);
 		if (row !== null) {
 			_.addClass(row, 'no-errors');
 		}
 	};
 
-	self.clearStatus = function(elementName) {
-		var errorContainer = errorContainers[elementName];
+	self.clearStatus = function(fieldName) {
+		var errorContainer = self.getErrorContainer(fieldName, true);
+		if (errorContainer === null) {
+			return;
+		}
 		errorContainer.innerHTML = '';
 		var row = self.findFormRow(errorContainer);
 		if (row !== null) {
@@ -439,14 +437,16 @@ var ajaxform = function(formElement, options) {
 
 	self.onValidate = function(formData, onlyValidate) {
 		var key;
-		for (key in errorContainers) {
-			if (_.has(errorContainers, key)) {
+		self.clearStatus('__all__');
+		for (key in formData.errors) {
+			if (_.has(formData.errors, key)) {
 				self.clearStatus(key);
 			}
-			if (!onlyValidate) {
-				showErrorsOnFly = {__all__: true};
-			}
 		}
+		_.forEach(formData.valid, function(key) {
+			self.clearStatus(key);
+		});
+
 		for (key in formData.errors) {
 			if (_.has(formData.errors, key)) {
 				if (onlyValidate && !showErrorsOnFly[key] && formData.empty.indexOf(key) !== -1) {
