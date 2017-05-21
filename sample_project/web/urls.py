@@ -17,4 +17,5 @@ urlpatterns = [
 	url(r'^pjax/form/get/$', views.pjax_form_get_view, name='pjax_form_get'),
 	url(r'^urlpatterns/(?:(?P<param>\w+)/)?$', views.urlpatterns_view, name='urlpatterns'),
 	url(r'^form-utils/$', views.form_utils_view, name='form_utils'),
+	url(r'^form-utils/foundation/$', views.form_utils_foundation_view, name='form_utils_foundation'),
 ]

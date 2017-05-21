@@ -1,0 +1,29 @@
+{% extends "form_utils/base.html" %}
+
+{% load form_utils %}
+
+{% block style %}
+{% endblock %}
+
+{% block head_title %}Form utils (foundation){% endblock %}
+
+{% block extrastyle %}
+	{{ block.super }}
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/foundation/6.3.1/css/foundation.min.css">
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.min.css">
+{% endblock %}
+
+{% block body %}
+	<div class="row">
+		<div class="columns">
+			<h1>Form utils (foundation)</h1>
+
+			<form class="ajaxform" action="{{ request.path }}" method="post">{% csrf_token %}
+
+				{% form form using "form_utils/layout/foundation.html" %}
+				<button class="button" type="submit" data-loading-text="Saving ...">Save</button>
+
+			</form>
+		</div>
+	</div>
+{% endblock %}

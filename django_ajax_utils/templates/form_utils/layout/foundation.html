@@ -1,14 +1,14 @@
 {% load form_utils %}
 
-{% formrow_template "form_utils/row/default.html" %}
+{% formrow_template "form_utils/row/foundation.html" %}
 
 <div class="non-field-errors">
 	{% if form.non_field_errors %}
-		<ul class="errors">
+		<div class="alert callout">
 			{% for error in form.non_field_errors %}
-				<li>{{ error }}</li>
+			<p><i class="fi-alert"></i> {{ error }}</p>
 			{% endfor %}
-		</ul>
+		</div>
 	{% endif %}
 </div>
 
