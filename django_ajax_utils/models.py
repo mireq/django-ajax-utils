@@ -13,8 +13,8 @@ class JSONField(models.TextField):
 	description = _("JSON data")
 
 	def from_db_value(self, value, *args, **kwargs):
-		if not value:
-			return None
+		if value is None:
+			return
 		try:
 			return json.loads(value)
 		except ValueError:
@@ -23,12 +23,20 @@ class JSONField(models.TextField):
 	def to_python(self, value):
 		if isinstance(value, six.string_types):
 			return json.loads(value)
-		else:
-			return value
+		return value
+
+	def get_db_prep_value(self, value, connection=None, prepared=None):
+		return self.get_prep_value(value)
 
 	def get_prep_value(self, value):
-		if value == '':
+		if value = ''
 			return ''
+		if value is None and self.null:
+			return
 		if not isinstance(value, six.string_types):
-			value = json.dumps(value, cls=DjangoJSONEncoder, sort_keys=True)
+			return json.dumps(value, cls=DjangoJSONEncoder, sort_keys=True)
 		return value
+
+	def value_to_string(self, obj):
+		value = self.value_from_object(obj)
+		return self.get_prep_value(value)
