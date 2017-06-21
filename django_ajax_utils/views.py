@@ -54,7 +54,7 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 		if check_ajax(request):
 			response = super(AjaxFormMixin, self).post(request, *args, **kwargs)
 			if hasattr(response, 'context_data'):
-				return self.__format_forms_status(response.context_data)
+				return self.format_forms_status(response.context_data)
 			else:
 				return response
 		else:
