@@ -65,14 +65,14 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 			return self.render_to_response(self.get_context_data(form=form))
 		return super(AjaxFormMixin, self).form_valid(form)
 
-	def __format_forms_status(self, ctx, status_code=200):
+	def format_forms_status(self, ctx, status_code=200):
 		json_response = {'forms': {}}
 		for key, form in ctx.items():
 			if isinstance(form, forms.BaseForm):
-				json_response['forms'][key] = self.__format_form_status(form)
+				json_response['forms'][key] = self.format_form_status(form)
 		return self.render_json_response(json_response, status=status_code)
 
-	def __format_form_status(self, form):
+	def format_form_status(self, form):
 		form_data = {
 			'status': 'valid' if form.is_valid() else 'invalid',
 			'errors': {},
@@ -81,7 +81,7 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 
 		def add_formset_status(formset):
 			for formrow in formset:
-				status = self.__format_form_status(formrow)
+				status = self.format_form_status(formrow)
 				form_data['errors'].update(status['errors'])
 				form_data['valid'] += status['valid']
 
