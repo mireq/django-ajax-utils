@@ -29,7 +29,7 @@ class JSONField(models.TextField):
 		return self.get_prep_value(value)
 
 	def get_prep_value(self, value):
-		if value = '':
+		if value == '':
 			return ''
 		if value is None and self.null:
 			return
