@@ -60,8 +60,8 @@ var registerMessages = function(element) {
 };
 
 var register = function(element) {
-	_.addClass(element, 'ajax');
 	_.forEach(_.cls(element, 'messages-container'), function(element) {
+		_.addClass(element, 'ajax');
 		registerMessages(element);
 	});
 };
