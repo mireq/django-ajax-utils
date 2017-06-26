@@ -1,24 +1,27 @@
 {% load form_utils %}
-<div{% if field.auto_id %} id="{{ field.auto_id }}-form-row"{% endif %} class="form-row{% if field.errors %} has-errors{% endif %}{% if field.field.required %} required{% endif %}">
-	<label for="{{ field.auto_id }}" class="field-label{% if field.errors %} is-invalid-label{% endif %}">
-		{{ field.label|safe }}:
-	</label>
-	<span class="form-control">
-		{% if field.errors %}
-			{{ field|add_field_class:"foundation-field is-invalid-input" }}
-		{% else %}
-			{{ field|add_field_class:"foundation-field" }}
-		{% endif %}
-	</span>
-	{% if field.help_text %}<p class="help-text">{{ field.field.help_text|safe }}</p>{% endif %}
-	<div class="field-errors" id="{{ field.auto_id }}_errors">
-		{% if field.errors %}
-			<div class="errors">
-				{% for error in field.errors %}
-					<span class="form-error is-visible">{{ error }}</span>
-				{% endfor %}
-			</div>
-		{% endif %}
+{% if field.is_hidden %}
+	{{ field }}
+{% else %}
+	<div{% if field.auto_id %} id="{{ field.auto_id }}-form-row"{% endif %} class="form-row{% if field.errors %} has-errors{% endif %}{% if field.field.required %} required{% endif %}">
+		<label for="{{ field.auto_id }}" class="field-label{% if field.errors %} is-invalid-label{% endif %}">
+			{{ field.label|safe }}:
+		</label>
+		<span class="form-control">
+			{% if field.errors %}
+				{{ field|add_field_class:"foundation-field is-invalid-input" }}
+			{% else %}
+				{{ field|add_field_class:"foundation-field" }}
+			{% endif %}
+		</span>
+		{% if field.help_text %}<p class="help-text">{{ field.field.help_text|safe }}</p>{% endif %}
+		<div class="field-errors" id="{{ field.auto_id }}_errors">
+			{% if field.errors %}
+				<div class="errors">
+					{% for error in field.errors %}
+						<span class="form-error is-visible">{{ error }}</span>
+					{% endfor %}
+				</div>
+			{% endif %}
+		</div>
 	</div>
-</div>
-
+{% endif %}
