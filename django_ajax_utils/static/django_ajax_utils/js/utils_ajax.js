@@ -75,7 +75,11 @@ var xhrSend = function(options) {
 			}
 		}
 	};
-	req.send(opts.data);
+	var data = opts.data;
+	if (typeof data != 'string') {
+		data = _.encodeURLParameters(data);
+	}
+	req.send(data);
 };
 
 window._utils.xhrSend = xhrSend;
