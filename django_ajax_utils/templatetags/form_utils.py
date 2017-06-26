@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import types
 
+from django import forms
 from django import template
 
 
@@ -74,6 +75,8 @@ def formrow_template(context, template_name):
 def formrow(context, field, template_name=None):
 	if not 'form_utils_form' in context:
 		raise template.TemplateSyntaxError('This tag is allowed only inside template form tag')
+	if not isinstance(field, (forms.Field, forms.BoundField)):
+		return ''
 	if template_name is None:
 		template_name = getattr(context['form_utils_form'], FORMROW_TEMPLATE_ATTRIBUTE)
 	context.push()
