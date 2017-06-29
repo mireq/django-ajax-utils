@@ -136,7 +136,12 @@ var pjaxLoader = function(options) {
 
 	var processPjax = function(response, url, options) {
 		if (response.redirect !== undefined) {
-			window.location = response.redirect;
+			if (response.plain_redirect) {
+				window.location = response.redirect;
+			}
+			else {
+				pjax.load(response.redirect);
+			}
 			return;
 		}
 		var extrajsRx = /src="([^"]*)"/g;

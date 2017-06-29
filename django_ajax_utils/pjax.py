@@ -41,10 +41,14 @@ def pjax_supported(request):
 	return is_included and not is_excluded
 
 
-def is_pjax(request):
+def is_pjax_request(request):
 	if not request:
 		return False
-	return request.META.get('HTTP_X_REQUESTED_WITH') == 'PJAXRequest' and pjax_supported(request)
+	return request.META.get('HTTP_X_REQUESTED_WITH') == 'PJAXRequest'
+
+
+def is_pjax(request):
+	return is_pjax_request(request) and pjax_supported(request)
 
 
 class Middleware(object):
@@ -69,9 +73,11 @@ class Middleware(object):
 				}
 				response = HttpResponse(json.dumps(json_data).encode('utf-8'), content_type="application/json")
 
+		if is_pjax_request(request):
 			if response.status_code in (301, 302):
 				json_data = {
 					'is_pjax': True,
+					'plain_redirect': not pjax_supported(request),
 					'redirect': response.url,
 				}
 				response = HttpResponse(json.dumps(json_data).encode('utf-8'), content_type="application/json")
