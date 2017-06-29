@@ -13,7 +13,6 @@ var pushState = function(url) {
 		firstrun = false;
 	}
 	window.history.pushState({is_pjax: true, url: url}, null, url);
-	window.scrollTo(0, 0);
 
 	var base = document.getElementsByTagName('BASE')[0];
 	if (base !== undefined) {
