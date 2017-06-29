@@ -699,19 +699,31 @@ var loaderJs = (function () {
 
 		waitingCallbacks.push([callback, paths]);
 
-		forEach(missingPaths, function(path) {
+		var loadMissingPath = function() {
+			if (missingPaths.length === 0) {
+				return;
+			}
+			var path = missingPaths[0];
+			missingPaths = missingPaths.splice(1);
 			var script = document.createElement('SCRIPT');
 			script.src = path;
 			script.onreadystatechange = script.onload = function(path) {
 				return function() {
 					if (scriptIsReady(script.readyState)) {
 						loadedPaths.push(path);
-						setTimeout(fireCallbacks, 0);
+						if (missingPaths.length === 0) {
+							setTimeout(fireCallbacks, 0);
+						}
+						else {
+							loadMissingPath();
+						}
 					}
 				};
 			}(path);
 			head.appendChild(script);
-		});
+		};
+
+		loadMissingPath();
 
 		setTimeout(fireCallbacks, 0);
 	};
