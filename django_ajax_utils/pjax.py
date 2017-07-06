@@ -61,6 +61,8 @@ class Middleware(object):
 		response = self.get_response(request)
 		if is_pjax(request):
 			if response.status_code == 200:
+				if not response.get('Content-Type', '').startswith('text/html'):
+					return response
 				pjax_holders = getattr(request, '_pjax_holders', {})
 				blocks = {}
 				for block_name, content in pjax_holders.items():
