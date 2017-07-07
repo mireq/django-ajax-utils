@@ -28,7 +28,7 @@ class FormNode(template.Node):
 			form_instance = self.form.resolve(context)
 			setattr(form_instance, FORMROW_TEMPLATE_ATTRIBUTE, 'form_utils/row/default.html')
 			context['form_utils_form'] = form_instance
-			if template_name is not None:
+			if self.template_name is not None:
 				template_name = self.template_name.resolve(context)
 				t = context.template.engine.get_template(template_name)
 				output = t.render(context)
