@@ -18,7 +18,8 @@ class FormNode(template.Node):
 
 	def __init__(self, form_instance, template_name, nodelist):
 		self.form = template.Variable(form_instance)
-		self.nodelist = nodelist
+		self.empty_nodelist = nodelist is None
+		self.nodelist = nodelist or []
 		if template_name is not None:
 			self.template_name = template.Variable(template_name)
 
@@ -28,14 +29,12 @@ class FormNode(template.Node):
 			form_instance = self.form.resolve(context)
 			setattr(form_instance, FORMROW_TEMPLATE_ATTRIBUTE, 'form_utils/row/default.html')
 			context['form_utils_form'] = form_instance
-			if self.template_name is not None:
+			if self.empty_nodelist:
 				template_name = self.template_name.resolve(context)
 				t = context.template.engine.get_template(template_name)
 				output = t.render(context)
-			elif self.nodelist:
-				output = self.nodelist.render(context)
 			else:
-				output = ''
+				output = self.nodelist.render(context)
 		finally:
 			context.pop()
 		return output
@@ -50,7 +49,7 @@ def form(parser, token):
 		raise template.TemplateSyntaxError('%r tag requires max 3 arguments' % tag_name)
 	form_instance = contents[1]
 	template_name = '"form_utils/layout/default.html"'
-	nodelist = []
+	nodelist = None
 	if len(contents) > 2:
 		if contents[2] != 'using':
 			raise template.TemplateSyntaxError('%r tag\'s first argument should be using' % tag_name)
