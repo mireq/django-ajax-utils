@@ -4,6 +4,7 @@ var isSupported = _.checkFeatures(['history_push']);
 var pjax = {};
 var extrastyleCode = [];
 var firstrun = true;
+var homeRegistered = false;
 _utils.pjax = pjax;
 
 
@@ -88,17 +89,25 @@ var pjaxLoader = function(options) {
 	self.onRequest = self.options.onRequest || onRequest;
 	self.onResponse = self.options.onResponse || onResponse;
 
+	var onPjaxLinkClicked = function(e) {
+		var event = window.e || e;
+		var element = event.target;
+		if (element.tagName.toLowerCase() !== 'a') {
+			return;
+		}
+
+		if (!self.checkLinkSupported(element, self)) {
+			return;
+		}
+		if (!self.checkUrlSupported(element.getAttribute('href'), self)) {
+			return;
+		}
+		self.load(element.getAttribute('href'));
+		event.preventDefault();
+	};
+
 	var registerPjaxLink = function(element) {
-		_.bindEvent(element, 'click', function(e) {
-			if (!self.checkLinkSupported(element, self)) {
-				return;
-			}
-			if (!self.checkUrlSupported(element.getAttribute('href'), self)) {
-				return;
-			}
-			self.load(element.getAttribute('href'));
-			e.preventDefault();
-		});
+		_.bindEvent(element, 'click', onPjaxLinkClicked);
 	};
 
 	var registerPjaxForm = function(element) {
@@ -217,10 +226,15 @@ var pjaxLoader = function(options) {
 	};
 
 	self.register = function(element) {
-		var links = _.tag(element, 'A');
 		var forms = _.tag(element, 'FORM');
-		_.forEach(links, registerPjaxLink);
 		_.forEach(forms, registerPjaxForm);
+		if (homeRegistered) {
+			return;
+		}
+		_.bindEvent(document, 'click', onPjaxLinkClicked);
+		if (element === document.body) {
+			homeRegistered = true;
+		}
 	};
 
 	self.load = function(url, options) {
