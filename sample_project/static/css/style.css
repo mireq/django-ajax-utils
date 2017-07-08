@@ -93,6 +93,22 @@ fieldset {
 	border: 0;
 }
 
+fieldset.nested {
+	padding: 32px 16px 16px 16px;
+	box-sizing: border-box;
+	position: relative;
+}
+
+fieldset.nested legend {
+	position: absolute;
+	top: -8px;
+	left: 4px;
+	display: block;
+	padding: 0 16px;
+	font-weight: bold;
+	background: #fcfcfc;
+}
+
 pre {
 	background: #eee;
 	border: 1px solid #ddd;
@@ -294,3 +310,12 @@ body.loading {
 	text-decoration: none;
 }
 
+.left-column {
+	width: 50%;
+	float: left;
+}
+
+.right-column {
+	width: 50%;
+	float: right;
+}
