@@ -1,0 +1,10 @@
+{% extends "form_utils/base.html" %}
+
+{% load form_utils %}
+
+{% block form %}
+	{{ form.management_form }}
+	{% for subform in form %}
+		{% form subform %}
+	{% endfor %}
+{% endblock %}

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django import forms
 from django.contrib.messages import constants
 from django.core import validators
+from django.forms import formset_factory
 from django.utils.translation import ugettext_lazy as _
 
 from django_ajax_utils.forms import AutoPlaceholderFormMixin, SetWidgetAttrsMixin
@@ -49,3 +50,10 @@ class MessagesForm(forms.Form):
 
 	message = forms.CharField()
 	level = forms.ChoiceField(choices=LEVEL_CHOICES, initial=constants.INFO)
+
+
+class SimpleForm(forms.Form):
+	text = forms.CharField(widget=TextInput)
+
+
+SimpleFormSet = formset_factory(SimpleForm, extra=1, min_num=2, validate_min=True)

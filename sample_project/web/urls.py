@@ -18,4 +18,5 @@ urlpatterns = [
 	url(r'^urlpatterns/(?:(?P<param>\w+)/)?$', views.urlpatterns_view, name='urlpatterns'),
 	url(r'^form-utils/$', views.form_utils_view, name='form_utils'),
 	url(r'^form-utils/foundation/$', views.form_utils_foundation_view, name='form_utils_foundation'),
+	url(r'^form-utils/fomset/$', views.formset_view, name='formset'),
 ]
