@@ -90,10 +90,12 @@ var pjaxLoader = function(options) {
 	self.onResponse = self.options.onResponse || onResponse;
 
 	var onPjaxLinkClicked = function(e) {
-		var event = window.e || e;
 		var element = event.target;
 		if (element.tagName.toLowerCase() !== 'a') {
-			return;
+			element = _.findParentByTag(element, 'a');
+			if (element === null) {
+				return;
+			}
 		}
 
 		if (!self.checkLinkSupported(element, self)) {
@@ -103,7 +105,7 @@ var pjaxLoader = function(options) {
 			return;
 		}
 		self.load(element.getAttribute('href'));
-		event.preventDefault();
+		e.preventDefault();
 	};
 
 	var registerPjaxLink = function(element) {

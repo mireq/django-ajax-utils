@@ -448,6 +448,13 @@ var findParentByCls = function(element, cls) {
 	});
 };
 
+var findParentByTag = function(element, tag) {
+	var searchTag = tag.toLowerCase();
+	return findParent(element, function(el) {
+		return el.tagName.toLowerCase() === searchTag;
+	});
+};
+
 var elem = function(elementName, attrs, content) {
 	var element = document.createElement(elementName);
 	if (attrs !== undefined) {
@@ -486,6 +493,7 @@ window._utils.isElement = isElement;
 window._utils.isParentOf = isParentOf;
 window._utils.findParent = findParent;
 window._utils.findParentByCls = findParentByCls;
+window._utils.findParentByTag = findParentByTag;
 window._utils.elem = elem;
 window._utils.insertAfter = insertAfter;
 
