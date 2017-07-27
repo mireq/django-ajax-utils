@@ -90,7 +90,7 @@ var pjaxLoader = function(options) {
 	self.onResponse = self.options.onResponse || onResponse;
 
 	var onPjaxLinkClicked = function(e) {
-		var element = event.target;
+		var element = e.target;
 		if (element.tagName.toLowerCase() !== 'a') {
 			element = _.findParentByTag(element, 'a');
 			if (element === null) {
