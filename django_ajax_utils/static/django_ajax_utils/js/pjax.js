@@ -90,6 +90,9 @@ var pjaxLoader = function(options) {
 	self.onResponse = self.options.onResponse || onResponse;
 
 	var onPjaxLinkClicked = function(e) {
+		if (e.which !== 1) {
+			return;
+		}
 		var element = e.target;
 		if (element.tagName.toLowerCase() !== 'a') {
 			element = _.findParentByTag(element, 'a');
