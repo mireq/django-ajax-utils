@@ -3,8 +3,7 @@ from __future__ import unicode_literals
 
 import types
 
-from django import forms
-from django import template
+from django import forms, template
 
 
 register = template.Library()
@@ -105,3 +104,23 @@ def add_field_class(field, cls):
 
 	field.as_widget = types.MethodType(as_widget, field)
 	return field
+
+
+@register.filter
+def is_checkbox(field):
+	return isinstance(field.field.widget, forms.CheckboxInput)
+
+
+@register.filter
+def is_select(field):
+	return isinstance(field.field.widget, forms.Select)
+
+
+@register.filter
+def is_radio(field):
+	return isinstance(field.field.widget, forms.RadioSelect)
+
+
+@register.filter
+def is_multiple(field):
+	return isinstance(field.field, forms.MultipleChoiceField)
