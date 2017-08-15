@@ -29,6 +29,7 @@ class FormNode(template.Node):
 			form_instance = self.form.resolve(context)
 			setattr(form_instance, FORMROW_TEMPLATE_ATTRIBUTE, 'form_utils/row/default.html')
 			context['form_utils_form'] = form_instance
+			context['form'] = form_instance
 			if self.empty_nodelist:
 				template_name = self.template_name.resolve(context)
 				t = context.template.engine.get_template(template_name)
