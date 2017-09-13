@@ -77,6 +77,7 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 			'status': 'valid' if form.is_valid() else 'invalid',
 			'errors': {},
 			'valid': [],
+			'empty': [],
 		}
 
 		def add_formset_status(formset):
