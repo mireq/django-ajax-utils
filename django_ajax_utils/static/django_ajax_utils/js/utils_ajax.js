@@ -23,6 +23,7 @@ else {
 var xhrSend = function(options) {
 	var opts = _.lightCopy(options);
 	opts.method = options.method || 'GET';
+	opts.crossOrigin = options.crossOrigin || false;
 	var req = createXMLHttpRequest();
 	var extraHeaders = options.extraHeaders || {};
 	if (window._settings && window._settings.debug) {
@@ -38,11 +39,13 @@ var xhrSend = function(options) {
 		}
 	}
 	req.open(opts.method, opts.url, true);
-	if (!_.has(extraHeaders, 'X-CSRFToken')) {
-		req.setRequestHeader('X-CSRFToken', _utils.getCookie('csrftoken'));
-	}
-	if (!_.has(extraHeaders, 'X-Requested-With')) {
-		req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+	if (!opts.crossOrigin) {
+		if (!_.has(extraHeaders, 'X-CSRFToken')) {
+			req.setRequestHeader('X-CSRFToken', _utils.getCookie('csrftoken'));
+		}
+		if (!_.has(extraHeaders, 'X-Requested-With')) {
+			req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+		}
 	}
 	if (opts.method === 'POST') {
 		req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
