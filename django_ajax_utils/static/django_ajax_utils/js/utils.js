@@ -285,12 +285,35 @@ var unbindOnLoad = function(callback) {
 	}
 };
 
+
+var unloadCallbacks = [];
+
+var onUnload = function(callback) {
+	unloadCallbacks.push(callback);
+};
+
+var triggerUnload = function(element) {
+	forEach(unloadCallbacks, function(callback) {
+		callback({memo: element});
+	})
+};
+
+var unbindOnUnload = function(callback) {
+	var idx = unloadCallbacks.indexOf(callback);
+	if (idx !== -1) {
+		unloadCallbacks.splice(idx, 1);
+	}
+};
+
 window._utils.triggerEvent = triggerEvent;
 window._utils.bindEvent = bindEvent;
 window._utils.unbindEvent = unbindEvent;
 window._utils.onLoad = onLoad;
 window._utils.triggerLoad = triggerLoad;
 window._utils.unbindOnLoad = unbindOnLoad;
+window._utils.onUnload = onUnload;
+window._utils.triggerUnload = triggerUnload;
+window._utils.unbindOnUnload = unbindOnUnload;
 
 // dom
 var el = document.createElement('DIV');
