@@ -172,7 +172,7 @@ var ajaxformBase = function(formElement, options) {
 	var submitForm = function(onlyValidate) {
 		var data = self.getFormData();
 		if (onlyValidate) {
-			data.push([self.options.onlyValidateField], '1');
+			data.push([self.options.onlyValidateField, '1']);
 		}
 		if (self.submitButton !== undefined && self.submitButton.name) {
 			data.push([self.submitButton.name, self.submitButton.value]);
