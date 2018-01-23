@@ -22,6 +22,7 @@ def pjax_supported(request):
 		_pjax_cache['include'] = [
 			re.compile(pattern) for pattern in getattr(settings, 'PJAX_INCLUDE_URLPATTERNS', [])
 		]
+	if _pjax_cache['exclude'] is None:
 		_pjax_cache['exclude'] = [
 			re.compile(pattern) for pattern in getattr(settings, 'PJAX_EXCLUDE_URLPATTERNS', [])
 		]
