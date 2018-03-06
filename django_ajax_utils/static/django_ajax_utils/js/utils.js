@@ -634,7 +634,7 @@ var scrollToElement = function(element) {
 		if (window.innerHeight !== undefined) {
 			posOffset = window.innerHeight / 2;
 		}
-		window.scroll(0, Math.max(window.findVerticalPos(element) - posOffset, 0));
+		window.scroll(0, Math.max(findVerticalPos(element) - posOffset, 0));
 	}
 };
 
