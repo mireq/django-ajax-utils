@@ -47,8 +47,15 @@ var xhrSend = function(options) {
 			req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 		}
 	}
-	if (opts.method === 'POST') {
-		req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	if (options.contentType !== undefined) {
+		if (options.contentType !== null) {
+			req.setRequestHeader('Content-type', options.contentType);
+		}
+	}
+	else {
+		if (type == 'POST') {
+			req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		}
 	}
 
 	for (var header in extraHeaders) {
