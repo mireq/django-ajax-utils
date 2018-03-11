@@ -53,7 +53,7 @@ var xhrSend = function(options) {
 		}
 	}
 	else {
-		if (type == 'POST') {
+		if (opts.method == 'POST') {
 			req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 		}
 	}
