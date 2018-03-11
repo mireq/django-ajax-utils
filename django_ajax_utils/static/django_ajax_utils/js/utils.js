@@ -49,6 +49,10 @@ var checkFeatures = function(features) {
 				break;
 			case "touch":
 				return "ontouchstart" in window;
+			case "drop":
+				return "ondrop" in window;
+			case "file":
+				return "File" in window && "FileReader" in window;
 			default:
 				return false;
 		}
