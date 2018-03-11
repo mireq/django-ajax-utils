@@ -87,7 +87,7 @@ var xhrSend = function(options) {
 		}
 	};
 	var data = opts.data;
-	if (typeof data != 'string') {
+	if (typeof data != 'string' && !(window.FormData !== undefined && data instanceof window.FormData)) {
 		data = _.encodeURLParameters(data);
 	}
 	req.send(data);
