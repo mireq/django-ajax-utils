@@ -75,6 +75,7 @@ var xhrSend = function(options) {
 				var data = req.responseText;
 				if (contentType.indexOf('application/json') === 0) {
 					data = JSON.parse(data);
+					req.isJSON = true;
 				}
 				opts.successFn(data, req, options);
 			}
