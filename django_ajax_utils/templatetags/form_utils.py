@@ -95,7 +95,9 @@ def add_field_class(field, cls):
 	as_widget_copy = field.as_widget
 
 	def as_widget(self, widget=None, attrs=None, *args, **kwargs):
-		attrs = attrs or {}
+		if not widget:
+			widget = self.field.widget
+		attrs = attrs or widget.attrs.copy()
 		attrs.setdefault('class', '')
 		attrs['class'] += ' ' + cls
 		output = as_widget_copy(widget, attrs, *args, **kwargs)
