@@ -50,7 +50,7 @@ class SetWidgetAttrsMixin(object):
 
 	Example
 
-	class Foo(SetRequiredFieldsMixin, forms.ModelForm):
+	class Foo(SetWidgetAttrsMixin, forms.ModelForm):
 		widget_attrs = {
 			'field1': {'maxlength': '10'},
 		}
