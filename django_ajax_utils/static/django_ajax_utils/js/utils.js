@@ -828,7 +828,7 @@ var serializeFormElement = function(element) {
 					addParameter(element.name, element.value);
 					break;
 				case 'select-multiple':
-					_utils.forEach(formElement.options, function(option) {
+					_utils.forEach(element.options, function(option) {
 						if (option.selected) {
 							addParameter(element.name, option.value);
 						}
