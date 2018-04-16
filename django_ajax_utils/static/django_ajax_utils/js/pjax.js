@@ -65,7 +65,7 @@ var pjaxLoader = function(options) {
 		}
 	};
 
-	var onResponse = function(url, loader) {
+	var onResponse = function(status, response, loader) {
 		if (self.bodyLoadingCls !== undefined) {
 			_.removeClass(document.body, self.bodyLoadingCls);
 		}
