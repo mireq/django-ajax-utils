@@ -262,20 +262,24 @@ var pjaxLoader = function(options) {
 					if (ignoreLink) {
 						return;
 					}
+					if (self.onResponse("success", response, self) === false) {
+						return;
+					}
 					if (response.is_pjax) {
 						processPjax(response, options.url, pjaxOptions);
 					}
 					else {
 						pjaxFallback(res, options.url, pjaxOptions);
 					}
-					self.onResponse("success", response, self);
 				},
 				failFn: function(response, options) {
 					if (ignoreLink) {
 						return;
 					}
+					if (self.onResponse("fail", response, self) === false) {
+						return;
+					}
 					pjaxFallback(response, options.url, pjaxOptions);
-					self.onResponse("fail", response, self);
 				},
 				headersFn: function(response) {
 					var contentType = response.getResponseHeader('content-type');
