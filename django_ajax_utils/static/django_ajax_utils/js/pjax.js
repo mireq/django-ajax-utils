@@ -65,7 +65,7 @@ var pjaxLoader = function(options) {
 		}
 	};
 
-	var onResponse = function(status, response, loader) {
+	var onResponse = function(status, response, loader, options) {
 		if (self.bodyLoadingCls !== undefined) {
 			_.removeClass(document.body, self.bodyLoadingCls);
 		}
@@ -262,7 +262,7 @@ var pjaxLoader = function(options) {
 					if (ignoreLink) {
 						return;
 					}
-					if (self.onResponse("success", response, self) === false) {
+					if (self.onResponse("success", response, self, pjaxOptions) === false) {
 						return;
 					}
 					if (response.is_pjax) {
@@ -276,7 +276,7 @@ var pjaxLoader = function(options) {
 					if (ignoreLink) {
 						return;
 					}
-					if (self.onResponse("fail", response, self) === false) {
+					if (self.onResponse("fail", response, self, pjaxOptions) === false) {
 						return;
 					}
 					pjaxFallback(response, options.url, pjaxOptions);
