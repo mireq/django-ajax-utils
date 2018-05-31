@@ -223,7 +223,11 @@ window._utils.keys = keys;
 var triggerEvent = function(element, name, memo) {
 	var event;
 	if (document.createEvent) {
-		event = document.createEvent('HTMLEvents');
+		var eventType = 'HTMLEvents';
+		if (name === 'click') {
+			eventType = 'MouseEvents';
+		}
+		event = document.createEvent(eventType);
 		event.initEvent(name, true, true);
 	}
 	else {
