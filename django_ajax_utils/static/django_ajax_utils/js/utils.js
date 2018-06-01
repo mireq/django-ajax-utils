@@ -303,7 +303,7 @@ var onUnload = function(callback) {
 var triggerUnload = function(element) {
 	forEach(unloadCallbacks, function(callback) {
 		callback({memo: element});
-	})
+	});
 };
 
 var unbindOnUnload = function(callback) {
@@ -707,7 +707,7 @@ var loaderJs = (function () {
 			var paths = callback[1];
 			if (every(paths, function(path) { return loadedPaths.indexOf(path) !== -1; })) {
 				firedCallbacks.push(i);
-				fn();
+				setTimeout(fn, 0); // async call
 			}
 		});
 		firedCallbacks.reverse();
