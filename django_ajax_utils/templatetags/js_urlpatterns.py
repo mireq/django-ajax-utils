@@ -29,7 +29,7 @@ def prepare_url_list(resolver, namespace_path='', namespace=''):
 		inner_ns = namespace + inner_ns + ':'
 
 		if inner_ns_path:
-			inner_resolver = urls.get_ns_resolver(inner_ns_path, inner_resolver)
+			inner_resolver = urls.get_ns_resolver(inner_ns_path, inner_resolver, ())
 			inner_ns_path = ''
 
 		for url_pattern in prepare_url_list(inner_resolver, inner_ns_path, inner_ns):
