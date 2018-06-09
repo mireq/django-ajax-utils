@@ -72,10 +72,17 @@ try:
 
 
 	class FormExtension(Extension):
-		tags = set(['form'])
+		tags = set(['form', 'formrow'])
 
 		def parse(self, parser):
-			lineno = next(parser.stream).lineno
+			tag = next(parser.stream)
+			if tag.value == 'form':
+				return self.parse_form(parser, tag)
+			elif tag.value == 'formrow':
+				return self.parse_formrow(parser, tag)
+
+		def parse_form(self, parser, tag):
+			lineno = tag.lineno
 			form_instance = parser.parse_expression()
 			template_name = nodes.Const('form_utils/layout/default.jinja')
 			has_body = False
@@ -100,6 +107,24 @@ try:
 				nodes.Assign(nodes.Name('form_utils_form', 'store'), form_instance)
 			]
 			node.body = assignments + body
+			return node
+
+		def parse_formrow(self, parser, tag):
+			lineno = tag.lineno
+			field = parser.parse_expression()
+			template_name = None
+			if not parser.stream.current.test('block_end'):
+				template_name = parser.parse_expression()
+			else:
+				template_name = nodes.Getattr(nodes.Name('form_utils_form', 'store'), '_formrow_template', 'load')
+			if not parser.stream.current.test('block_end'):
+				raise TemplateSyntaxError("Too many arguments", lineno)
+
+			node = nodes.Scope(lineno=lineno)
+			assignments = [
+				nodes.Assign(nodes.Name('field', 'store'), field)
+			]
+			node.body = assignments + [nodes.Include(template_name, True, False)]
 			return node
 except ImportError:
 	pass
