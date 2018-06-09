@@ -5,6 +5,7 @@ import json
 import os
 import threading
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 from django.http.response import HttpResponse
 from django.template import TemplateDoesNotExist
@@ -134,6 +135,8 @@ class Loader(BaseLoader):
 
 
 try:
+	from jinja2 import nodes
+	from jinja2.ext import Extension
 	import jinja2
 	import jinja2.exceptions
 
@@ -149,6 +152,37 @@ try:
 					return super(Environment, self).get_template(name, *args, **kwargs)
 			else:
 				return super(Environment, self).get_template(name, *args, **kwargs)
+
+
+	class PjaxBlockExtension(Extension):
+		tags = set(['pjaxblock'])
+
+		def __init__(self, environment):
+			super(PjaxBlockExtension, self).__init__(environment)
+
+		def parse(self, parser):
+			lineno = next(parser.stream).lineno
+			namearg = parser.parse_expression()
+			if isinstance(namearg, nodes.Name):
+				namearg = nodes.Const(namearg.name)
+			ctx_ref = jinja2.nodes.ContextReference()
+			args = [ctx_ref, namearg]
+			body = parser.parse_statements(['name:endpjaxblock'], drop_needle=True)
+			return nodes.CallBlock(self.call_method('_process', args), [], [], body).set_lineno(lineno)
+
+		def _process(self, context, name, caller):
+			output = caller()
+			if not 'request' in context:
+				return output
+			request = context['request']
+			if is_pjax(request):
+				if not hasattr(request, '_pjax_holders'):
+					raise ImproperlyConfigured("Middleware django_ajax_utils.pjax.Middleware not enabled")
+				request._pjax_holders.setdefault(name, [])
+				request._pjax_holders[name].append(output)
+				return ''
+			return output
+
 
 except ImportError:
 	pass
