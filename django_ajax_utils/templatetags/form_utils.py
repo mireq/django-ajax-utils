@@ -126,3 +126,18 @@ def is_radio(field):
 @register.filter
 def is_multiple(field):
 	return isinstance(field.field, forms.MultipleChoiceField)
+
+
+try:
+	from django_jinja import library
+	from jinja2 import contextfunction
+
+	library.global_function(contextfunction(formrow_template))
+	library.global_function(contextfunction(formrow))
+	library.filter(add_field_class)
+	library.filter(is_checkbox)
+	library.filter(is_select)
+	library.filter(is_radio)
+	library.filter(is_multiple)
+except ImportError:
+	pass

@@ -63,3 +63,43 @@ class SetWidgetAttrsMixin(object):
 		for fieldname, attrs in self.widget_attrs.items():
 			if fieldname in self.fields:
 				self.fields[fieldname].widget.attrs.update(attrs)
+
+
+try:
+	from jinja2 import nodes
+	from jinja2.ext import Extension
+	from jinja2.exceptions import TemplateSyntaxError
+
+
+	class FormExtension(Extension):
+		tags = set(['form'])
+
+		def parse(self, parser):
+			lineno = next(parser.stream).lineno
+			form_instance = parser.parse_expression()
+			template_name = nodes.Const('form_utils/layout/default.jinja')
+			has_body = False
+			if not parser.stream.current.test('block_end'):
+				parser.stream.expect('name:using')
+				if parser.stream.current.test('block_end'):
+					has_body = True
+			if not parser.stream.current.test('block_end'):
+				template_name = parser.parse_expression()
+			if not parser.stream.current.test('block_end'):
+				raise TemplateSyntaxError("Too many arguments", lineno)
+
+			body = None
+			if has_body:
+				body = parser.parse_statements(['name:endform'], drop_needle=True)
+			else:
+				body = nodes.Include(template_name, True, False)
+				body = [body]
+
+			node = nodes.Scope(lineno=lineno)
+			assignments = [
+				nodes.Assign(nodes.Name('form_utils_form', 'store'), form_instance)
+			]
+			node.body = assignments + body
+			return node
+except ImportError:
+	pass

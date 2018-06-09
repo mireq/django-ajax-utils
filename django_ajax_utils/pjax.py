@@ -157,9 +157,6 @@ try:
 	class PjaxBlockExtension(Extension):
 		tags = set(['pjaxblock'])
 
-		def __init__(self, environment):
-			super(PjaxBlockExtension, self).__init__(environment)
-
 		def parse(self, parser):
 			lineno = next(parser.stream).lineno
 			namearg = parser.parse_expression()

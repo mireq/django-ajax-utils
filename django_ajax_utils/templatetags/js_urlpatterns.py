@@ -60,3 +60,11 @@ def js_urlpatterns(*export_patterns):
 	else:
 		url_patterns = {pattern['name']: pattern['patterns'] for pattern in prepare_url_list(url_resolver)}
 	return safe_json_str(json.dumps(url_patterns))
+
+
+try:
+	from django_jinja import library
+
+	library.global_function(js_urlpatterns)
+except ImportError:
+	pass
