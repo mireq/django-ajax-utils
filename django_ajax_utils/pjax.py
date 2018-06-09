@@ -131,3 +131,24 @@ class Loader(BaseLoader):
 			except AttributeError:
 				pass
 		raise TemplateDoesNotExist(template_name)
+
+
+try:
+	import jinja2
+	import jinja2.exceptions
+
+	class Environment(jinja2.Environment):
+		def pjax_template_name(self, template_name):
+			return '_pjax'.join(os.path.splitext(template_name))
+
+		def get_template(self, name, *args, **kwargs):
+			if is_pjax(getattr(_local, 'request', None)):
+				try:
+					return super(Environment, self).get_template(self.pjax_template_name(name), *args, **kwargs)
+				except jinja2.exceptions.TemplateNotFound:
+					return super(Environment, self).get_template(name, *args, **kwargs)
+			else:
+				return super(Environment, self).get_template(name, *args, **kwargs)
+
+except ImportError:
+	pass
