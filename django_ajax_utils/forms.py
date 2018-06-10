@@ -71,8 +71,11 @@ try:
 	from jinja2.exceptions import TemplateSyntaxError
 
 
+	FORMROW_TEMPLATE_ATTRIBUTE = '_formrow_template'
+
+
 	class FormExtension(Extension):
-		tags = set(['form', 'formrow'])
+		tags = set(['form', 'formrow', 'formrow_template'])
 
 		def parse(self, parser):
 			tag = next(parser.stream)
@@ -80,6 +83,8 @@ try:
 				return self.parse_form(parser, tag)
 			elif tag.value == 'formrow':
 				return self.parse_formrow(parser, tag)
+			elif tag.value == 'formrow_template':
+				return self.parse_formrow_template(parser, tag)
 
 		def parse_form(self, parser, tag):
 			lineno = tag.lineno
@@ -116,7 +121,7 @@ try:
 			if not parser.stream.current.test('block_end'):
 				template_name = parser.parse_expression()
 			else:
-				template_name = nodes.Getattr(nodes.Name('form_utils_form', 'store'), '_formrow_template', 'load')
+				template_name = nodes.Getattr(nodes.Name('form_utils_form', 'store'), FORMROW_TEMPLATE_ATTRIBUTE, 'load')
 			if not parser.stream.current.test('block_end'):
 				raise TemplateSyntaxError("Too many arguments", lineno)
 
@@ -126,5 +131,20 @@ try:
 			]
 			node.body = assignments + [nodes.Include(template_name, True, False)]
 			return node
+
+		def parse_formrow_template(self, parser, tag):
+			lineno = tag.lineno
+			template_name = parser.parse_expression()
+			if not parser.stream.current.test('block_end'):
+				raise TemplateSyntaxError("Too many arguments", lineno)
+			call = self.call_method('_process', [template_name, nodes.Name('form_utils_form', 'load', lineno=lineno)])
+			return nodes.Output([nodes.MarkSafe(call)])
+
+		def _process(self, template_name, form_instance):
+			setattr(form_instance, FORMROW_TEMPLATE_ATTRIBUTE, template_name)
+			return ''
+
+
+
 except ImportError:
 	pass

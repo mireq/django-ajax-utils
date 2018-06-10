@@ -65,13 +65,10 @@ register.tag(form)
 
 
 @register.simple_tag(takes_context=True)
-def formrow_template(context, template_name, form_instance=None):
-	if form_instance is None:
-		if not 'form_utils_form' in context:
-			raise template.TemplateSyntaxError('This tag is allowed only inside template form tag')
-		setattr(context['form_utils_form'], FORMROW_TEMPLATE_ATTRIBUTE, template_name)
-	else:
-		setattr(form_instance, FORMROW_TEMPLATE_ATTRIBUTE, template_name)
+def formrow_template(context, template_name):
+	if not 'form_utils_form' in context:
+		raise template.TemplateSyntaxError('This tag is allowed only inside template form tag')
+	setattr(context['form_utils_form'], FORMROW_TEMPLATE_ATTRIBUTE, template_name)
 	return ''
 
 
@@ -135,7 +132,7 @@ try:
 	from django_jinja import library
 	from jinja2 import contextfunction
 
-	library.global_function(contextfunction(formrow_template))
+	#library.global_function(contextfunction(formrow_template))
 	#library.global_function(contextfunction(formrow))
 	library.filter(add_field_class)
 	library.filter(is_checkbox)
