@@ -112,7 +112,7 @@ try:
 				nodes.Assign(nodes.Name('form_utils_form', 'store'), form_instance)
 			]
 			node.body = assignments + body
-			return node
+			return node.set_lineno(lineno)
 
 		def parse_formrow(self, parser, tag):
 			lineno = tag.lineno
@@ -130,7 +130,7 @@ try:
 				nodes.Assign(nodes.Name('field', 'store'), field)
 			]
 			node.body = assignments + [nodes.Include(template_name, True, False)]
-			return node
+			return node.set_lineno(lineno)
 
 		def parse_formrow_template(self, parser, tag):
 			lineno = tag.lineno
@@ -138,7 +138,7 @@ try:
 			if not parser.stream.current.test('block_end'):
 				raise TemplateSyntaxError("Too many arguments", lineno)
 			call = self.call_method('_process', [template_name, nodes.Name('form_utils_form', 'load', lineno=lineno)])
-			return nodes.Output([nodes.MarkSafe(call)])
+			return nodes.Output([nodes.MarkSafe(call)]).set_lineno(lineno)
 
 		def _process(self, template_name, form_instance):
 			setattr(form_instance, FORMROW_TEMPLATE_ATTRIBUTE, template_name)
