@@ -22,7 +22,7 @@ var pushState = function(url) {
 };
 
 var popState = function(e) {
-	if (e.state === null || !e.state.is_pjax) {
+	if (e.state === null || e.state === undefined || !e.state.is_pjax) {
 		return;
 	}
 	pjax.load(e.state.url, { history: false });
