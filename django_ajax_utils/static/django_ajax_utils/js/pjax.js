@@ -8,6 +8,16 @@ var homeRegistered = false;
 _utils.pjax = pjax;
 
 
+var evalScript = function(script) {
+	var headElement = document.getElementsByTagName("head")[0];
+	var scriptElement = document.createElement("script");
+	scriptElement.type = "text/javascript";
+	scriptElement.appendChild(document.createTextNode(script));
+	headElement.insertBefore(scriptElement, headElement.firstChild);
+	headElement.removeChild(scriptElement);
+};
+
+
 var pushState = function(url) {
 	if (firstrun) {
 		window.history.replaceState({is_pjax: true, url: window.location + ''}, null, window.location);
@@ -142,7 +152,7 @@ var pjaxLoader = function(options) {
 				var type = element.getAttribute('type');
 				if (!type || type.toLowerCase() === 'text/javascript') {
 					var scriptData = (element.text || element.textContent || element.innerHTML || "" );
-					eval(scriptData); // jshint ignore:line
+					evalScript(scriptData);
 				}
 			}
 		});
