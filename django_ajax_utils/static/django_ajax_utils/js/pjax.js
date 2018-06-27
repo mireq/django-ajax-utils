@@ -202,9 +202,11 @@ var pjaxLoader = function(options) {
 		_.loaderJs(extrajs, function() {
 			if (self.pjaxContainerId !== undefined) {
 				var pjaxContainer = _.id(self.pjaxContainerId);
-				pjaxContainer.innerHTML = response.content;
-				self.execEmbeddedScripts(pjaxContainer);
-				_.triggerLoad(pjaxContainer);
+				if (pjaxContainer !== null) {
+					pjaxContainer.innerHTML = response.content;
+					self.execEmbeddedScripts(pjaxContainer);
+					_.triggerLoad(pjaxContainer);
+				}
 			}
 
 			if (self.titleBlock !== undefined && response.blocks[self.titleBlock] !== undefined) {
