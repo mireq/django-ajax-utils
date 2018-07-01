@@ -3,6 +3,34 @@
 "use strict";
 
 /* jshint loopfunc:true */
+var formData = function(multipart) {
+	var self = {};
+	var data = [];
+
+	self.append = function(name, value) {
+		data.push([name, value]);
+	};
+
+	self.getData = function() {
+		return data;
+	};
+
+	self.serialize = function() {
+		if (multipart) {
+			var formDataInstance = new FormData();
+			_.forEach(data, function(name_value) {
+				formDataInstance.append(name_value[0], name_value[1]);
+			});
+			return formDataInstance;
+		}
+		else {
+			return _.encodeURLParameters(data);
+		}
+	};
+
+	return self;
+}
+
 
 var submitDisabler = function(formElement) {
 	var self = {};
@@ -79,6 +107,12 @@ var ajaxformBase = function(formElement, options) {
 	self.options.formName = self.options.formName || _.getData(formElement, 'formName') || 'form';
 	if (self.options.validateDelay === undefined) {
 		self.options.validateDelay = 1000;
+	}
+	if (self.options.isMultipart === undefined) {
+		var enctype = formElement.getAttribute('enctype');
+		if (enctype === 'multipart/form-data') {
+			self.options.isMultipart = true;
+		}
 	}
 	self.inputs = [];
 	self.submits = [];
@@ -172,10 +206,10 @@ var ajaxformBase = function(formElement, options) {
 	var submitForm = function(onlyValidate) {
 		var data = self.getFormData();
 		if (onlyValidate) {
-			data.push([self.options.onlyValidateField, '1']);
+			data.append(self.options.onlyValidateField, '1');
 		}
 		if (self.submitButton !== undefined && self.submitButton.name) {
-			data.push([self.submitButton.name, self.submitButton.value]);
+			data.append(self.submitButton.name, self.submitButton.value);
 		}
 
 		if (onlyValidate) {
@@ -185,17 +219,11 @@ var ajaxformBase = function(formElement, options) {
 			self.onBeforeSend(data, formElement, self.options.formName);
 		}
 
-		var query = [];
-		_.forEach(data, function(name_value) {
-			query.push(encodeURIComponent(name_value[0]) + '=' + encodeURIComponent(name_value[1]));
-		});
-		query = query.join('&');
-
 		var url = formElement.getAttribute('action');
 		_.xhrSend({
 			method: 'POST',
 			url: url,
-			data: query,
+			data: data.serialize(),
 			successFn: function(data, e) {
 				if (onlyValidate) {
 					processFormSubmit(data, e, onlyValidate);
@@ -269,19 +297,19 @@ var ajaxformBase = function(formElement, options) {
 
 	// Get form data in array of key-value pairs
 	self.getFormData = function() {
-		var q = [];
+		var data = formData(self.options.isMultipart);
 		_.forEach(self.formElement.elements, function(input) {
 			_.forEach(_.serializeFormElement(input), function(name_value) {
-				q.push(name_value);
+				data.append(name_value[0], name_value[1]);
 			});
 		});
-		return q;
+		return data;
 	};
 
 	// Get form data in dictionary (field name: value list)
 	self.getFormDict = function() {
 		var dct = {};
-		_.forEach(self.getFormData(), function(item) {
+		_.forEach(self.getFormData().getData(), function(item) {
 			var key = item[0];
 			var val = item[1];
 			if (!_.has(dct, key)) {
