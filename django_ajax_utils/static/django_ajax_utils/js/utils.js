@@ -815,6 +815,12 @@ var serializeFormElement = function(element) {
 					}
 					break;
 				case 'file':
+					if (element.files) {
+						forEach(element.files, function(file) {
+							addParameter(element.name, file);
+						});
+					}
+					break;
 				case 'reset':
 				case 'submit':
 					break;
