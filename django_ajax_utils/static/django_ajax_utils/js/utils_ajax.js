@@ -26,9 +26,11 @@ var xhrSend = function(options) {
 	opts.crossOrigin = options.crossOrigin || false;
 	var req = createXMLHttpRequest();
 	var extraHeaders = options.extraHeaders || {};
+
 	if (window._settings && window._settings.debug) {
 		opts.failFn = opts.failFn || ajaxForwardError;
 	}
+
 	if (opts.method === 'GET') {
 		var dummy = '_dummy=' + new Date().getTime();
 		if (opts.url.indexOf('?') === -1) {
@@ -38,6 +40,11 @@ var xhrSend = function(options) {
 			opts.url += '&' + dummy;
 		}
 	}
+
+	if (options.progress) {
+		_.bindEvent(req.upload, 'progress', options.progress);
+	}
+
 	req.open(opts.method, opts.url, true);
 	if (!opts.crossOrigin) {
 		if (!_.has(extraHeaders, 'X-CSRFToken')) {
