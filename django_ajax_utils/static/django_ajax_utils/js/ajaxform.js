@@ -129,6 +129,7 @@ var ajaxformBase = function(formElement, options) {
 	self.onBeforeSend = self.options.onBeforeSend || function(query, formElement, formName) {};
 	self.onResponse = self.options.onResponse || function(data, onlyValidate, ajaxform) {};
 	self.onValidate = self.options.onValidate || function(data, onlyValidate, ajaxform) {};
+	self.onProgress = self.options.onProgress || function(event) {};
 
 	var onInputChanged = function(e, finished) {
 		self.onInputChanged(e, finished);
@@ -243,7 +244,8 @@ var ajaxformBase = function(formElement, options) {
 						_.ajaxForwardError(req);
 					}
 				}
-			}
+			},
+			progress: onlyValidate ? undefined : self.onProgress
 		});
 	};
 
