@@ -45,6 +45,11 @@ var xhrSend = function(options) {
 		_.bindEvent(req.upload, 'progress', options.progress);
 	}
 
+	var data = opts.data;
+	if (typeof data != 'string' && !(window.FormData !== undefined && data instanceof window.FormData)) {
+		data = _.encodeURLParameters(data);
+	}
+
 	req.open(opts.method, opts.url, true);
 	if (!opts.crossOrigin) {
 		if (!_.has(extraHeaders, 'X-CSRFToken')) {
@@ -61,7 +66,9 @@ var xhrSend = function(options) {
 	}
 	else {
 		if (opts.method == 'POST') {
-			req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			if (!(window.FormData !== undefined && data instanceof window.FormData)) {
+				req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			}
 		}
 	}
 
@@ -93,10 +100,6 @@ var xhrSend = function(options) {
 			}
 		}
 	};
-	var data = opts.data;
-	if (typeof data != 'string' && !(window.FormData !== undefined && data instanceof window.FormData)) {
-		data = _.encodeURLParameters(data);
-	}
 	req.send(data);
 };
 

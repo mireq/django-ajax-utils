@@ -29,7 +29,7 @@ var formData = function(multipart) {
 	};
 
 	return self;
-}
+};
 
 
 var submitDisabler = function(formElement) {
