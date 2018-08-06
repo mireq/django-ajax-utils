@@ -104,6 +104,9 @@ var pjaxLoader = function(options) {
 			return;
 		}
 		var element = e.target;
+		if (!element) {
+			return;
+		}
 		if (element.tagName && element.tagName.toLowerCase() !== 'a') {
 			element = _.findParentByTag(element, 'a');
 			if (element === null) {
