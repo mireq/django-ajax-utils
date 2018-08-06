@@ -213,7 +213,10 @@ var pjaxLoader = function(options) {
 			}
 
 			if (self.titleBlock !== undefined && response.blocks[self.titleBlock] !== undefined) {
-				_.tag(document, 'title')[0].innerHTML = response.blocks[self.titleBlock];
+				var titleElement = _.tag(document, 'title')[0];
+				if (titleElement !== undefined) {
+					titleElement.innerHTML = response.blocks[self.titleBlock];
+				}
 			}
 
 			if (self.onLoaded !== undefined) {
