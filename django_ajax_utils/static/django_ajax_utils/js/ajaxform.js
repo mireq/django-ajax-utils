@@ -271,7 +271,9 @@ var ajaxformBase = function(formElement, options) {
 			_.forEach(_.cls(self.formElement, 'subform'), function(element) {
 				var formName = _.getData(element, 'formname');
 				if (formName && data.forms[formName]) {
+					self.subFormElement = element;
 					self.onValidate(data.forms[formName], onlyValidate, self, formName);
+					self.subFormElement = undefined;
 				}
 			});
 		}
@@ -390,7 +392,13 @@ var ajaxform = function(formElement, options) {
 	};
 
 	var getFallbackErrorContainer = function() {
-		var container = _.cls(formElement, o.nonFieldErrorsClass)[0];
+		var container;
+		if (self.subFormElement !== undefined) {
+			container = _.cls(self.subFormElement, o.nonFieldErrorsClass)[0];
+		}
+		if (container === undefined) {
+			container = _.cls(formElement, o.nonFieldErrorsClass)[0];
+		}
 		if (container === undefined) {
 			container = _.elem('div', {'class': o.nonFieldErrorsClass});
 			if (formElement.childNodes.length) {
@@ -481,9 +489,6 @@ var ajaxform = function(formElement, options) {
 			}
 		}
 		_.forEach(formData.valid, function(key) {
-			self.clearStatus(key);
-		});
-		_.forEach(formData.empty, function(key) {
 			self.clearStatus(key);
 		});
 
