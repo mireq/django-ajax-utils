@@ -19,6 +19,9 @@ _pjax_cache = {'include': None, 'exclude': None}
 
 
 def pjax_supported(request):
+	pjax_supported = getattr(request, 'pjax_supported', None)
+	if pjax_supported is not None:
+		return pjax_supported
 	if _pjax_cache['include'] is None:
 		_pjax_cache['include'] = [
 			re.compile(pattern) for pattern in getattr(settings, 'PJAX_INCLUDE_URLPATTERNS', [])
@@ -40,7 +43,9 @@ def pjax_supported(request):
 		if pattern.match(view_name):
 			is_excluded = True
 			break
-	return is_included and not is_excluded
+	pjax_supported = is_included and not is_excluded
+	setattr(request, 'pjax_supported', pjax_supported)
+	return getattr(request, 'pjax_supported')
 
 
 def is_pjax_request(request):
