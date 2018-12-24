@@ -53,7 +53,10 @@ var xhrSend = function(options) {
 	req.open(opts.method, opts.url, true);
 	if (!opts.crossOrigin) {
 		if (!_.has(extraHeaders, 'X-CSRFToken')) {
-			req.setRequestHeader('X-CSRFToken', _utils.getCookie('csrftoken'));
+			var tokenCookie = _utils.getCookie('csrftoken');
+			if (tokenCookie !== null) {
+				req.setRequestHeader('X-CSRFToken', tokenCookie);
+			}
 		}
 		if (!_.has(extraHeaders, 'X-Requested-With')) {
 			req.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
