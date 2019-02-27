@@ -115,7 +115,6 @@ var ajaxformBase = function(formElement, options) {
 		}
 	}
 	self.inputs = [];
-	self.submits = [];
 	self.submitButton = undefined;
 	self.initial = undefined;
 
@@ -140,16 +139,30 @@ var ajaxformBase = function(formElement, options) {
 	var onInputChangedDelayed = function(e) {
 		self.onInputChanged(e, false);
 	};
+	var onFormClick = function(e) {
+		var target = e.target;
+		while (target && target.tagName) {
+			var tagName = target.tagName.toLowerCase();
+			if (tagName === 'form') {
+				break;
+			}
+			if (target.getAttribute('type') === 'submit' && (tagName === 'input' || tagName === 'button')) {
+				self.submitButton = target;
+			}
+			target = target.parentNode;
+		}
+	};
 	var onFormSubmit = function(e) {
 		if (self.submitButton === undefined) {
-			self.submitButton = self.submits[0];
+			_.some(formElement.elements, function(input) {
+				if (input.getAttribute('type') === 'submit') {
+					self.submitButton = input;
+					return true;
+				}
+			});
 		}
 		self.onFormSubmit(e);
 		self.submitButton = undefined;
-	};
-
-	var setSubmitButton = function() {
-		self.submitButton = this;
 	};
 
 	var registerInput = function(input) {
@@ -184,24 +197,6 @@ var ajaxformBase = function(formElement, options) {
 				_.unbindEvent(input, 'input', onInputChanged);
 			}
 		}
-	};
-
-	var registerSubmit = function(submit) {
-		var idx = self.submits.indexOf(submit);
-		if (idx !== -1) {
-			return;
-		}
-		self.submits.push(submit);
-		_.bindEvent(submit, 'click', setSubmitButton);
-	};
-
-	var unregisterSubmit = function(submit) {
-		var idx = self.submits.indexOf(submit);
-		if (idx === -1) {
-			return;
-		}
-		self.submits.splice(idx, 1);
-		_.unbindEvent(submit, 'click', setSubmitButton);
 	};
 
 	var submitForm = function(onlyValidate) {
@@ -281,22 +276,12 @@ var ajaxformBase = function(formElement, options) {
 
 	// Register input or submit element
 	self.registerElement = function(element) {
-		if (element.getAttribute('type') === 'submit') {
-			registerSubmit(element);
-		}
-		else {
-			registerInput(element);
-		}
+		registerInput(element);
 	};
 
 	// Unregister input or submit element
 	self.unregisterElement = function(element) {
-		if (element.getAttribute('type') === 'submit') {
-			unregisterSubmit(element);
-		}
-		else {
-			unregisterInput(element);
-		}
+		unregisterInput(element);
 	};
 
 	// Get form data in array of key-value pairs
@@ -362,6 +347,7 @@ var ajaxformBase = function(formElement, options) {
 	}
 
 	_.forEach(formElement.elements, self.registerElement);
+	_.bindEvent(formElement, 'click', onFormClick);
 	_.bindEvent(formElement, 'submit', onFormSubmit);
 
 	return self;
