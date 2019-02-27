@@ -276,12 +276,18 @@ var ajaxformBase = function(formElement, options) {
 
 	// Register input or submit element
 	self.registerElement = function(element) {
-		registerInput(element);
+		var type = element.getAttribute('type');
+		if (type !== 'submit') {
+			registerInput(element);
+		}
 	};
 
 	// Unregister input or submit element
 	self.unregisterElement = function(element) {
-		unregisterInput(element);
+		var type = element.getAttribute('type');
+		if (type !== 'submit') {
+			unregisterInput(element);
+		}
 	};
 
 	// Get form data in array of key-value pairs
