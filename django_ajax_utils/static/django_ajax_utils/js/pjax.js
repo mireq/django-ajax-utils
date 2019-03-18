@@ -19,12 +19,7 @@ var evalScript = function(script) {
 
 
 var pushState = function(url) {
-	if (firstrun) {
-		window.history.replaceState({is_pjax: true, url: window.location + ''}, null, window.location);
-		firstrun = false;
-	}
 	window.history.pushState({is_pjax: true, url: url}, null, url);
-
 	var base = document.getElementsByTagName('BASE')[0];
 	if (base !== undefined) {
 		base.href = (url.split('?')[0]).split('#')[0];
@@ -35,7 +30,9 @@ var popState = function(e) {
 	if (e.state === null || e.state === undefined || e.state.url === undefined || !e.state.is_pjax) {
 		return;
 	}
-	pjax.load(e.state.url, { history: false });
+	var options = _.lightCopy(e.state || {});
+	options.history = false;
+	pjax.load(e.state.url, options);
 };
 
 
@@ -69,7 +66,7 @@ var pjaxLoader = function(options) {
 		return self.checkUrlSupported(action, loader);
 	};
 
-	var onRequest = function(url, loader) {
+	var onRequest = function(url, loader, options) {
 		if (self.bodyLoadingCls !== undefined) {
 			_.addClass(document.body, self.bodyLoadingCls);
 		}
@@ -79,6 +76,17 @@ var pjaxLoader = function(options) {
 		if (self.bodyLoadingCls !== undefined) {
 			_.removeClass(document.body, self.bodyLoadingCls);
 		}
+	};
+
+	var onInit = function(loader, options) {
+		if (_.id(options.pjaxContainerId) === null) {
+			return;
+		}
+		var state = {
+			is_pjax: true,
+			url: window.location + '',
+		};
+		window.history.replaceState(state, null, window.location);
 	};
 
 	var self = {};
@@ -95,9 +103,12 @@ var pjaxLoader = function(options) {
 	self.checkFormSupported = self.options.checkFormSupported || checkFormSupported;
 	self.checkUrlSupported = self.options.checkUrlSupported || checkUrlSupported;
 
-	self.onLoaded = self.options.onLoaded || function(response, url,  loader) {};
+	self.onInit = self.options.onInit || onInit;
+	self.onLoaded = self.options.onLoaded || function(response, url,  loader, options) {};
 	self.onRequest = self.options.onRequest || onRequest;
 	self.onResponse = self.options.onResponse || onResponse;
+
+	self.onInit(self, options);
 
 	var onPjaxLinkClicked = function(e) {
 		if (e.which !== 1) {
@@ -220,7 +231,7 @@ var pjaxLoader = function(options) {
 			}
 
 			if (self.onLoaded !== undefined) {
-				self.onLoaded(response, url, self);
+				self.onLoaded(response, url, self, options);
 			}
 		});
 
@@ -266,10 +277,10 @@ var pjaxLoader = function(options) {
 		if (pjaxOptions.history === undefined) {
 			pjaxOptions.history = true;
 		}
+		self.onRequest(url, self, pjaxOptions);
 		if (pjaxOptions.history) {
 			pushState(url);
 		}
-		self.onRequest(url, self);
 		if (pjaxOptions.response === undefined) {
 			_.xhrSend({
 				url: url,
