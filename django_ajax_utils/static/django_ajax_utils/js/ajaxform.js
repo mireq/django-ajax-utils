@@ -114,7 +114,6 @@ var ajaxformBase = function(formElement, options) {
 			self.options.isMultipart = true;
 		}
 	}
-	self.inputs = [];
 	self.submitButton = undefined;
 	self.initial = undefined;
 
@@ -163,40 +162,6 @@ var ajaxformBase = function(formElement, options) {
 		}
 		self.onFormSubmit(e);
 		self.submitButton = undefined;
-	};
-
-	var registerInput = function(input) {
-		var idx = self.inputs.indexOf(input);
-		if (idx !== -1) {
-			return;
-		}
-		self.inputs.push(input);
-		_.bindEvent(input, 'change', onInputChangedFinished);
-		if (self.options.liveValidate) {
-			if (input.oninput === undefined) {
-				_.bindEvent(input, 'keyup', onInputChangedDelayed);
-			}
-			else {
-				_.bindEvent(input, 'input', onInputChangedDelayed);
-			}
-		}
-	};
-
-	var unregisterInput = function(input) {
-		var idx = self.inputs.indexOf(input);
-		if (idx === -1) {
-			return;
-		}
-		self.inputs.splice(idx, 1);
-		_.unbindEvent(input, 'change', onInputChangedFinished);
-		if (self.options.liveValidate) {
-			if (input.oninput === undefined) {
-				_.unbindEvent(input, 'keyup', onInputChanged);
-			}
-			else {
-				_.unbindEvent(input, 'input', onInputChanged);
-			}
-		}
 	};
 
 	var submitForm = function(onlyValidate) {
@@ -274,22 +239,6 @@ var ajaxformBase = function(formElement, options) {
 		}
 	};
 
-	// Register input or submit element
-	self.registerElement = function(element) {
-		var type = element.getAttribute('type');
-		if (type !== 'submit') {
-			registerInput(element);
-		}
-	};
-
-	// Unregister input or submit element
-	self.unregisterElement = function(element) {
-		var type = element.getAttribute('type');
-		if (type !== 'submit') {
-			unregisterInput(element);
-		}
-	};
-
 	// Get form data in array of key-value pairs
 	self.getFormData = function() {
 		var data = formData(self.options.isMultipart);
@@ -352,9 +301,33 @@ var ajaxformBase = function(formElement, options) {
 		validate = _.debounce(self.validate, self.options.validateDelay);
 	}
 
-	_.forEach(formElement.elements, self.registerElement);
 	_.bindEvent(formElement, 'click', onFormClick);
 	_.bindEvent(formElement, 'submit', onFormSubmit);
+	_.bindEvent(formElement, 'change', onInputChangedFinished);
+	if (self.options.liveValidate) {
+		var input = document.createElement('input');
+		if (input.oninput === undefined) {
+			_.bindEvent(formElement, 'keyup', onInputChangedDelayed);
+		}
+		else {
+			_.bindEvent(formElement, 'input', onInputChangedDelayed);
+		}
+	}
+
+	self.destroy = function() {
+		_.unbindEvent(formElement, 'click', onFormClick);
+		_.unbindEvent(formElement, 'submit', onFormSubmit);
+		_.unbindEvent(formElement, 'change', onInputChangedFinished);
+		if (self.options.liveValidate) {
+			var input = document.createElement('input');
+			if (input.oninput === undefined) {
+				_.unbindEvent(formElement, 'keyup', onInputChangedDelayed);
+			}
+			else {
+				_.unbindEvent(formElement, 'input', onInputChangedDelayed);
+			}
+		}
+	};
 
 	return self;
 };
