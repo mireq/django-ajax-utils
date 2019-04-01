@@ -906,6 +906,26 @@ var encodeURLParameters = function(parameters) {
 	return urlComponents.join('&');
 };
 
+var decodeURLParameters = function(data) {
+	var parameters = [];
+	if (data === '') {
+		return parameters;
+	}
+	var components = data.split('&');
+	forEach(components, function(component) {
+		var separatorPosition = component.indexOf('=');
+		if (separatorPosition === -1) {
+			parameters.push([decodeURIComponent(component), '']);
+		}
+		else {
+			var name = decodeURIComponent(component.slice(0, separatorPosition));
+			var value = decodeURIComponent(component.slice(separatorPosition + 1));
+			parameters.push([name, value]);
+		}
+	});
+	return parameters;
+};
+
 var addURLParameters = function(url, parameters) {
 	var encodedParameters = encodeURLParameters(parameters);
 	var finalUrl = url;
@@ -924,6 +944,7 @@ window._utils.serializeFormElement = serializeFormElement;
 window._utils.serializeForm = serializeForm;
 window._utils.getUrlParameterByName = getUrlParameterByName;
 window._utils.encodeURLParameters = encodeURLParameters;
+window._utils.decodeURLParameters = decodeURLParameters;
 window._utils.addURLParameters = addURLParameters;
 
 
