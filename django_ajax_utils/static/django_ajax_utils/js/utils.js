@@ -128,6 +128,14 @@ var dictToPairs = function(collection) {
 	return pairs;
 };
 
+var pairsToDict = function(collection) {
+	var dict = {};
+	forEach(collection, function(item) {
+		dict[item[0]] = item[1];
+	});
+	return dict;
+};
+
 var map;
 if (Array.prototype.map) {
 	var coreMap = Array.prototype.map;
@@ -212,6 +220,7 @@ var keys = function(dct) {
 window._utils.forEach = forEach;
 window._utils.forEachDict = forEachDict;
 window._utils.dictToPairs = dictToPairs;
+window._utils.pairsToDict = pairsToDict;
 window._utils.map = map;
 window._utils.some = some;
 window._utils.every = every;
