@@ -344,7 +344,7 @@ var escapeHTML = function(unsafe) {
 		.replace(/'/g, "&#039;");
 };
 
-var hasClass, addClass, removeClass, toggleClass;
+var hasClass, addClass, removeClass, toggleClass, setClass;
 if (el.classList === undefined) {
 	hasClass = function(elem, cls) {
 		return elem.className.split(" ").indexOf(cls) !== -1;
@@ -373,6 +373,17 @@ if (el.classList === undefined) {
 			addClass(elem, cls);
 		}
 	};
+
+	setClass = function(elem, cls, enabled) {
+		if (enabled) {
+			if (!hasClass(element, cls)) {
+				addClass(elem, cls);
+			}
+		}
+		else {
+			removeClass(elem, cls);
+		}
+	};
 }
 else {
 	hasClass = function(elem, cls) {
@@ -389,6 +400,15 @@ else {
 
 	toggleClass = function(elem, cls) {
 		return elem.classList.toggle(cls);
+	};
+
+	setClass = function(elem, cls, enabled) {
+		if (enabled) {
+			addClass(elem, cls);
+		}
+		else {
+			removeClass(elem, cls);
+		}
 	};
 }
 
@@ -525,6 +545,7 @@ window._utils.hasClass = hasClass;
 window._utils.addClass = addClass;
 window._utils.removeClass = removeClass;
 window._utils.toggleClass = toggleClass;
+window._utils.setClass = setClass;
 window._utils.id = getElementById;
 window._utils.tag = getElementsByTagName;
 window._utils.cls = getElementsByClassName;
