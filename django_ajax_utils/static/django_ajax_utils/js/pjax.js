@@ -146,7 +146,11 @@ var pjaxLoader = function(options) {
 				return;
 			}
 			var formData = _.serializeForm(element);
-			pjax.load(link + '?' + formData);
+			var separator = '?';
+			if (link.indexOf('?') !== -1) {
+				separator = '&';
+			}
+			pjax.load(link + separator + formData);
 			e.preventDefault();
 		});
 	};
