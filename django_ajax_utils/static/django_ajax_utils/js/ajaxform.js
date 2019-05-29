@@ -456,6 +456,11 @@ var ajaxform = function(formElement, options) {
 		_.forEach(formData.valid, function(key) {
 			self.clearStatus(key);
 		});
+		_.forEach(formData.empty, function(key) {
+			if (!_.has(formData.errors, key)) {
+				self.clearStatus(key);
+			}
+		});
 
 		for (key in formData.errors) {
 			if (_.has(formData.errors, key)) {
