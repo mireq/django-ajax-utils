@@ -82,9 +82,13 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 
 		def add_formset_status(formset):
 			for formrow in formset:
-				status = self.format_form_status(formrow)
-				form_data['errors'].update(status['errors'])
-				form_data['valid'] += status['valid']
+				if formset.can_delete and formset._should_delete_form(formrow):
+					for name, __ in formrow.fields.items():
+						form_data['empty'].append(formrow[name].id_for_label)
+				else:
+					status = self.format_form_status(formrow)
+					form_data['errors'].update(status['errors'])
+					form_data['valid'] += status['valid']
 
 		if not form.is_valid():
 			if hasattr(form, 'non_form_errors'):
