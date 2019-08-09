@@ -84,7 +84,7 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 			for formrow in formset:
 				if formset.can_delete and formset._should_delete_form(formrow):
 					for name, __ in formrow.fields.items():
-						form_data['empty'].append(formrow[name].id_for_label)
+						form_data['empty'].append(formrow.add_prefix(name))
 				else:
 					status = self.format_form_status(formrow)
 					form_data['errors'].update(status['errors'])
@@ -100,11 +100,8 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 				return form_data
 			else:
 				for field, errors in form.errors.items():
-					if field in form.fields:
-						fieldname = form[field].id_for_label
-						form_data['errors'][fieldname] = json.loads(errors.as_json())
-					else:
-						form_data['errors'][field] = json.loads(errors.as_json())
+					fieldname = form.add_prefix(field)
+					form_data['errors'][fieldname] = json.loads(errors.as_json())
 
 		if isinstance(form, forms.BaseFormSet):
 			add_formset_status(form)
@@ -117,7 +114,7 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 		empty = []
 		if hasattr(form, 'cleaned_data'):
 			for name, field in form.fields.items():
-				fieldname = form[name].id_for_label
+				fieldname = form.add_prefix(name)
 				if field.widget.value_from_datadict(form.data, form.files, form.add_prefix(name)) in field.empty_values:
 					empty.append(fieldname)
 				if fieldname in form_data['errors'] or not name in form.cleaned_data or form.cleaned_data[name] in field.empty_values:

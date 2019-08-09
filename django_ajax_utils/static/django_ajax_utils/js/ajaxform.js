@@ -345,7 +345,7 @@ var ajaxform = function(formElement, options) {
 	var showErrorsOnFly = {__all__: true};
 
 	var errorIdToName = function(id) {
-		var match = id.match(/(id_.*)_errors/);
+		var match = id.match(/id_(.*)_errors/);
 		if (match === null) {
 			return null;
 		}
@@ -377,7 +377,7 @@ var ajaxform = function(formElement, options) {
 	};
 
 	self.getErrorContainer = function(fieldName, strict) {
-		var container = _.id(fieldName + '_errors');
+		var container = _.id('id_' + fieldName + '_errors');
 		if (strict || container !== null) {
 			return container;
 		}
