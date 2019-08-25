@@ -68,7 +68,7 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 	def format_forms_status(self, ctx, status_code=200):
 		json_response = {'forms': {}}
 		for key, form in ctx.items():
-			if isinstance(form, (forms.BaseForm, forms.BaseFormSet)):
+			if isinstance(form, (forms.BaseForm, forms.BaseFormSet)) and form.is_bound:
 				json_response['forms'][key] = self.format_form_status(form)
 		return self.render_json_response(json_response, status=status_code)
 
