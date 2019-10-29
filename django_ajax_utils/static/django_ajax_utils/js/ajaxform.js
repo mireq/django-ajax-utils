@@ -507,6 +507,8 @@ var ajaxformFoundation = function(formElement, options) {
 			});
 			var row = self.findFormRow(errorContainer);
 			if (row !== null) {
+				_.removeClass(row, 'no-errors');
+				_.addClass(row, 'has-errors');
 				_.forEach(_.cls(row, 'foundation-field'), function(field) {
 					_.addClass(field, 'is-invalid-input');
 				});
@@ -528,6 +530,8 @@ var ajaxformFoundation = function(formElement, options) {
 		errorContainer.innerHTML = '';
 		var row = self.findFormRow(errorContainer);
 		if (row !== null) {
+			_.removeClass(row, 'has-errors');
+			_.removeClass(row, 'no-errors');
 			_.forEach(_.cls(row, 'foundation-field'), function(field) {
 				_.removeClass(field, 'is-invalid-input');
 			});
