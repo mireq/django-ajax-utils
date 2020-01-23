@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.forms import CheckboxInput
 from django.utils.encoding import force_text
 

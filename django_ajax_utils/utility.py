@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
-from django.utils import six
-
-
 def template_name_add_suffix(template_name, suffix):
 	"""
 	Add suffix to template name. Example
@@ -17,7 +12,7 @@ def template_names_add_suffix(template_names, suffix):
 	"""
 	Add suffix to each template name from list template_names
 	"""
-	if isinstance(template_names, six.string_types):
+	if isinstance(template_names, str):
 		template_names  = (template_names,)
 	return tuple(template_name_add_suffix(tpl, suffix) for tpl in template_names)
 

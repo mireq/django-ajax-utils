@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import types
 
 from django.utils.encoding import escape_uri_path
