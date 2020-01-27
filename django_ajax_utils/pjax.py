@@ -10,7 +10,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.http.response import HttpResponse
 from django.template import TemplateDoesNotExist
 from django.template.loaders.base import Loader as BaseLoader
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 import re
 
 
@@ -77,7 +77,7 @@ class Middleware(object):
 
 				json_data = {
 					'is_pjax': True,
-					'content': force_text(response.getvalue()),
+					'content': force_str(response.getvalue()),
 					'blocks': blocks,
 				}
 				response = HttpResponse(json.dumps(json_data).encode('utf-8'), content_type="application/json")

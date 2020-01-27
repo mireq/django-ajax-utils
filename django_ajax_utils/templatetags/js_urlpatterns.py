@@ -2,7 +2,7 @@
 import json
 
 from django import template, urls
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 
 
@@ -14,7 +14,7 @@ def prepare_url_list(resolver, namespace_path='', namespace=''):
 	for url_name in resolver.reverse_dict.keys():
 		if not isinstance(url_name, str):
 			continue
-		url_name = force_text(url_name)
+		url_name = force_str(url_name)
 		formated_patterns = []
 		for url_pattern in resolver.reverse_dict.getlist(url_name):
 			for url_format, url_params in url_pattern[0]:
