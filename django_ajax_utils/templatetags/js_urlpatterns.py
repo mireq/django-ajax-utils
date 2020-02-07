@@ -51,12 +51,16 @@ def safe_json_str(json_str):
 def js_urlpatterns(*export_patterns):
 	if len(export_patterns) == 1 and isinstance(export_patterns[0], (list, tuple)):
 		export_patterns = export_patterns[0]
-	export_patterns = set(export_patterns)
+	export_patterns = frozenset(export_patterns)
+	if export_patterns in js_urlpatterns.cache:
+		return js_urlpatterns.cache[export_patterns]
 	if export_patterns:
 		url_patterns = {pattern['name']: pattern['patterns'] for pattern in prepare_url_list(url_resolver) if pattern['name'] in export_patterns}
 	else:
 		url_patterns = {pattern['name']: pattern['patterns'] for pattern in prepare_url_list(url_resolver)}
-	return safe_json_str(json.dumps(url_patterns))
+	js_urlpatterns.cache[export_patterns] = safe_json_str(json.dumps(url_patterns))
+	return js_urlpatterns.cache[export_patterns]
+js_urlpatterns.cache = {}
 
 
 try:
