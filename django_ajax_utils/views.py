@@ -36,8 +36,10 @@ class AjaxRedirectMixin(JsonResponseMixin):
 		response = super(AjaxRedirectMixin, self).dispatch(request, *args, **kwargs)
 		if check_ajax(request):
 			if isinstance(response, HttpResponseRedirect):
-				url = response.url
+				original_response = response
+				url = original_response.url
 				response = self.render_json_response({"redirect": url})
+				response.cookies = original_response.cookies
 		return response
 
 
