@@ -223,6 +223,11 @@ var pjaxLoader = function(options) {
 				if (pjaxContainer !== null) {
 					pjaxContainer.innerHTML = response.content;
 					self.execEmbeddedScripts(pjaxContainer);
+					_.forEach(extrajsBlocks, function(extrajsBlock) {
+						var div = _.elem('div');
+						div.innerHTML = extrajsBlock;
+						self.execEmbeddedScripts(div);
+					});
 					_.triggerLoad(pjaxContainer);
 				}
 			}
