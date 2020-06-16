@@ -3,11 +3,18 @@
 
 var createXMLHttpRequest = null;
 var ajaxForwardError = function(response) {
-	document.open();
-	document.write(response.responseText); // jshint ignore:line
-	document.close();
-	if (window.history !== undefined) {
-		window.history.replaceState({}, null, window.location);
+	if (response.status !== 0 && response.responseText) {
+		document.open();
+		document.write(response.responseText); // jshint ignore:line
+		document.close();
+		if (window.history !== undefined) {
+			window.history.replaceState({}, null, window.location);
+		}
+	}
+	else {
+		if (window.console) {
+			console.log("Response error, status: " + response.status);
+		}
 	}
 };
 
