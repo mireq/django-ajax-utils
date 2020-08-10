@@ -169,7 +169,7 @@ var pjaxLoader = function(options) {
 			if (element.nodeName && element.nodeName.toUpperCase() === 'SCRIPT') {
 				var type = element.getAttribute('type');
 				if (!type || type.toLowerCase() === 'text/javascript') {
-					var scriptData = (element.text || element.textContent || element.innerHTML || "" );
+					var scriptData = (element.text || element.textContent || element.innerHTML || "");
 					evalScript(scriptData);
 				}
 			}
