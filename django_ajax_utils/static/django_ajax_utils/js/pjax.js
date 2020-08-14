@@ -178,7 +178,7 @@ var pjaxLoader = function(options) {
 
 	var processPjax = function(response, url, options) {
 		if (response.redirect !== undefined) {
-			if (response.plain_redirect) {
+			if (response.plain_redirect || !self.checkUrlSupported(response.redirect, self)) {
 				window.location = response.redirect;
 			}
 			else {
