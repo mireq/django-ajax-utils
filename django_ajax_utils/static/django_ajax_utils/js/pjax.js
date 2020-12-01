@@ -218,17 +218,11 @@ var pjaxLoader = function(options) {
 		}
 
 		_.loaderJs(extrajs, function() {
+			var pjaxContainer;
 			if (self.pjaxContainerId !== undefined) {
-				var pjaxContainer = _.id(self.pjaxContainerId);
+				pjaxContainer = _.id(self.pjaxContainerId);
 				if (pjaxContainer !== null) {
 					pjaxContainer.innerHTML = response.content;
-					self.execEmbeddedScripts(pjaxContainer);
-					_.forEach(extrajsBlocks, function(extrajsBlock) {
-						var div = _.elem('div');
-						div.innerHTML = extrajsBlock;
-						self.execEmbeddedScripts(div);
-					});
-					_.triggerLoad(pjaxContainer);
 				}
 			}
 
@@ -241,6 +235,16 @@ var pjaxLoader = function(options) {
 
 			if (self.onLoaded !== undefined) {
 				self.onLoaded(response, url, self, options);
+			}
+
+			if (pjaxContainer !== undefined) {
+				self.execEmbeddedScripts(pjaxContainer);
+				_.forEach(extrajsBlocks, function(extrajsBlock) {
+					var div = _.elem('div');
+					div.innerHTML = extrajsBlock;
+					self.execEmbeddedScripts(div);
+				});
+				_.triggerLoad(pjaxContainer);
 			}
 		});
 
