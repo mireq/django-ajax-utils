@@ -298,7 +298,7 @@ var ajaxformBase = function(formElement, options) {
 		};
 	}
 	else {
-		validate = _.debounce(self.validate, self.options.validateDelay);
+		validate = _.debounce(function() { self.validate(); }, self.options.validateDelay);
 	}
 
 	_.bindEvent(formElement, 'click', onFormClick);
