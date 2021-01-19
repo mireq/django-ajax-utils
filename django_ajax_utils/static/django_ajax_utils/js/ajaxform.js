@@ -392,12 +392,19 @@ var ajaxform = function(formElement, options) {
 		var errorContainer = self.getErrorContainer(fieldName);
 		var errorsElement = _.tag(errorContainer, 'ul')[0];
 		if (errorsElement === undefined) {
-			errorsElement = _.elem('ul', {'class': 'errors'});
+			errorsElement = _.elem('ul');
 			errorContainer.appendChild(errorsElement);
 		}
 
+		var errorsElementClassName = o.fieldErrorsClass + ' count-' + errorList.length;
+		errorsElement.className = errorsElementClassName;
+
 		_.forEach(errorList, function(error) {
-			errorsElement.appendChild(_.elem('li', {}, error.message));
+			var messageElement = _.elem('li', {}, error.message);
+			if (error.code) {
+				messageElement.className = 'form-error code-' + error.code;
+			}
+			errorsElement.appendChild(messageElement);
 		});
 
 		var row = self.findFormRow(errorContainer);
@@ -424,6 +431,7 @@ var ajaxform = function(formElement, options) {
 			return;
 		}
 		errorContainer.innerHTML = '';
+		errorContainer.className = 'errors empty';
 		var row = self.findFormRow(errorContainer);
 		if (row !== null) {
 			_.removeClass(row, 'has-errors');
