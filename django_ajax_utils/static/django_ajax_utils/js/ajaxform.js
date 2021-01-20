@@ -396,7 +396,7 @@ var ajaxform = function(formElement, options) {
 			errorContainer.appendChild(errorsElement);
 		}
 
-		var errorsElementClassName = o.fieldErrorsClass + ' count-' + errorList.length;
+		var errorsElementClassName = o.fieldErrorsClass + ' has-errors count-' + errorList.length;
 		errorsElement.className = errorsElementClassName;
 
 		_.forEach(errorList, function(error) {
@@ -433,8 +433,6 @@ var ajaxform = function(formElement, options) {
 		if (errorContainer === null) {
 			return;
 		}
-		errorContainer.innerHTML = '';
-		errorContainer.className = 'errors empty';
 		var row = self.findFormRow(errorContainer);
 		if (row !== null) {
 			_.removeClass(row, 'has-errors');
