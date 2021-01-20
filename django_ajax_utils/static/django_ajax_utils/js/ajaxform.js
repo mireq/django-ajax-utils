@@ -341,7 +341,7 @@ var ajaxform = function(formElement, options) {
 	if (!_.has(o, 'liveValidate')) { o.liveValidate = (_.getData(formElement, 'liveValidate') !== 'false'); }
 
 	var self = ajaxformBase(formElement, o);
-	var disabler = submitDisabler(formElement);
+	self.disabler = submitDisabler(formElement);
 	var showErrorsOnFly = {__all__: true};
 
 	var errorIdToName = function(id) {
@@ -442,16 +442,16 @@ var ajaxform = function(formElement, options) {
 
 	self.onFormSubmit = function(e) {
 		self.submit();
-		disabler.disable();
+		self.disabler.disable();
 		e.preventDefault();
 	};
 
 	self.onFormSubmitSuccess = function(data) {
-		disabler.enable();
+		self.disabler.enable();
 	};
 
 	self.onFormSubmitFail = function(response) {
-		disabler.enable();
+		self.disabler.enable();
 	};
 
 	self.onValidate = function(formData, onlyValidate) {
