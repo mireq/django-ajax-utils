@@ -404,6 +404,9 @@ var ajaxform = function(formElement, options) {
 			if (error.code) {
 				messageElement.className = 'form-error code-' + error.code;
 			}
+			else {
+				messageElement.className = 'form-error';
+			}
 			errorsElement.appendChild(messageElement);
 		});
 
