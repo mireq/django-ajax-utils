@@ -433,6 +433,7 @@ var ajaxform = function(formElement, options) {
 		if (errorContainer === null) {
 			return;
 		}
+		errorContainer.innerHTML = '';
 		var row = self.findFormRow(errorContainer);
 		if (row !== null) {
 			_.removeClass(row, 'has-errors');
