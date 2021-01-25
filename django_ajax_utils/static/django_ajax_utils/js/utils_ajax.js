@@ -10,6 +10,10 @@ var ajaxForwardError = function(response) {
 		if (window.history !== undefined) {
 			window.history.replaceState({}, null, window.location);
 		}
+		window.onpopstate = function(event) {
+			document.body.style.display = 'none';
+			window.location.reload();
+		};
 	}
 	else {
 		if (window.console) {

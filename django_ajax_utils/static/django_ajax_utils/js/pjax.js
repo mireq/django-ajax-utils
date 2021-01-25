@@ -268,8 +268,12 @@ var pjaxLoader = function(options) {
 		document.write(response.responseText); // jshint ignore:line
 		document.close();
 		if (options.history) {
-			window.history.replaceState({is_pjax: true}, null, url);
+			window.history.replaceState({is_pjax: true, url: url}, null, url);
 		}
+		window.onpopstate = function(event) {
+			document.body.style.display = 'none';
+			window.location.reload();
+		};
 	};
 
 	self.register = function(element) {
