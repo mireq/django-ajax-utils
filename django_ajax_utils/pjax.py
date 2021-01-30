@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import json
 import os
+import re
 import threading
+import weakref
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-
 from django.http.response import HttpResponse
 from django.template import TemplateDoesNotExist
 from django.template.loaders.base import Loader as BaseLoader
 from django.utils.encoding import force_str
-import re
 
 
 _local = threading.local()
@@ -145,18 +144,40 @@ try:
 	import jinja2
 	import jinja2.exceptions
 
+
 	class Environment(jinja2.Environment):
 		def pjax_template_name(self, template_name):
 			return '_pjax'.join(os.path.splitext(template_name))
 
+		def _load_template(self, name, globals): # pylint: disable=redefined-builtin
+			if self.loader is None:
+				raise TypeError("no loader for this environment specified")
+			cache_key = (weakref.ref(self.loader), name)
+			if self.cache is not None:
+				template = self.cache.get(cache_key)
+				if template is not None and (not self.auto_reload or template.is_up_to_date):
+					if template == '':
+						raise jinja2.exceptions.TemplateNotFound(name)
+					return template
+			try:
+				template = self.loader.load(self, name, globals)
+			except jinja2.exceptions.TemplateNotFound:
+				if self.cache is not None and not self.auto_reload:
+					self.cache[cache_key] = ''
+				raise
+
+			if self.cache is not None:
+				self.cache[cache_key] = template
+			return template
+
 		def get_template(self, name, *args, **kwargs):
 			if is_pjax(getattr(_local, 'request', None)):
 				try:
-					return super(Environment, self).get_template(self.pjax_template_name(name), *args, **kwargs)
+					return super().get_template(self.pjax_template_name(name), *args, **kwargs)
 				except jinja2.exceptions.TemplateNotFound:
-					return super(Environment, self).get_template(name, *args, **kwargs)
+					return super().get_template(name, *args, **kwargs)
 			else:
-				return super(Environment, self).get_template(name, *args, **kwargs)
+				return super().get_template(name, *args, **kwargs)
 
 
 	class PjaxBlockExtension(Extension):
