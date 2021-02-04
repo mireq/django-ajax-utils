@@ -146,6 +146,8 @@ try:
 
 
 	class Environment(jinja2.Environment):
+		nopjax_prefix = 'nopjax/'
+
 		def pjax_template_name(self, template_name):
 			return '_pjax'.join(os.path.splitext(template_name))
 
@@ -171,6 +173,8 @@ try:
 			return template
 
 		def get_template(self, name, *args, **kwargs):
+			if name.startswith(self.nopjax_prefix):
+				return super().get_template(name[len(self.nopjax_prefix):], *args, **kwargs)
 			if is_pjax(getattr(_local, 'request', None)):
 				try:
 					return super().get_template(self.pjax_template_name(name), *args, **kwargs)
