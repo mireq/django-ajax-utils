@@ -146,8 +146,6 @@ try:
 
 
 	class Environment(jinja2.Environment):
-		nopjax_prefix = 'nopjax/'
-
 		def pjax_template_name(self, template_name):
 			return '_pjax'.join(os.path.splitext(template_name))
 
@@ -172,10 +170,11 @@ try:
 				self.cache[cache_key] = template
 			return template
 
+		def check_pjax(self, name, request): # pylint: disable=unused-argument
+			return is_pjax(request)
+
 		def get_template(self, name, *args, **kwargs):
-			if name.startswith(self.nopjax_prefix):
-				return super().get_template(name[len(self.nopjax_prefix):], *args, **kwargs)
-			if is_pjax(getattr(_local, 'request', None)):
+			if self.check_pjax(name, getattr(_local, 'request', None)):
 				try:
 					return super().get_template(self.pjax_template_name(name), *args, **kwargs)
 				except jinja2.exceptions.TemplateNotFound:
