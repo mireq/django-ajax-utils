@@ -2,6 +2,8 @@
 from django.forms import CheckboxInput
 from django.utils.encoding import force_str
 
+from .settings import FORMUTILS_ROW_TEMPLATE_ATTRIBUTE
+
 
 class AutoPlaceholderFormMixin(object):
 	"""
@@ -69,9 +71,6 @@ try:
 	from jinja2.exceptions import TemplateSyntaxError
 
 
-	FORMROW_TEMPLATE_ATTRIBUTE = '_formrow_template'
-
-
 	class FormExtension(Extension):
 		tags = set(['form', 'formrow', 'formrow_template'])
 
@@ -87,7 +86,16 @@ try:
 		def parse_form(self, parser, tag):
 			lineno = tag.lineno
 			form_instance = parser.parse_expression()
-			template_name = nodes.Const('form_utils/layout/default.jinja')
+			template_name = nodes.Call(
+				nodes.Name('get_formlayout_template', 'load'),
+				[],
+				[
+					nodes.Keyword('caller_template', nodes.Const(parser.name)),
+					nodes.Keyword('form', form_instance),
+				],
+				None,
+				None,
+			)
 			has_body = False
 			if not parser.stream.current.test('block_end'):
 				parser.stream.expect('name:using')
@@ -119,7 +127,16 @@ try:
 			if not parser.stream.current.test('block_end'):
 				template_name = parser.parse_expression()
 			else:
-				template_name = nodes.Getattr(nodes.Name('form_utils_form', 'store'), FORMROW_TEMPLATE_ATTRIBUTE, 'load')
+				template_name = nodes.Call(
+					nodes.Name('get_formrow_template', 'load'),
+					[],
+					[
+						nodes.Keyword('caller_template', nodes.Const(parser.name)),
+						nodes.Keyword('form', nodes.Name('form_utils_form', 'load'))
+					],
+					None,
+					None,
+				)
 			if not parser.stream.current.test('block_end'):
 				raise TemplateSyntaxError("Too many arguments", lineno)
 
@@ -139,9 +156,8 @@ try:
 			return nodes.Output([nodes.MarkSafe(call)]).set_lineno(lineno)
 
 		def _process(self, template_name, form_instance):
-			setattr(form_instance, FORMROW_TEMPLATE_ATTRIBUTE, template_name)
+			setattr(form_instance, FORMUTILS_ROW_TEMPLATE_ATTRIBUTE, template_name)
 			return ''
-
 
 
 except ImportError:

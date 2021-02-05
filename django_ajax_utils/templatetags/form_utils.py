@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import types
+from importlib import import_module
 
 from django import forms, template
 
+from ..settings import FORMUTILS_ROW_TEMPLATE_ATTRIBUTE, FORMUTILS_DEFAULT_LAYOUT_TEMPLATE, FORMUTILS_DEFAULT_ROW_TEMPLATE, FORMUTILS_DEFAULT_ROW_TEMPLATE_GET, FORMUTILS_DEFAULT_LAYOUT_TEMPLATE_GET
+
 
 register = template.Library()
-
-
-FORMROW_TEMPLATE_ATTRIBUTE = '_formrow_template'
 
 
 class FormNode(template.Node):
@@ -24,7 +24,7 @@ class FormNode(template.Node):
 		context.push()
 		try:
 			form_instance = self.form.resolve(context)
-			setattr(form_instance, FORMROW_TEMPLATE_ATTRIBUTE, 'form_utils/row/default.html')
+			setattr(form_instance, FORMUTILS_ROW_TEMPLATE_ATTRIBUTE, 'form_utils/row/default.html')
 			context['form_utils_form'] = form_instance
 			context['form'] = form_instance
 			if self.empty_nodelist:
@@ -66,7 +66,7 @@ register.tag(form)
 def formrow_template(context, template_name):
 	if not 'form_utils_form' in context:
 		raise template.TemplateSyntaxError('This tag is allowed only inside template form tag')
-	setattr(context['form_utils_form'], FORMROW_TEMPLATE_ATTRIBUTE, template_name)
+	setattr(context['form_utils_form'], FORMUTILS_ROW_TEMPLATE_ATTRIBUTE, template_name)
 	return ''
 
 
@@ -77,7 +77,7 @@ def formrow(context, field, template_name=None):
 	if not isinstance(field, (forms.Field, forms.BoundField)):
 		return ''
 	if template_name is None:
-		template_name = getattr(context['form_utils_form'], FORMROW_TEMPLATE_ATTRIBUTE)
+		template_name = getattr(context['form_utils_form'], FORMUTILS_ROW_TEMPLATE_ATTRIBUTE)
 	context.push()
 	try:
 		context['field'] = field
@@ -86,6 +86,34 @@ def formrow(context, field, template_name=None):
 	finally:
 		context.pop()
 	return output
+
+
+FORMUTILS_DEFAULT_LAYOUT_TEMPLATE = 'form_utils/layout/default.jinja' if FORMUTILS_DEFAULT_LAYOUT_TEMPLATE is None else FORMUTILS_DEFAULT_LAYOUT_TEMPLATE
+FORMUTILS_DEFAULT_ROW_TEMPLATE = 'form_utils/row/default.jinja' if FORMUTILS_DEFAULT_ROW_TEMPLATE is None else FORMUTILS_DEFAULT_ROW_TEMPLATE
+
+
+def import_name(path):
+	module_name, obj_name = path.rsplit('.', 1)
+	module = import_module(module_name)
+	return getattr(module, obj_name)
+
+
+if FORMUTILS_DEFAULT_LAYOUT_TEMPLATE_GET is None:
+	def get_formlayout_template(form, caller_template, **kwargs): # pylint: disable=unused-argument
+		return FORMUTILS_DEFAULT_LAYOUT_TEMPLATE
+else:
+	get_formlayout_template = import_name(FORMUTILS_DEFAULT_LAYOUT_TEMPLATE_GET)
+
+
+if FORMUTILS_DEFAULT_ROW_TEMPLATE_GET is None:
+	def get_formrow_template(form, caller_template, **kwargs): # pylint: disable=unused-argument
+		return getattr(form, FORMUTILS_ROW_TEMPLATE_ATTRIBUTE, FORMUTILS_DEFAULT_ROW_TEMPLATE)
+else:
+	get_formrow_template = import_name(FORMUTILS_DEFAULT_ROW_TEMPLATE_GET)
+
+
+jinja_get_formlayout_template = get_formlayout_template
+jinja_get_formrow_template = get_formrow_template
 
 
 @register.filter
@@ -128,10 +156,10 @@ def is_multiple(field):
 
 try:
 	from django_jinja import library
-	from jinja2 import contextfunction
 
 	#library.global_function(contextfunction(formrow_template))
-	#library.global_function(contextfunction(formrow))
+	library.global_function(fn=jinja_get_formlayout_template, name='get_formlayout_template')
+	library.global_function(fn=jinja_get_formrow_template, name='get_formrow_template')
 	library.filter(add_field_class)
 	library.filter(is_checkbox)
 	library.filter(is_select)
