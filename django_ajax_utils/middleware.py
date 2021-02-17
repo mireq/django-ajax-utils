@@ -19,15 +19,17 @@ def get_clean_path(self):
 	return clean_path
 
 
-
 class RemoveDummyParametersMiddleware(object):
 	def __init__(self, get_response):
 		self.get_response = get_response
 
 	def __call__(self, request):
+		request = self.process_request(request) or request
+		return self.get_response(request)
+
+	def process_request(self, request):
 		request.GET._mutable = True
 		for param in DUMMY_PARAMETER_NAMES:
 			request.GET.pop(param, None)
 		request.GET._mutable = False
 		request.get_clean_path = types.MethodType(get_clean_path, request)
-		return self.get_response(request)
