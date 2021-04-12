@@ -294,7 +294,9 @@ var pjaxLoader = function(options) {
 		if (pjaxOptions.history === undefined) {
 			pjaxOptions.history = true;
 		}
-		self.onRequest(url, self, pjaxOptions);
+		if (self.onRequest(url, self, pjaxOptions) === false) {
+			return;
+		}
 		if (pjaxOptions.history) {
 			pushState(url);
 		}
