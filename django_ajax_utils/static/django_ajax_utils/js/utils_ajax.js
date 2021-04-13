@@ -2,7 +2,7 @@
 "use strict";
 
 var createXMLHttpRequest = null;
-var ajaxForwardError = function(response) {
+var ajaxForwardError = function(response, options) {
 	if (response.status !== 0 && response.responseText) {
 		document.open();
 		document.write(response.responseText); // jshint ignore:line
@@ -18,6 +18,9 @@ var ajaxForwardError = function(response) {
 	else {
 		if (window.console) {
 			console.log("Response error, status: " + response.status);
+		}
+		if (options && options.url) {
+			window.location = options.url;
 		}
 	}
 };
@@ -35,6 +38,7 @@ var xhrSend = function(options) {
 	var opts = _.lightCopy(options);
 	opts.method = options.method || 'GET';
 	opts.crossOrigin = options.crossOrigin || false;
+	opts.final_url = opts.url;
 	var req = createXMLHttpRequest();
 	var extraHeaders = options.extraHeaders || {};
 
@@ -44,11 +48,11 @@ var xhrSend = function(options) {
 
 	if (opts.method === 'GET') {
 		var dummy = '_dummy=' + new Date().getTime();
-		if (opts.url.indexOf('?') === -1) {
-			opts.url += '?' + dummy;
+		if (opts.final_url.indexOf('?') === -1) {
+			opts.final_url += '?' + dummy;
 		}
 		else {
-			opts.url += '&' + dummy;
+			opts.final_url += '&' + dummy;
 		}
 	}
 
@@ -61,7 +65,7 @@ var xhrSend = function(options) {
 		data = _.encodeURLParameters(data);
 	}
 
-	req.open(opts.method, opts.url, true);
+	req.open(opts.method, opts.final_url, true);
 	if (!opts.crossOrigin) {
 		if (!_.has(extraHeaders, 'X-CSRFToken')) {
 			var tokenCookie = _utils.getCookie('csrftoken');

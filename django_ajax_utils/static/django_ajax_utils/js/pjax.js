@@ -264,6 +264,10 @@ var pjaxLoader = function(options) {
 	};
 
 	var pjaxFallback = function(response, url, options) {
+		if (response.status === 0) {
+			window.location = url;
+			return;
+		}
 		document.open();
 		document.write(response.responseText); // jshint ignore:line
 		document.close();
