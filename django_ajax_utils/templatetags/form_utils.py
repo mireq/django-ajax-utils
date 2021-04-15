@@ -116,21 +116,55 @@ jinja_get_formlayout_template = get_formlayout_template
 jinja_get_formrow_template = get_formrow_template
 
 
+class AsWidgetModifier(object):
+	def __init__(self, field, original_as_widget):
+		self.original_field = field
+		self.original_as_widget = original_as_widget
+		self.__additional_classes = set()
+		self.__attributes = {}
+
+	def __call__(self, widget=None, attrs=None, *args, **kwargs):
+		if not widget:
+			widget = self.original_field.widget
+		attrs = attrs or widget.attrs.copy()
+		if self.__additional_classes:
+			cls = attrs.get('class', '')
+			cls += ' '.join(self.__additional_classes)
+			cls = cls.strip()
+			attrs['class'] = cls
+		attrs.update(self.__attributes)
+		return self.original_as_widget(widget=widget, attrs=attrs, **kwargs)
+
+	def __get__(self, instance, owner):
+		return types.MethodType(self, instance) if instance else self
+
+	def add_field_class(self, cls):
+		if isinstance(cls, str):
+			cls = cls.split()
+		self.__additional_classes.update(cls)
+
+	def add_attribute(self, key, value):
+		self.__attributes[key] = value
+
+
+def patch_as_widget(field):
+	if not hasattr(field.as_widget, 'original_field'):
+		field.as_widget = AsWidgetModifier(field.field, field.as_widget)
+	return field.as_widget
+
+
 @register.filter
 def add_field_class(field, cls):
-	as_widget_copy = field.as_widget
+	as_widget_modifier = patch_as_widget(field)
+	as_widget_modifier.add_field_class(cls)
+	return field
 
-	def as_widget(self, widget=None, attrs=None, *args, **kwargs):
-		if not widget:
-			widget = self.field.widget
-		attrs = attrs or widget.attrs.copy()
-		attrs.setdefault('class', '')
-		attrs['class'] += ' ' + cls
-		output = as_widget_copy(widget, attrs, *args, **kwargs)
-		self.as_widget = as_widget_copy
-		return output
 
-	field.as_widget = types.MethodType(as_widget, field)
+@register.filter
+def add_field_attr(field, attr):
+	key, value = attr.split('=', 1)
+	as_widget_modifier = patch_as_widget(field)
+	as_widget_modifier.add_attribute(key, value)
 	return field
 
 
@@ -165,5 +199,6 @@ try:
 	library.filter(is_select)
 	library.filter(is_radio)
 	library.filter(is_multiple)
+	library.filter(add_field_attr)
 except ImportError:
 	pass
