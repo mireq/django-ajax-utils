@@ -128,8 +128,8 @@ class AsWidgetModifier(object):
 			widget = self.original_field.widget
 		attrs = attrs or widget.attrs.copy()
 		if self.__additional_classes:
-			cls = attrs.get('class', '')
-			cls += ' '.join(self.__additional_classes)
+			cls = attrs.get('class', '').strip()
+			cls += ' ' + ' '.join(self.__additional_classes)
 			cls = cls.strip()
 			attrs['class'] = cls
 		attrs.update(self.__attributes)
