@@ -89,7 +89,7 @@ var setCookie = function(name, value, days) {
 	else {
 		expires = "";
 	}
-	document.cookie = name+"="+value+expires+"; path=/";
+	document.cookie = name+"="+value+expires+"; path=/; SameSite=Lax";
 };
 
 window._utils.getCookie = getCookie;
