@@ -2,10 +2,8 @@
 import json
 
 from django import forms
-from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.http.response import HttpResponseRedirect
-from django.utils.encoding import force_bytes
 
 from .utility import check_ajax
 
@@ -15,15 +13,12 @@ class JsonResponseMixin(object):
 	Mixin that handles JSON serialization.
 	"""
 
-	def __serialize_json_data(self, data, encoder):
-		return force_bytes(json.dumps(data, cls=encoder))
-
-	def render_json_response(self, data, encoder=DjangoJSONEncoder, **kwargs):
+	def render_json_response(self, data, **kwargs):
 		"""
 		Renders data as JSON into HttpResponse.
 		"""
-		json_data = self.__serialize_json_data(data, encoder)
-		return HttpResponse(json_data, content_type="application/json", **kwargs)
+		kwargs.setdefault('safe', False)
+		return JsonResponse(data, **kwargs)
 
 
 class AjaxRedirectMixin(JsonResponseMixin):
