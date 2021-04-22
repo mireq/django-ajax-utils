@@ -33,7 +33,7 @@ class AjaxRedirectMixin(JsonResponseMixin):
 	"""
 
 	def dispatch(self, request, *args, **kwargs):
-		response = super(AjaxRedirectMixin, self).dispatch(request, *args, **kwargs)
+		response = super().dispatch(request, *args, **kwargs)
 		if check_ajax(request):
 			if isinstance(response, HttpResponseRedirect):
 				original_response = response
@@ -52,20 +52,21 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 
 	def post(self, request, *args, **kwargs):
 		if check_ajax(request):
-			response = super(AjaxFormMixin, self).post(request, *args, **kwargs)
+			response = super().post(request, *args, **kwargs)
 			if hasattr(response, 'context_data'):
-				return self.format_forms_status(response.context_data)
+				return self.format_forms_status(response)
 			else:
 				return response
 		else:
-			return super(AjaxFormMixin, self).post(request, *args, **kwargs)
+			return super().post(request, *args, **kwargs)
 
 	def form_valid(self, form):
 		if self.only_validate_form:
 			return self.render_to_response(self.get_context_data(form=form))
-		return super(AjaxFormMixin, self).form_valid(form)
+		return super().form_valid(form)
 
-	def format_forms_status(self, ctx, status_code=200):
+	def format_forms_status(self, response, status_code=200):
+		ctx = response.context_data
 		json_response = {'forms': {}}
 		for key, form in ctx.items():
 			if isinstance(form, (forms.BaseForm, forms.BaseFormSet)) and form.is_bound:
