@@ -36,5 +36,9 @@ setup(
 		'Topic :: Internet :: WWW/HTTP',
 		'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
 	],
+	install_requires=[
+		'contextvars;python_version<"3.7"',
+		'dataclasses;python_version<"3.7"',
+	],
 )
 

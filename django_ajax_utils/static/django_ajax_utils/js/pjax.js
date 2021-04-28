@@ -308,7 +308,8 @@ var pjaxLoader = function(options) {
 			_.xhrSend({
 				url: url,
 				extraHeaders: {
-					'X-Requested-With': 'PJAXRequest'
+					'X-Requested-With': 'PJAXRequest',
+					'Accept': 'application/pjax.json, */*;q=0.8'
 				},
 				successFn: function(response, res, options) {
 					if (ignoreLink) {

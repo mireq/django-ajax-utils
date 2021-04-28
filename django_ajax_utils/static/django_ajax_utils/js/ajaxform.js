@@ -180,6 +180,11 @@ var ajaxformBase = function(formElement, options) {
 			self.onBeforeSend(data, formElement, self.options.formName);
 		}
 
+		var httpHeaders = self.options.httpHeders;
+		if (httpHeaders === undefined) {
+			httpHeaders = {'Accept': 'application/json'};
+		}
+
 		var url = formElement.getAttribute('action');
 		_.xhrSend({
 			method: 'POST',
@@ -205,7 +210,8 @@ var ajaxformBase = function(formElement, options) {
 					}
 				}
 			},
-			progress: onlyValidate ? undefined : self.onProgress
+			progress: onlyValidate ? undefined : self.onProgress,
+			extraHeaders: httpHeaders
 		});
 	};
 

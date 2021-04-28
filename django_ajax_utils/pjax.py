@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import contextvars as cv
 import json
 import os
 import re
@@ -12,8 +13,10 @@ from django.template import TemplateDoesNotExist
 from django.template.loaders.base import Loader as BaseLoader
 from django.utils.encoding import force_str
 
+from .utility import get_accept_parser
 
-_local = threading.local()
+
+_current_request = cv.ContextVar("request", default=None)
 _pjax_cache = {'include': None, 'exclude': None}
 
 
@@ -50,7 +53,7 @@ def pjax_supported(request):
 def is_pjax_request(request):
 	if not request:
 		return False
-	return request.META.get('HTTP_X_REQUESTED_WITH') == 'PJAXRequest'
+	return get_accept_parser(request).has_content_type('application/pjax.json')
 
 
 def is_pjax(request):
@@ -62,7 +65,7 @@ class Middleware(object):
 		self.get_response = get_response
 
 	def __call__(self, request):
-		_local.request = request
+		_current_request.set(request)
 		setattr(request, '_pjax_holders', {})
 		response = self.get_response(request)
 		if is_pjax(request):
@@ -105,7 +108,7 @@ class Loader(BaseLoader):
 
 	def get_template_sources(self, template_name, *args, **kwargs):
 		sources = []
-		if is_pjax(getattr(_local, 'request', None)):
+		if is_pjax(_current_request.get()):
 			pjax_template = self.pjax_template_name(template_name)
 			for template_loader in self.other_template_loaders:
 				sources += template_loader.get_template_sources(pjax_template, *args, **kwargs)
@@ -117,7 +120,7 @@ class Loader(BaseLoader):
 		return origin.loader.get_contents(origin)
 
 	def load_template_source(self, template_name, template_dirs=None):
-		if is_pjax(getattr(_local, 'request', None)):
+		if is_pjax(_current_request.get()):
 			try:
 				return self.direct_load_template(self.pjax_template_name(template_name), template_dirs)
 			except TemplateDoesNotExist:
@@ -174,7 +177,7 @@ try:
 			return is_pjax(request)
 
 		def get_template(self, name, *args, **kwargs):
-			if self.check_pjax(name, getattr(_local, 'request', None)):
+			if self.check_pjax(name, _current_request.get()):
 				try:
 					return super().get_template(self.pjax_template_name(name), *args, **kwargs)
 				except jinja2.exceptions.TemplateNotFound:
