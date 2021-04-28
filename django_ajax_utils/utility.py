@@ -32,7 +32,7 @@ def get_accept_parser(request):
 	return request.accept_parser
 
 
-def check_ajax(request):
+def check_json(request):
 	"""
 	Returns True if request is from ajax call
 	"""

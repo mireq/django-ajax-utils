@@ -5,7 +5,7 @@ from django import forms
 from django.http import JsonResponse
 from django.http.response import HttpResponseRedirect
 
-from .utility import check_ajax
+from .utility import check_json
 
 
 class JsonResponseMixin(object):
@@ -29,7 +29,7 @@ class AjaxRedirectMixin(JsonResponseMixin):
 
 	def dispatch(self, request, *args, **kwargs):
 		response = super().dispatch(request, *args, **kwargs)
-		if check_ajax(request):
+		if check_json(request):
 			if isinstance(response, HttpResponseRedirect):
 				original_response = response
 				url = original_response.url
@@ -46,7 +46,7 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 		return bool(self.request.POST.get(self.only_validate_field, False))
 
 	def post(self, request, *args, **kwargs):
-		if check_ajax(request):
+		if check_json(request):
 			response = super().post(request, *args, **kwargs)
 			if hasattr(response, 'context_data'):
 				return self.format_forms_status(response)
