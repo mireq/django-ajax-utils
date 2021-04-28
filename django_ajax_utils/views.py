@@ -90,7 +90,7 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 			if hasattr(form, 'non_form_errors'):
 				errors = json.loads(form.non_form_errors().as_json())
 				if errors:
-					form_data['errors']['__all__'] = errors
+					form_data['errors'][form.add_prefix('__all__')] = errors
 			if isinstance(form, forms.BaseFormSet):
 				add_formset_status(form)
 				return form_data
