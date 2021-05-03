@@ -217,7 +217,7 @@ var pjaxLoader = function(options) {
 			} while (match !== null);
 		}
 
-		_.loaderJs(extrajs, function() {
+		function onFinish() {
 			var pjaxContainer;
 			if (self.pjaxContainerId !== undefined) {
 				pjaxContainer = _.id(self.pjaxContainerId);
@@ -246,7 +246,9 @@ var pjaxLoader = function(options) {
 				});
 				_.triggerLoad(pjaxContainer);
 			}
-		});
+		}
+
+		_.loaderJs(extrajs, onFinish, onFinish);
 
 		_.forEach(extrastyle, function(item) {
 			if (extrastyleCode.indexOf(item) !== -1) {
