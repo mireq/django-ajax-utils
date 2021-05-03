@@ -723,6 +723,7 @@ window._utils.debounce = debounce;
 var loaderJs = (function () {
 	var head = document.getElementsByTagName('head')[0];
 	var loadedPaths;
+	var errorPaths = [];
 	var registeredPaths = [];
 	var waitingCallbacks = [];
 
@@ -733,8 +734,18 @@ var loaderJs = (function () {
 	var fireCallbacks = function() {
 		var firedCallbacks = [];
 		forEach(waitingCallbacks, function(callback, i) {
-			var fn = callback[0];
+			var fn = callback[0][0];
+			var errorFn = callback[0][1];
 			var paths = callback[1];
+
+			if (some(paths, function(path) { return errorPaths.indexOf(path) !== -1; })) {
+				firedCallbacks.push(i);
+				if (errorFn !== undefined) {
+					setTimeout(errorFn, 0);
+					return;
+				}
+			}
+
 			if (every(paths, function(path) { return loadedPaths.indexOf(path) !== -1; })) {
 				firedCallbacks.push(i);
 				setTimeout(fn, 0); // async call
@@ -746,7 +757,7 @@ var loaderJs = (function () {
 		}
 	};
 
-	return function(paths, callback) {
+	return function(paths, callback, error) {
 		var missingPaths = [];
 		if (loadedPaths === undefined) {
 			loadedPaths = [];
@@ -766,7 +777,7 @@ var loaderJs = (function () {
 			}
 		});
 
-		waitingCallbacks.push([callback, paths]);
+		waitingCallbacks.push([[callback, error], paths]);
 
 		var loadMissingPath = function() {
 			if (missingPaths.length === 0) {
@@ -775,7 +786,6 @@ var loaderJs = (function () {
 			var path = missingPaths[0];
 			missingPaths = missingPaths.splice(1);
 			var script = document.createElement('SCRIPT');
-			script.src = path;
 			script.onreadystatechange = script.onload = function(path) {
 				return function() {
 					if (scriptIsReady(script.readyState)) {
@@ -789,6 +799,17 @@ var loaderJs = (function () {
 					}
 				};
 			}(path);
+			script.onerror = function(path) {
+				return function() {
+					loadedPaths.push(path);
+					errorPaths.push(path);
+					setTimeout(fireCallbacks, 0);
+					if (window.console) {
+						window.console.warn("Script " + path + " not loaded.");
+					}
+				};
+			}(path);
+			script.src = path;
 			head.appendChild(script);
 		};
 
