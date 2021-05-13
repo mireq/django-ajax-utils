@@ -147,12 +147,47 @@ try:
 	import jinja2
 	import jinja2.exceptions
 
-
 	class Environment(jinja2.Environment):
+		def __init__(self, *args, **kwargs):
+			super().__init__(*args, **kwargs)
+			if jinja2.__version__.split('.')[0] == '3':
+				self._load_template_impl = self._load_template3
+			else:
+				self._load_template_impl = self._load_template2
+
 		def pjax_template_name(self, template_name):
 			return '_pjax'.join(os.path.splitext(template_name))
 
+		def check_pjax(self, name, request): # pylint: disable=unused-argument
+			return is_pjax(request)
+
 		def _load_template(self, name, globals): # pylint: disable=redefined-builtin
+			return self._load_template_impl(name, globals)
+
+		def _load_template3(self, name, globals): # pylint: disable=redefined-builtin
+			if self.loader is None:
+				raise TypeError("no loader for this environment specified")
+			cache_key = (weakref.ref(self.loader), name)
+			if self.cache is not None:
+				template = self.cache.get(cache_key)
+				if template is not None and (not self.auto_reload or template.is_up_to_date):
+					if template == '':
+						raise jinja2.exceptions.TemplateNotFound(name)
+					if globals:
+						template.globals.update(globals)
+					return template
+			try:
+				template = self.loader.load(self, name, self.make_globals(globals))
+			except jinja2.exceptions.TemplateNotFound:
+				if self.cache is not None and not self.auto_reload:
+					self.cache[cache_key] = ''
+				raise
+
+			if self.cache is not None:
+				self.cache[cache_key] = template
+			return template
+
+		def _load_template2(self, name, globals): # pylint: disable=redefined-builtin
 			if self.loader is None:
 				raise TypeError("no loader for this environment specified")
 			cache_key = (weakref.ref(self.loader), name)
@@ -172,9 +207,6 @@ try:
 			if self.cache is not None:
 				self.cache[cache_key] = template
 			return template
-
-		def check_pjax(self, name, request): # pylint: disable=unused-argument
-			return is_pjax(request)
 
 		def get_template(self, name, *args, **kwargs):
 			if self.check_pjax(name, _current_request.get()):
