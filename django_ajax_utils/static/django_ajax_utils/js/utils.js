@@ -852,7 +852,7 @@ var serializeFormElement = function(element, opts) {
 		q.push([name, value]);
 	};
 
-	if (!opts.includeDisabled && (element.name === '' || element.disabled)) {
+	if (!(opts && opts.includeDisabled) && (element.name === '' || element.disabled)) {
 		return [];
 	}
 
