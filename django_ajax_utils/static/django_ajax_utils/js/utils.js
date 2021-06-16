@@ -846,13 +846,13 @@ window._utils.execEmbeddedScripts = execEmbeddedScripts;
 
 
 // forms
-var serializeFormElement = function(element) {
+var serializeFormElement = function(element, opts) {
 	var q = [];
 	var addParameter = function(name, value) {
 		q.push([name, value]);
 	};
 
-	if (element.name === '' || element.disabled) {
+	if (!opts.includeDisabled && (element.name === '' || element.disabled)) {
 		return [];
 	}
 
@@ -920,7 +920,7 @@ var serializeForm = function(formElement, options) {
 	}
 
 	_utils.forEach(formElement.elements, function(element) {
-		_utils.forEach(_utils.serializeFormElement(element), function(name_value) {
+		_utils.forEach(_utils.serializeFormElement(element, o), function(name_value) {
 			var name = name_value[0];
 			var value = name_value[1];
 			addParameter(name, value);
