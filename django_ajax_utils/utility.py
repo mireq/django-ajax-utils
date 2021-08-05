@@ -32,11 +32,15 @@ def get_accept_parser(request):
 	return request.accept_parser
 
 
+JSON_SUPPORTED_TYPES = ['application/json', 'application/pjax.json']
+
+
 def check_json(request):
 	"""
 	Returns True if request is from ajax call
 	"""
-	return get_accept_parser(request).main_mimetype in ('application/json', 'application/pjax.json')
+	mimetype = get_accept_parser(request).negotiate(JSON_SUPPORTED_TYPES)
+	return bool(mimetype)
 
 
 MimeType = namedtuple('MimeType', ['content_type', 'content_subtype'])
