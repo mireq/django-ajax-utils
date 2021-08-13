@@ -39,7 +39,7 @@ def check_json(request):
 	"""
 	Returns True if request is from ajax call
 	"""
-	mimetype = get_accept_parser(request).negotiate(JSON_SUPPORTED_TYPES)
+	mimetype = get_accept_parser(request).negotiate(JSON_SUPPORTED_TYPES, wildcard=False)
 	return bool(mimetype)
 
 
@@ -83,7 +83,9 @@ class ContentType(object):
 				parameters[param] = value
 		return ContentType(content_type, content_subtype, q, parameters)
 
-	def matches(self, other: 'ContentType') -> bool:
+	def matches(self, other: 'ContentType', wildcard: bool = True) -> bool:
+		if not wildcard:
+			return self.content_type == other.content_type and self.content_subtype == other.content_subtype
 		if self.content_type != '*' and other.content_type != '*' and self.content_type != other.content_type:
 			return False
 		if self.content_subtype != '*' and other.content_subtype != '*' and self.content_subtype != other.content_subtype:
@@ -91,6 +93,10 @@ class ContentType(object):
 		if self.parameters and other.parameters and self.parameters != other.parameters:
 			return False
 		return True
+
+	@property
+	def full_type(self):
+		return f'{self.content_type}/{self.content_subtype}'
 
 
 class AcceptParser(object):
@@ -134,7 +140,7 @@ class AcceptParser(object):
 				raise ValueError("Not supported choice type")
 		return choices
 
-	def negotiate(self, query: Union[list, str]) -> Optional[ContentType]:
+	def negotiate(self, query: Union[list, str], wildcard: bool = True) -> Optional[ContentType]:
 		"""
 		Find best matching content type
 		"""
@@ -143,7 +149,7 @@ class AcceptParser(object):
 		query = self.__query_to_content_type(query)
 		for content_type in self.__content_types:
 			for choice in query:
-				if content_type.matches(choice):
+				if content_type.matches(choice, wildcard):
 					return content_type
 
 	def has_content_type(self, content_type: str) -> bool:
