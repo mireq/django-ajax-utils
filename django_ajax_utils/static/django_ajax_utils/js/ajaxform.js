@@ -100,6 +100,8 @@ var ajaxformBase = function(formElement, options) {
 	var self = {};
 	var validate;
 
+	formElement.ajaxformInstance = self;
+
 	self.formElement = formElement;
 	self.options = _.lightCopy(options || {});
 	self.options.liveValidate = self.options.liveValidate || false;
@@ -307,32 +309,25 @@ var ajaxformBase = function(formElement, options) {
 		validate = _.debounce(function() { self.validate(); }, self.options.validateDelay);
 	}
 
-	_.bindEvent(formElement, 'click', onFormClick);
-	_.bindEvent(formElement, 'submit', onFormSubmit);
-	_.bindEvent(formElement, 'change', onInputChangedFinished);
+	self.destroy = function() {
+	};
+
+	var events = {
+		click: function(e) { onFormClick(e); },
+		submit: function(e) { onFormSubmit(e); },
+		change: function(e) { onInputChangedFinished(e); }
+	};
 	if (self.options.liveValidate) {
-		var input = document.createElement('input');
-		if (input.oninput === undefined) {
-			_.bindEvent(formElement, 'keyup', onInputChangedDelayed);
-		}
-		else {
-			_.bindEvent(formElement, 'input', onInputChangedDelayed);
-		}
+		events.keyup = function(e) { onInputChangedDelayed(e); };
+		events.input = function(e) { onInputChangedDelayed(e); };
+	}
+	else {
+		events.keyup = function(e) {};
+		events.input = function(e) {};
 	}
 
-	self.destroy = function() {
-		_.unbindEvent(formElement, 'click', onFormClick);
-		_.unbindEvent(formElement, 'submit', onFormSubmit);
-		_.unbindEvent(formElement, 'change', onInputChangedFinished);
-		if (self.options.liveValidate) {
-			var input = document.createElement('input');
-			if (input.oninput === undefined) {
-				_.unbindEvent(formElement, 'keyup', onInputChangedDelayed);
-			}
-			else {
-				_.unbindEvent(formElement, 'input', onInputChangedDelayed);
-			}
-		}
+	self.dispatchEvent = function(eventType, e) {
+		events[eventType](e);
 	};
 
 	return self;
@@ -564,6 +559,55 @@ var ajaxformFoundation = function(formElement, options) {
 window._utils.ajaxformBase = ajaxformBase;
 window._utils.ajaxform = ajaxform;
 window._utils.ajaxformFoundation = ajaxformFoundation;
+
+
+function dispatchEvent(eventType, e) {
+	var form;
+	if (eventType === 'submit') {
+		form = e.target;
+	}
+	else {
+		form = event.target.form;
+	}
+
+	if (form === undefined) {
+		return;
+	}
+
+	var ajaxformInstance = form.ajaxformInstance;
+	if (ajaxformInstance) {
+		ajaxformInstance.dispatchEvent(eventType, e);
+	}
+}
+
+
+function onBodyClick(e) {
+	dispatchEvent('click', e);
+}
+function onBodySubmit(e) {
+	dispatchEvent('submit', e);
+}
+function onBodyChange(e) {
+	dispatchEvent('change', e);
+}
+function onBodyKeyup(e) {
+	dispatchEvent('keyup', e);
+}
+function onBodyInput(e) {
+	dispatchEvent('input', e);
+}
+
+
+_.bindEvent(document.body, 'click', onBodyClick);
+_.bindEvent(document.body, 'submit', onBodySubmit);
+_.bindEvent(document.body, 'change', onBodyChange);
+var input = document.createElement('input');
+if (input.oninput === undefined) {
+	_.bindEvent(document.body, 'keyup', onBodyKeyup);
+}
+else {
+	_.bindEvent(document.body, 'input', onBodyInput);
+}
 
 
 }(_utils));
