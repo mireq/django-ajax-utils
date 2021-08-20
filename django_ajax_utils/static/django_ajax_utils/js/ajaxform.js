@@ -567,10 +567,10 @@ function dispatchEvent(eventType, e) {
 		form = e.target;
 	}
 	else {
-		form = event.target.form;
+		form = e.target.form;
 	}
 
-	if (form === undefined) {
+	if (form === undefined || form === null) {
 		return;
 	}
 
