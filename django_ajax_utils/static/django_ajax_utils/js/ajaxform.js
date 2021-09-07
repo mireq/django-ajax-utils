@@ -35,61 +35,70 @@ var formData = function(multipart) {
 var submitDisabler = function(formElement) {
 	var self = {};
 
-	var enabledSubmits = [];
+	var disabledSubmits = [];
 
-	_.forEach(formElement.elements, function(element) {
-		if (element.getAttribute('type') === 'submit' && element.disabled === false) {
-			var content;
-			var loadingText = _.getData(element, 'loadingText');
-			var disableElement = function() {
-				element.disabled = true;
-			};
-			var enableElement = function() {
-				element.disabled = false;
-			};
-			if (loadingText) {
-				if (element.tagName.toLowerCase() === 'input') {
-					content = element.value;
-					disableElement = function() {
-						element.disabled = true;
-						element.value = loadingText;
-					};
-					enableElement = function() {
-						element.disabled = false;
-						element.value = content;
-					};
+	function getEnabledSubmits() {
+		var enabledSubmits = [];
+
+		_.forEach(formElement.elements, function(element) {
+			if (element.getAttribute('type') === 'submit' && element.disabled === false) {
+				var content;
+				var loadingText = _.getData(element, 'loadingText');
+				var disableElement = function() {
+					element.disabled = true;
+				};
+				var enableElement = function() {
+					element.disabled = false;
+				};
+				if (loadingText) {
+					if (element.tagName.toLowerCase() === 'input') {
+						content = element.value;
+						disableElement = function() {
+							element.disabled = true;
+							element.value = loadingText;
+						};
+						enableElement = function() {
+							element.disabled = false;
+							element.value = content;
+						};
+					}
+					else {
+						content = element.innerHTML;
+						disableElement = function() {
+							element.disabled = true;
+							element.innerHTML = '';
+							element.appendChild(document.createTextNode(loadingText));
+						};
+						enableElement = function() {
+							element.disabled = false;
+							element.innerHTML = content;
+						};
+					}
 				}
-				else {
-					content = element.innerHTML;
-					disableElement = function() {
-						element.disabled = true;
-						element.innerHTML = '';
-						element.appendChild(document.createTextNode(loadingText));
-					};
-					enableElement = function() {
-						element.disabled = false;
-						element.innerHTML = content;
-					};
-				}
+				enabledSubmits.push({
+					element: element,
+					disableElement: disableElement,
+					enableElement: enableElement
+				});
 			}
-			enabledSubmits.push({
-				element: element,
-				disableElement: disableElement,
-				enableElement: enableElement
-			});
-		}
-	});
+		});
+
+		return enabledSubmits;
+	}
 
 	self.disable = function() {
-		_.forEach(enabledSubmits, function(input) {
+		var submits = getEnabledSubmits();
+		_.forEach(submits, function(input) {
 			input.disableElement();
 		});
+		disabledSubmits = disabledSubmits.concat(submits);
 	};
 
 	self.enable = function() {
-		_.forEach(enabledSubmits, function(input) {
+		_.forEach(disabledSubmits, function(input) {
 			input.enableElement();
 		});
+		disabledSubmits = [];
 	};
 
 	return self;
