@@ -467,7 +467,12 @@ var ajaxform = function(formElement, options) {
 
 	self.onValidate = function(formData, onlyValidate) {
 		var key;
-		self.clearStatus('__all__');
+		if (formData.prefix === null) {
+			self.clearStatus('__all__');
+		}
+		else {
+			self.clearStatus(formData.prefix + '-__all__');
+		}
 		for (key in formData.errors) {
 			if (_.has(formData.errors, key)) {
 				self.clearStatus(key);
