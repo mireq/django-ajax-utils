@@ -363,7 +363,7 @@ var ajaxform = function(formElement, options) {
 	};
 
 	var checkFormRow = function(element) {
-		return _.hasClass(element, o.rowClass) || element === formElement;
+		return _.hasClass(element, o.rowClass);
 	};
 
 	var getFallbackErrorContainer = function() {
