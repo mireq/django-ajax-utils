@@ -1,11 +1,19 @@
 # -*- coding: utf-8 -*-
-import json
-
 from django import forms
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 from django.http.response import HttpResponseRedirect
 
 from .utility import check_json
+
+
+class SafeDjangoJSONEncoder(DjangoJSONEncoder):
+	def default(self, o):
+		try:
+			val = super().default(o)
+		except TypeError:
+			val = f'<not serializable: {type(o).__qualname__}>'
+		return val
 
 
 class JsonResponseMixin(object):
@@ -66,7 +74,7 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 		for key, form in ctx.items():
 			if isinstance(form, (forms.BaseForm, forms.BaseFormSet)) and form.is_bound:
 				json_response['forms'][key] = self.format_form_status(form)
-		return self.render_json_response(json_response, status=status_code)
+		return self.render_json_response(json_response, status=status_code, encoder=SafeDjangoJSONEncoder)
 
 	def format_form_status(self, form):
 		form_data = {
@@ -89,7 +97,7 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 
 		if not form.is_valid():
 			if hasattr(form, 'non_form_errors'):
-				errors = json.loads(form.non_form_errors().as_json())
+				errors = self.__format_errorlist(form.non_form_errors())
 				if errors:
 					form_data['errors'][form.add_prefix('__all__')] = errors
 			if isinstance(form, forms.BaseFormSet):
@@ -98,13 +106,26 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 			else:
 				for field, errors in form.errors.items():
 					fieldname = form.add_prefix(field)
-					form_data['errors'][fieldname] = json.loads(errors.as_json())
+					form_data['errors'][fieldname] = self.__format_errorlist(errors)
 
 		if isinstance(form, forms.BaseFormSet):
 			add_formset_status(form)
 		else:
 			form_data.update(self.__format_fields_status(form, form_data))
 		return form_data
+
+	def __format_errorlist(self, errorlist):
+		errors = []
+		for error in errorlist.as_data():
+			message = next(iter(error))
+			error_data = {
+				'message': message,
+				'code': error.code or '',
+			}
+			if getattr(error, 'params', None):
+				error_data['params'] = error.params
+			errors.append(error_data)
+		return errors
 
 	def __format_fields_status(self, form, form_data):
 		valid = []
