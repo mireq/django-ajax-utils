@@ -363,7 +363,7 @@ var ajaxform = function(formElement, options) {
 	};
 
 	var checkFormRow = function(element) {
-		return _.hasClass(element, o.rowClass) || element === formElement;
+		return _.hasClass(element, o.rowClass);
 	};
 
 	var getFallbackErrorContainer = function() {
@@ -384,6 +384,15 @@ var ajaxform = function(formElement, options) {
 			}
 		}
 		return container;
+	};
+
+	var addPrefix = function(val, formData) {
+		if (formData.prefix === null) {
+			return val;
+		}
+		else {
+			return formData.prefix + '-' + val;
+		}
 	};
 
 	self.getErrorContainer = function(fieldName, strict) {
@@ -467,11 +476,11 @@ var ajaxform = function(formElement, options) {
 
 	self.onValidate = function(formData, onlyValidate) {
 		var key;
-		if (formData.prefix === null) {
-			self.clearStatus('__all__');
-		}
-		else {
-			self.clearStatus(formData.prefix + '-__all__');
+		self.clearStatus(addPrefix('__all__', formData));
+		if (formData.total_form_count !== undefined) {
+			for (let i = 0; i < formData.total_form_count; i++) {
+				self.clearStatus(addPrefix(i + '-__all__', formData));
+			}
 		}
 		for (key in formData.errors) {
 			if (_.has(formData.errors, key)) {
