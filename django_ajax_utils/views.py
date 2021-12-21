@@ -82,6 +82,7 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 			'errors': {},
 			'valid': [],
 			'empty': [],
+			'changed': [],
 			'prefix': form.prefix,
 		}
 
@@ -144,4 +145,5 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 		return {
 			'valid': valid,
 			'empty': empty,
+			'changed': form.changed_data,
 		}
