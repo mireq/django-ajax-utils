@@ -319,6 +319,7 @@ var ajaxformBase = function(formElement, options) {
 	}
 
 	self.destroy = function() {
+		formElement.ajaxformInstance = undefined;
 	};
 
 	var events = {
