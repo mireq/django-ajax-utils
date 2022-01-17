@@ -479,7 +479,7 @@ var ajaxform = function(formElement, options) {
 		var key;
 		self.clearStatus(addPrefix('__all__', formData));
 		if (formData.total_form_count !== undefined) {
-			for (let i = 0; i < formData.total_form_count; i++) {
+			for (var i = 0; i < formData.total_form_count; i++) {
 				self.clearStatus(addPrefix(i + '-__all__', formData));
 			}
 		}
