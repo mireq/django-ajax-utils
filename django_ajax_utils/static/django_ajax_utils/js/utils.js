@@ -4,21 +4,23 @@
 
 window._utils = window._utils || {};
 
+var ap = Array.prototype;
+
 // misc
 
-var has = function(array, key) {
+function has(array, key) {
 	return Object.prototype.hasOwnProperty.call(array, key);
-};
+}
 
-var isEqual = function(a, b) {
+function isEqual(a, b) {
 	return JSON.stringify(a) === JSON.stringify(b);
-};
+}
 
-var deepCopy = function(obj) {
+function deepCopy(obj) {
 	return JSON.parse(JSON.stringify(obj));
-};
+}
 
-var lightCopy = function(obj) {
+function lightCopy(obj) {
 	var copy = {};
 	for (var prop in obj) {
 		if (has(obj, prop)) {
@@ -26,7 +28,7 @@ var lightCopy = function(obj) {
 		}
 	}
 	return copy;
-};
+}
 
 window._utils.has = has;
 window._utils.isEqual = isEqual;
@@ -34,7 +36,7 @@ window._utils.deepCopy = deepCopy;
 window._utils.lightCopy = lightCopy;
 
 // features
-var checkFeatures = function(features) {
+function checkFeatures(features) {
 	for (var i = 0; i < features.length; ++i) {
 		switch (features[i]) {
 			case "ajax":
@@ -58,12 +60,12 @@ var checkFeatures = function(features) {
 		}
 	}
 	return true;
-};
+}
 
 window._utils.checkFeatures = checkFeatures;
 
 // cookies
-var getCookie = function(name) {
+function getCookie(name) {
 	var cookieValue = null;
 	if (document.cookie && document.cookie !== '') {
 		var cookies = document.cookie.split(';');
@@ -77,9 +79,9 @@ var getCookie = function(name) {
 		}
 	}
 	return cookieValue;
-};
+}
 
-var setCookie = function(name, value, days) {
+function setCookie(name, value, days) {
 	var expires;
 	if (days) {
 		var date = new Date();
@@ -90,132 +92,60 @@ var setCookie = function(name, value, days) {
 		expires = "";
 	}
 	document.cookie = name+"="+value+expires+"; path=/; SameSite=Lax";
-};
+}
 
 window._utils.getCookie = getCookie;
 window._utils.setCookie = setCookie;
 
 // iteration
-var forEach;
-if (Array.prototype.forEach) {
-	var coreForEach = Array.prototype.forEach;
-	forEach = function(collection, fn) {
-		coreForEach.call(collection, fn);
-	};
-}
-else {
-	forEach = function(collection, fn) {
-		for (var i = 0, len = collection.length; i < len; i++) {
-			fn(collection[i], i);
-		}
-	};
+function forEach(collection, fn) {
+	return ap.forEach.call(collection, fn);
 }
 
-var forEachDict = function(collection, fn) {
+function forEachDict(collection, fn) {
 	for (var key in collection) {
 		if (has(collection, key)) {
 			var value = collection[key];
 			fn(key, value);
 		}
 	}
-};
+}
 
-var dictToPairs = function(collection) {
+function dictToPairs(collection) {
 	var pairs = [];
 	forEachDict(collection, function(key, value) {
 		pairs.push([key, value]);
 	});
 	return pairs;
-};
+}
 
-var pairsToDict = function(collection) {
+function pairsToDict(collection) {
 	var dict = {};
 	forEach(collection, function(item) {
 		dict[item[0]] = item[1];
 	});
 	return dict;
-};
-
-var map;
-if (Array.prototype.map) {
-	var coreMap = Array.prototype.map;
-	map = function(collection, fn) {
-		return coreMap.call(collection, fn);
-	};
-}
-else {
-	map = function(collection, fn) {
-		var outputs = [];
-		for (var i = 0, len = collection.length; i < len; i++) {
-			outputs.push(fn(collection[i], i, collection));
-		}
-		return outputs;
-	};
 }
 
-var some;
-if (Array.prototype.some) {
-	some = function(array, test) {
-		return Array.prototype.some.call(array, test);
-	};
-}
-else {
-	some = function(array, test) {
-		var ret = false;
-
-		for (var i = 0, len = array.length; i < len; i++) {
-			ret = ret || fn(array[i], i);
-			if (ret) {
-				break;
-			}
-		}
-		return ret;
-	};
+function map(collection, fn) {
+	return ap.map.call(collection, fn);
 }
 
-var every;
-if (Array.prototype.every) {
-	every = function(array, test) {
-		return array.every(test);
-	};
-}
-else {
-	every = function(array, test) {
-		var ret = true;
-
-		for (var i = 0, len = array.length; i < len; i++) {
-			ret = ret && fn(array[i], i);
-			if (!ret) {
-				break;
-			}
-		}
-		return ret;
-	};
+function some(collection, fn) {
+	return ap.some.call(collection, fn);
 }
 
-var filter = function(array, fun) {
-	if (Array.prototype.filter) {
-		return array.filter(fun);
-	}
-	else {
-		var res = [];
-		forEach(array, function(val) {
-			if (fun.call(val)) {
-				res.push(val);
-			}
-		});
-	}
-};
+function every(collection, fn) {
+	return ap.every.call(collection, fn);
+}
 
-var keys = function(dct) {
-	var keys = [];
-	for (var key in dct) {
-		if (has(dct, key)) {
-			keys.push(key);
-		}
-	}
-	return keys;
-};
+function filter(collection, fn) {
+	return ap.filter.call(collection, fn);
+}
+
+function keys(dct) {
+	return Object.keys(dct);
+}
 
 window._utils.forEach = forEach;
 window._utils.forEachDict = forEachDict;
@@ -229,190 +159,259 @@ window._utils.keys = keys;
 
 
 // events
-var triggerEvent = function(element, name, memo) {
-	var event;
-	if (document.createEvent) {
-		var eventType = 'HTMLEvents';
-		if (name === 'click') {
-			eventType = 'MouseEvents';
-		}
-		event = document.createEvent(eventType);
-		event.initEvent(name, true, true);
-	}
-	else {
-		event = document.createEventObject();
-		event.eventType = name;
-	}
+var eventClasses = {
+	click: MouseEvent
+};
 
-	event.eventName = name;
+function triggerEvent(element, name, memo, bubbles) {
+	var cls = eventClasses[name] || Event;
+	var event = new cls(name, {bubbles: bubbles === false ? false : true, cancelable: true});
 	event.memo = memo || { };
+	element.dispatchEvent(event);
+}
 
-	if (document.createEvent) {
-		element.dispatchEvent(event);
-	}
-	else {
-		element.fireEvent("on" + event.eventType, event);
-	}
-};
+function bindEvent(element, name, fn) {
+	element.addEventListener(name, fn, false);
+}
 
-var bindEvent = function(element, name, fn) {
-	if (document.addEventListener) {
-		element.addEventListener(name, fn, false);
-	}
-	else {
-		element.attachEvent('on' + name, fn);
-	}
-};
+function unbindEvent(element, name, fn) {
+	element.removeEventListener(name, fn, false);
+}
 
-var unbindEvent = function(element, name, fn) {
-	if (document.removeEventListener) {
-		element.removeEventListener(name, fn, false);
-	}
-	else {
-		element.detachEvent('on' + name, fn);
-	}
-
-};
-
-var onLoad = function(callback) {
+function onLoad(callback) {
 	if (document.body) {
 		callback({memo: document.body});
-		window._utils.bindEvent(document.body, 'contentloaded', callback);
+		bindEvent(document.body, 'contentloaded', callback);
 	}
 	else {
 		document.addEventListener("DOMContentLoaded", function(event) {
 			callback({memo: document.body});
-			window._utils.bindEvent(document.body, 'contentloaded', callback);
+			bindEvent(document.body, 'contentloaded', callback);
 		});
 	}
-};
+}
 
-var triggerLoad = function(element) {
-	window._utils.triggerEvent(document.body, 'contentloaded', element);
-};
+function onUnload(callback) {
+	bindEvent(document.body, 'contentunloaded', callback);
+}
 
-var unbindOnLoad = function(callback) {
+function triggerLoad(element) {
+	triggerEvent(document.body, 'contentloaded', element, false);
+}
+
+function triggerUnload(element) {
+	triggerEvent(document.body, 'contentunloaded', element, false);
+}
+
+function unbindOnLoad(callback) {
 	if (document.body) {
-		window._utils.unbindEvent(document.body, 'contentloaded', callback);
+		unbindEvent(document.body, 'contentloaded', callback);
 	}
 	else {
 		document.addEventListener("DOMContentLoaded", function(event) {
-			window._utils.unbindEvent(document.body, 'contentloaded', callback);
+			unbindEvent(document.body, 'contentloaded', callback);
 		});
 	}
-};
+}
 
+function unbindOnUnLoad(callback) {
+	unbindEvent(document.body, 'contentunloaded', callback);
+}
 
-var unloadCallbacks = [];
-
-var onUnload = function(callback) {
-	unloadCallbacks.push(callback);
-};
-
-var triggerUnload = function(element) {
-	forEach(unloadCallbacks, function(callback) {
-		callback({memo: element});
-	});
-};
-
-var unbindOnUnload = function(callback) {
-	var idx = unloadCallbacks.indexOf(callback);
-	if (idx !== -1) {
-		unloadCallbacks.splice(idx, 1);
+function getAttachToElement(attachTo) {
+	if (attachTo === undefined) {
+		attachTo = document.body;
 	}
-};
+	return attachTo;
+}
+
+function getElementEventsBound(element) {
+	if (element._eventsBound === undefined) {
+		element._eventsBound = {};
+	}
+	return element._eventsBound;
+}
+
+function makeEventDispatcher(fn, selector, attachTo) {
+	var wrapped = function(e) {
+		var target = e.target;
+		if (target.matches(selector)) {
+			fn(e, target);
+		}
+		else {
+			var closest = target.closest(selector);
+			if (closest !== null && (attachTo === closest || attachTo.contains(closest))) {
+				fn(e, closest);
+			}
+		}
+	};
+	wrapped.wrappedJSObject = fn;
+	return wrapped;
+}
+
+function listen(selector, event, fn, attachTo) {
+	attachTo = getAttachToElement(attachTo);
+	if (selector === null) {
+		bindEvent(attachTo, event, fn);
+	}
+	else {
+		var bound = getElementEventsBound(attachTo);
+		var wrapped = makeEventDispatcher(fn, selector, attachTo);
+		bound[fn] = wrapped;
+		bindEvent(attachTo, event, wrapped);
+	}
+}
+
+function unlisten(selector, event, fn, attachTo) {
+	attachTo = getAttachToElement(attachTo);
+	if (selector === null) {
+		unbindEvent(attachTo, event, fn);
+	}
+	else {
+		var bound = getElementEventsBound(attachTo);
+		var wrapped = bound[fn];
+		delete bound[fn];
+		unbindEvent(attachTo, event, wrapped);
+	}
+}
+
+var liveListeners = [];
+var liveRegistered = false;
+
+function getAttachToListeners(element, listener) {
+	if (listener.attachTo === undefined) {
+		return qa(listener.selector, element, true);
+	}
+	else {
+		if (typeof listener.attachTo === 'string' || listener.attachTo instanceof String) {
+			return qa(listener.attachTo, element, true);
+		}
+		else if (Array.isArray(listener.attachTo)) {
+			return listener.attachTo;
+		}
+		else {
+			return [listener.attachTo];
+		}
+	}
+}
+
+function registerLiveListener(element, listener) {
+	var attachElements = getAttachToListeners(element, listener);
+	var selector = (listener.attachTo === undefined) ? null : listener.selector;
+	attachElements.forEach(function(element) {
+		listen(selector, listener.event, listener.fn, element);
+	});
+}
+
+function unregisterLiveListener(element, listener) {
+	var attachElements = getAttachToListeners(element, listener);
+	var selector = (listener.attachTo === undefined) ? null : listener.selector;
+	attachElements.forEach(function(element) {
+		unlisten(selector, listener.event, listener.fn, element);
+	});
+}
+
+function live(selector, event, fn, attachTo) {
+	if (!liveRegistered) {
+		onLoad(function(e) {
+			liveListeners.forEach(function(listener) {
+				registerLiveListener(e.memo, listener);
+			});
+		});
+
+		onUnload(function(e) {
+			liveListeners.forEach(function(listener) {
+				unregisterLiveListener(e.memo, listener);
+			});
+		});
+		liveRegistered = true;
+	}
+	var listener = {selector: selector, event: event, fn: fn, attachTo: attachTo};
+	liveListeners.push(listener);
+	registerLiveListener(document.body, listener);
+}
+
+var autoInitializers = [];
+var autoInitializersRegistered = false;
+
+function autoInitializersTrigger(element, loaded, initializer) {
+	if (!autoInitializersRegistered) {
+		return;
+	}
+	function processInitializer(initializer) {
+		qa(initializer.selector, element, true).forEach(function(matchElement) {
+			var fn = loaded ? initializer.load : initializer.unload;
+			if (fn !== undefined) {
+				fn(matchElement);
+			}
+		});
+	}
+	if (initializer === undefined) {
+		autoInitializers.forEach(function(initializer) {
+			processInitializer(initializer);
+		});
+	}
+	else {
+		processInitializer(initializer);
+	}
+}
+
+function autoInitialize(selector, loadListener, unloadListener) {
+	var initializer = {selector: selector, load: loadListener, unload: unloadListener};
+	autoInitializers.push(initializer);
+	if (autoInitializersRegistered === false) {
+		onLoad(function(e) { autoInitializersTrigger(e.memo || document.body, true); });
+		onUnload(function(e) { autoInitializersTrigger(e.memo || document.body, false); });
+		autoInitializersRegistered = true;
+	}
+	autoInitializersTrigger(document.body, true, initializer);
+}
 
 window._utils.triggerEvent = triggerEvent;
 window._utils.bindEvent = bindEvent;
 window._utils.unbindEvent = unbindEvent;
 window._utils.onLoad = onLoad;
 window._utils.triggerLoad = triggerLoad;
+window._utils.onUnload = onUnload;
 window._utils.unbindOnLoad = unbindOnLoad;
 window._utils.onUnload = onUnload;
 window._utils.triggerUnload = triggerUnload;
-window._utils.unbindOnUnload = unbindOnUnload;
+window._utils.live = live;
+window._utils.autoInitialize = autoInitialize;
 
 // dom
 var el = document.createElement('DIV');
 
-var escapeHTML = function(unsafe) {
+function escapeHTML(unsafe) {
 	return unsafe
 		.replace(/&/g, "&amp;")
 		.replace(/</g, "&lt;")
 		.replace(/>/g, "&gt;")
 		.replace(/"/g, "&quot;")
 		.replace(/'/g, "&#039;");
-};
-
-var hasClass, addClass, removeClass, toggleClass, setClass;
-if (el.classList === undefined) {
-	hasClass = function(elem, cls) {
-		return elem.className.split(" ").indexOf(cls) !== -1;
-	};
-
-	addClass = function(elem, cls) {
-		elem.className += " " + cls;
-	};
-
-	removeClass = function(elem, cls) {
-		var classNames = elem.className.split(" ");
-		var newClassNames = [];
-		for (var i = 0, leni = classNames.length; i < leni; i++) {
-			if (classNames[i] != cls) {
-				newClassNames.push(classNames[i]);
-			}
-		}
-		elem.className = newClassNames.join(" ");
-	};
-
-	toggleClass = function(elem, cls) {
-		if (hasClass(elem, cls)) {
-			removeClass(elem, cls);
-		}
-		else {
-			addClass(elem, cls);
-		}
-	};
-
-	setClass = function(elem, cls, enabled) {
-		if (enabled) {
-			if (!hasClass(element, cls)) {
-				addClass(elem, cls);
-			}
-		}
-		else {
-			removeClass(elem, cls);
-		}
-	};
-}
-else {
-	hasClass = function(elem, cls) {
-		return elem.classList.contains(cls);
-	};
-
-	addClass = function(elem, cls) {
-		return elem.classList.add(cls);
-	};
-
-	removeClass = function(elem, cls) {
-		return elem.classList.remove(cls);
-	};
-
-	toggleClass = function(elem, cls) {
-		return elem.classList.toggle(cls);
-	};
-
-	setClass = function(elem, cls, enabled) {
-		if (enabled) {
-			addClass(elem, cls);
-		}
-		else {
-			removeClass(elem, cls);
-		}
-	};
 }
 
-var getElementById = function(parent, id) {
+function hasClass(elem, cls) {
+	return elem.classList.contains(cls);
+}
+
+function addClass(elem, cls) {
+	return elem.classList.add(cls);
+}
+
+function removeClass(elem, cls) {
+	return elem.classList.remove(cls);
+}
+
+function toggleClass(elem, cls) {
+	return elem.classList.toggle(cls);
+}
+
+function setClass(elem, cls, enabled) {
+	return elem.classList.toggle(cls, enabled ? true : false);
+}
+
+function getElementById(parent, id) {
 	if (id === undefined) {
 		return document.getElementById(parent);
 	}
@@ -425,58 +424,67 @@ var getElementById = function(parent, id) {
 			return null;
 		}
 	}
-};
+}
 
-var getElementsByTagName = function(parent, tag) {
+function getElementsByTagName(parent, tag) {
 	if (tag === undefined) {
 		tag = parent;
 		parent = document.body;
 	}
 	return parent.getElementsByTagName(tag);
-};
-
-var getElementsByClassName;
-if (el.getElementsByClassName === undefined) {
-	getElementsByClassName = function(parent, cls) {
-		if (cls === undefined) {
-			cls = parent;
-			parent = document.body;
-		}
-		var elements = parent.getElementsByTagName('*');
-		var match = [];
-		for (var i = 0, leni = elements.length; i < leni; i++) {
-			if (hasClass(elements[i], cls)) {
-				match.push(elements[i]);
-			}
-		}
-		return match;
-	};
-}
-else {
-	getElementsByClassName = function(parent, cls) {
-		if (cls === undefined) {
-			cls = parent;
-			parent = document.body;
-		}
-		return parent.getElementsByClassName(cls);
-	};
 }
 
-var isNode = function(o) {
+function q(selector, element) {
+	if (element === undefined) {
+		element = document;
+	}
+	return element.querySelector(selector);
+}
+
+function queryElements(sel, element, include_self, type) {
+	if (element === undefined) {
+		element = document;
+	}
+	var elements = ap.slice.call(type === 'cls' ? element.getElementsByClassName(sel) : element.querySelectorAll(sel));
+	if (include_self) {
+		if (type === 'cls' ? element.classList.contains(sel) : element.matches(sel)) {
+			elements.unshift(element);
+		}
+	}
+	return elements;
+}
+
+function qa(selector, element, include_self) {
+	return queryElements(selector, element, include_self, 'q');
+}
+
+function cla(cls, element, include_self) {
+	return queryElements(cls, element, include_self, 'cls');
+}
+
+function cls(parent, cls) {
+	if (cls === undefined) {
+		cls = parent;
+		parent = document.body;
+	}
+	return cla(cls, parent);
+}
+
+function isNode(o) {
 	return (
 		typeof Node === "object" ? o instanceof Node :
 		o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
 	);
-};
+}
 
-var isElement = function(o) {
+function isElement(o) {
 	return (
 		typeof HTMLElement === "object" ? o instanceof HTMLElement :
 		o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
 	);
-};
+}
 
-var isParentOf = function(element, parent) {
+function isParentOf(element, parent) {
 	while (element) {
 		element = element.parentNode;
 		if (!(element instanceof Element)) {
@@ -487,9 +495,9 @@ var isParentOf = function(element, parent) {
 		}
 	}
 	return false;
-};
+}
 
-var findParent = function(element, checkFn) {
+function findParent(element, checkFn) {
 	while (element) {
 		element = element.parentNode;
 		if (!(element instanceof Element)) {
@@ -500,22 +508,22 @@ var findParent = function(element, checkFn) {
 		}
 	}
 	return null;
-};
+}
 
-var findParentByCls = function(element, cls) {
+function findParentByCls(element, cls) {
 	return findParent(element, function(el) {
 		return hasClass(el, cls);
 	});
-};
+}
 
-var findParentByTag = function(element, tag) {
+function findParentByTag(element, tag) {
 	var searchTag = tag.toLowerCase();
 	return findParent(element, function(el) {
 		return el.tagName.toLowerCase() === searchTag;
 	});
-};
+}
 
-var elem = function(elementName, attrs, content) {
+function elem(elementName, attrs, content) {
 	var element = document.createElement(elementName);
 	if (attrs !== undefined) {
 		for (var attrName in attrs) {
@@ -534,11 +542,11 @@ var elem = function(elementName, attrs, content) {
 		}
 	}
 	return element;
-};
+}
 
-var insertAfter = function(newNode, referenceNode) {
+function insertAfter(newNode, referenceNode) {
 	referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-};
+}
 
 window._utils.escapeHTML = escapeHTML;
 window._utils.hasClass = hasClass;
@@ -548,7 +556,10 @@ window._utils.toggleClass = toggleClass;
 window._utils.setClass = setClass;
 window._utils.id = getElementById;
 window._utils.tag = getElementsByTagName;
-window._utils.cls = getElementsByClassName;
+window._utils.q = q;
+window._utils.qa = qa;
+window._utils.cla = cla;
+window._utils.cls = cls;
 window._utils.isNode = isNode;
 window._utils.isElement = isElement;
 window._utils.isParentOf = isParentOf;
@@ -560,28 +571,12 @@ window._utils.insertAfter = insertAfter;
 
 
 // data
-var getData, setData;
-if (el.dataset === undefined) {
-	var generateDataName = function(name) {
-		return name.replace(/([A-Z])/g, '-$1').toLowerCase();
-	};
-
-	getData = function(element, name) {
-		return element.getAttribute('data-' + generateDataName(name));
-	};
-
-	setData = function(element, name, value) {
-		element.setAttribute('data-' + generateDataName(name), value);
-	};
+function getData(element, name) {
+	return element.dataset[name];
 }
-else {
-	getData = function(element, name) {
-		return element.dataset[name];
-	};
 
-	setData = function(element, name, value) {
-		element.dataset[name] = value;
-	};
+function setData(element, name, value) {
+	element.dataset[name] = value;
 }
 
 _utils.getData = getData;
@@ -594,7 +589,7 @@ var resizeListenerElements = [];
 var resizeListenerData = [];
 var resizeListenerTimer;
 
-var checkResize = function() {
+function checkResize() {
 	for (var i = 0, leni = resizeListenerElements.length; i < leni; i++) {
 		var element = resizeListenerElements[i];
 		var lastSize = resizeListenerData[i].lastSize;
@@ -606,7 +601,7 @@ var checkResize = function() {
 		lastSize = [newWidth, newHeight];
 		resizeListenerData[i].lastSize = lastSize;
 	}
-};
+}
 
 bindEvent(window, 'resize', checkResize);
 
@@ -631,7 +626,7 @@ function ResizeListener(element) {
 	};
 }
 
-var getViewportSize = function() {
+function getViewportSize() {
 	var w = window;
 	var d = document;
 	var e = d.documentElement;
@@ -639,7 +634,7 @@ var getViewportSize = function() {
 	var x = w.innerWidth || e.clientWidth || g.clientWidth;
 	var y = w.innerHeight|| e.clientHeight|| g.clientHeight;
 	return [x, y];
-};
+}
 
 
 window._utils.ResizeListener = ResizeListener;
@@ -647,7 +642,7 @@ window._utils.getViewportSize = getViewportSize;
 
 
 // scroll
-var findGlobalPos = function(obj) {
+function findGlobalPos(obj) {
 	var curleft = 0;
 	var curtop = 0;
 	if (obj.offsetParent) {
@@ -657,16 +652,16 @@ var findGlobalPos = function(obj) {
 		} while (obj = obj.offsetParent); // jshint ignore:line
 		return [curleft, curtop];
 	}
-};
+}
 
-var findVerticalPos = function(obj) {
+function findVerticalPos(obj) {
 	var pos = findGlobalPos(obj);
 	if (pos) {
 		return pos[1];
 	}
-};
+}
 
-var scrollToElement = function(element) {
+function scrollToElement(element) {
 	if (window.scroll) {
 		var posOffset = 0;
 		if (window.innerHeight !== undefined) {
@@ -674,9 +669,9 @@ var scrollToElement = function(element) {
 		}
 		window.scroll(0, Math.max(findVerticalPos(element) - posOffset, 0));
 	}
-};
+}
 
-var getScroll = function(){
+function getScroll(){
 	if(window.pageYOffset !== undefined){
 		return [pageXOffset, pageYOffset];
 	}
@@ -688,7 +683,7 @@ var getScroll = function(){
 		sy = d.scrollTop || b.scrollTop || 0;
 		return [sx, sy];
 	}
-};
+}
 
 window._utils.findGlobalPos = findGlobalPos;
 window._utils.findVerticalPos = findVerticalPos;
@@ -697,7 +692,7 @@ window._utils.getScroll = getScroll;
 
 
 // debounce
-var debounce = function(fn, delay) {
+function debounce(fn, delay) {
 	var timer = null;
 	var closure = function () {
 		var context = this, args = arguments;
@@ -713,7 +708,7 @@ var debounce = function(fn, delay) {
 	};
 	closure.instant = instant;
 	return closure;
-};
+}
 
 window._utils.debounce = debounce;
 
@@ -821,7 +816,7 @@ var loaderJs = (function () {
 
 window._utils.loaderJs = loaderJs;
 
-var execEmbeddedScripts = function(element) {
+function execEmbeddedScripts(element) {
 	var flatNodesList = [];
 	var flatNodes = function(root) {
 		flatNodesList.push(root);
@@ -840,13 +835,13 @@ var execEmbeddedScripts = function(element) {
 			}
 		}
 	});
-};
+}
 
 window._utils.execEmbeddedScripts = execEmbeddedScripts;
 
 
 // forms
-var serializeFormElement = function(element, opts) {
+function serializeFormElement(element, opts) {
 	var q = [];
 	var addParameter = function(name, value) {
 		q.push([name, value]);
@@ -901,9 +896,9 @@ var serializeFormElement = function(element, opts) {
 			break;
 	}
 	return q;
-};
+}
 
-var serializeForm = function(formElement, options) {
+function serializeForm(formElement, options) {
 	var o = lightCopy(options || {});
 	var q = [];
 	var addParameter;
@@ -934,17 +929,17 @@ var serializeForm = function(formElement, options) {
 	else {
 		return q.join('&');
 	}
-};
+}
 
-var getUrlParameterByName = function(name, url) {
+function getUrlParameterByName(name, url) {
 	var location = url || window.location;
 	var nameReg = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
 	var regex = new RegExp("[\\?&]" + nameReg + "=([^&#]*)");
 	var results = regex.exec(location);
 	return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, " "));
-};
+}
 
-var encodeURLParameters = function(parameters) {
+function encodeURLParameters(parameters) {
 	var urlParameterList = parameters;
 	if (!Array.isArray(parameters)) {
 		urlParameterList = dictToPairs(urlParameterList);
@@ -955,9 +950,9 @@ var encodeURLParameters = function(parameters) {
 		urlComponents.push(encodeURIComponent(parameter[0]) + '=' + encodeURIComponent(parameter[1]));
 	});
 	return urlComponents.join('&');
-};
+}
 
-var decodeURLParameters = function(data) {
+function decodeURLParameters(data) {
 	var parameters = [];
 	if (data === '') {
 		return parameters;
@@ -975,9 +970,9 @@ var decodeURLParameters = function(data) {
 		}
 	});
 	return parameters;
-};
+}
 
-var addURLParameters = function(url, parameters) {
+function addURLParameters(url, parameters) {
 	var encodedParameters = encodeURLParameters(parameters);
 	var finalUrl = url;
 	if (encodedParameters.length > 0) {
@@ -989,7 +984,7 @@ var addURLParameters = function(url, parameters) {
 		}
 	}
 	return finalUrl;
-};
+}
 
 window._utils.serializeFormElement = serializeFormElement;
 window._utils.serializeForm = serializeForm;
@@ -998,15 +993,5 @@ window._utils.encodeURLParameters = encodeURLParameters;
 window._utils.decodeURLParameters = decodeURLParameters;
 window._utils.addURLParameters = addURLParameters;
 
-
-if (!Function.prototype.bind) {
-	Function.prototype.bind=function(b){if(typeof this!=="function"){throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");}function c(){}var a=[].slice,f=a.call(arguments,1),e=this,d=function(){return e.apply(this instanceof c?this:b||window,f.concat(a.call(arguments)));};c.prototype=this.prototype;d.prototype=new c();return d;}; // jshint ignore:line
-}
-
-if (typeof Array.isArray !== 'function') {
-	Array.isArray = function(arr) {
-		return Object.prototype.toString.call(arr) === '[object Array]';
-	};
-}
 
 }());
