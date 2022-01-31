@@ -377,6 +377,8 @@ window._utils.unbindOnLoad = unbindOnLoad;
 window._utils.onUnload = onUnload;
 window._utils.triggerUnload = triggerUnload;
 window._utils.live = live;
+window._utils.listen = listen;
+window._utils.unlisten = unlisten;
 window._utils.autoInitialize = autoInitialize;
 
 // dom
