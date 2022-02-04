@@ -78,6 +78,16 @@ def is_pjax(request):
 	return is_pjax_request(request) and pjax_supported(request)
 
 
+def init_pjax_request(request):
+	holders = {}
+	setattr(request, '_pjax_holders', holders)
+	return holders
+
+
+def get_pjax_holders(request):
+	return getattr(request, '_pjax_holders', {})
+
+
 class Middleware(object):
 	def __init__(self, get_response):
 		self.get_response = get_response
@@ -85,13 +95,13 @@ class Middleware(object):
 	def __call__(self, request):
 		if _current_request is not None:
 			_current_request.set(request)
-		setattr(request, '_pjax_holders', {})
+		init_pjax_request(request)
 		response = self.get_response(request)
 		if is_pjax(request):
 			if response.status_code == 200:
 				if not response.get('Content-Type', '').startswith('text/html'):
 					return response
-				pjax_holders = getattr(request, '_pjax_holders', {})
+				pjax_holders = get_pjax_holders(request)
 				blocks = {}
 				for block_name, content in pjax_holders.items():
 					blocks[block_name] = ''.join(content)
