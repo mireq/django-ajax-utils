@@ -231,7 +231,7 @@ var ajaxformBase = function(formElement, options) {
 			return;
 		}
 		if (_.has(data, 'redirect')) {
-			if (_.has(_, 'pjax')) {
+			if (_.has(_, 'pjax') && !data.plain_redirect) {
 				_.pjax.load(data.redirect);
 			}
 			else {
