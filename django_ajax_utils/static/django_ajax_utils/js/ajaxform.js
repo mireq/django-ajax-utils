@@ -245,7 +245,7 @@ var ajaxformBase = function(formElement, options) {
 			}
 			self.onValidate(formData, onlyValidate, self);
 
-			_.forEach(_.cls(self.formElement, 'subform'), function(element) {
+			_.forEach(_.qa('[data-formname]', self.formElement), function(element) {
 				var formName = _.getData(element, 'formname');
 				if (formName && data.forms[formName]) {
 					self.subFormElement = element;
