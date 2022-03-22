@@ -320,7 +320,7 @@ var pjaxLoader = function(options) {
 					if (self.onResponse("success", response, self, pjaxOptions) === false) {
 						return;
 					}
-					if (response.is_pjax) {
+					if (response.is_pjax || response.redirect) {
 						processPjax(response, options.url, pjaxOptions);
 					}
 					else {
