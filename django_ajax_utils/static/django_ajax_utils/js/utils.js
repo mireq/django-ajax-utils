@@ -436,9 +436,12 @@ function getElementsByTagName(parent, tag) {
 	return parent.getElementsByTagName(tag);
 }
 
-function q(selector, element) {
+function q(selector, element, include_self) {
 	if (element === undefined) {
 		element = document;
+	}
+	if (include_self && element.matches(selector)) {
+		return element;
 	}
 	return element.querySelector(selector);
 }
