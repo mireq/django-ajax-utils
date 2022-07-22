@@ -483,6 +483,7 @@ var ajaxform = function(formElement, options) {
 				self.clearStatus(addPrefix(i + '-__all__', formData));
 			}
 		}
+		getFallbackErrorContainer().innerHTML = '';
 		for (key in formData.errors) {
 			if (_.has(formData.errors, key)) {
 				self.clearStatus(key);
