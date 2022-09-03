@@ -100,6 +100,7 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 					status = self.format_form_status(formrow)
 					form_data['errors'].update(status['errors'])
 					form_data['valid'] += status['valid']
+					form_data['empty'] += status['empty']
 			form_data['total_form_count'] = total_form_count
 
 		if not form.is_valid():
@@ -142,7 +143,7 @@ class AjaxFormMixin(AjaxRedirectMixin, JsonResponseMixin):
 				fieldname = form.add_prefix(name)
 				if field.widget.value_from_datadict(form.data, form.files, form.add_prefix(name)) in field.empty_values:
 					empty.append(fieldname)
-				if fieldname in form_data['errors'] or not name in form.cleaned_data or form.cleaned_data[name] in field.empty_values:
+				if fieldname in form_data['errors'] or name not in form.cleaned_data or form.cleaned_data[name] in field.empty_values:
 					continue
 				valid.append(fieldname)
 		return {
