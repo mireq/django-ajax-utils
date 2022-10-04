@@ -176,7 +176,7 @@ var ajaxformBase = function(formElement, options) {
 	};
 
 	var submitForm = function(onlyValidate) {
-		var data = self.getFormData();
+		var data = self.getFormData(onlyValidate);
 		if (onlyValidate) {
 			data.append(self.options.onlyValidateField, '1');
 		}
@@ -257,9 +257,12 @@ var ajaxformBase = function(formElement, options) {
 	};
 
 	// Get form data in array of key-value pairs
-	self.getFormData = function() {
+	self.getFormData = function(onlyValidate) {
 		var data = formData(self.options.isMultipart);
 		_.forEach(self.formElement.elements, function(input) {
+			if (onlyValidate && input.type == 'file') {
+				return;
+			}
 			_.forEach(_.serializeFormElement(input), function(name_value) {
 				data.append(name_value[0], name_value[1]);
 			});
