@@ -400,9 +400,11 @@ var ajaxform = function(formElement, options) {
 	};
 
 	self.getErrorContainer = function(fieldName, strict) {
-		var container = _.id('id_' + fieldName + '_errors');
-		if (strict || container !== null) {
-			return container;
+		if (fieldName !== '__all__') {
+			var container = _.id('id_' + fieldName + '_errors');
+			if (strict || container !== null) {
+				return container;
+			}
 		}
 		return getFallbackErrorContainer();
 	};
