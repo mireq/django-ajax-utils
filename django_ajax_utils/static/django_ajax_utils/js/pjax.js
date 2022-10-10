@@ -5,6 +5,8 @@ var pjax = {};
 var extrastyleCode = [];
 var firstrun = true;
 var homeRegistered = false;
+var lastState;
+var state;
 _utils.pjax = pjax;
 
 
@@ -19,7 +21,9 @@ var evalScript = function(script) {
 
 
 var pushState = function(url) {
-	window.history.pushState({is_pjax: true, url: url}, null, url);
+	lastState = state;
+	state = {is_pjax: true, url: url};
+	window.history.pushState(state, null, url);
 	var base = document.getElementsByTagName('BASE')[0];
 	if (base !== undefined) {
 		base.href = (url.split('?')[0]).split('#')[0];
@@ -82,7 +86,7 @@ var pjaxLoader = function(options) {
 		if (_.id(options.pjaxContainerId) === null) {
 			return;
 		}
-		var state = {
+		state = {
 			is_pjax: true,
 			url: window.location + '',
 		};
@@ -341,6 +345,10 @@ var pjaxLoader = function(options) {
 					if (contentType === null || (contentType.indexOf('application/json') !== 0 && contentType.indexOf('text/html') !== 0)) {
 						window.location = url;
 						ignoreLink = true;
+						if (lastState !== undefined) {
+							window.history.replaceState(lastState, null, lastState.url);
+						}
+						self.onResponse("success", null, self, pjaxOptions);
 						return;
 					}
 				}
