@@ -139,6 +139,7 @@ var ajaxformBase = function(formElement, options) {
 	self.onResponse = self.options.onResponse || function(data, onlyValidate, ajaxform) {};
 	self.onValidate = self.options.onValidate || function(data, onlyValidate, ajaxform) {};
 	self.onProgress = self.options.onProgress || function(event) {};
+	self.requestMiddleware = self.options.requestMiddleware || function(request, onlyValidate) { return request; };
 
 	var onInputChanged = function(e, finished) {
 		self.onInputChanged(e, finished);
@@ -197,7 +198,7 @@ var ajaxformBase = function(formElement, options) {
 		}
 
 		var url = formElement.getAttribute('action');
-		_.xhrSend({
+		var request = {
 			method: 'POST',
 			url: url,
 			data: data.serialize(),
@@ -223,7 +224,15 @@ var ajaxformBase = function(formElement, options) {
 			},
 			progress: onlyValidate ? undefined : self.onProgress,
 			extraHeaders: httpHeaders
-		});
+		};
+		var req = self.requestMiddleware(request, onlyValidate);
+		if (req === false) { // Stop processing
+			return;
+		}
+		if (req === undefined) {
+			req = request;
+		}
+		_.xhrSend(req);
 	};
 
 	var processFormSubmit = function(data, event, onlyValidate) {
