@@ -104,10 +104,16 @@ var xhrSend = function(options) {
 		if (req.status >= 200 && req.status < 400) {
 			if (opts.successFn !== undefined) {
 				var contentType = req.getResponseHeader('content-type');
-				var data = req.responseText;
-				if (contentType.indexOf('application/json') === 0) {
-					data = JSON.parse(data);
-					req.isJSON = true;
+				var data;
+				if (!req.responseType || req.responseType === 'text') {
+					data = req.responseText;
+					if (contentType.indexOf('application/json') === 0) {
+						data = JSON.parse(data);
+						req.isJSON = true;
+					}
+				}
+				else {
+					data = req.response;
 				}
 				opts.successFn(data, req, options);
 			}
