@@ -164,6 +164,9 @@ var ajaxformBase = function(formElement, options) {
 		}
 	};
 	var onFormSubmit = function(e) {
+		if (e.submitter && e.submitter.getAttribute('type') === 'submit') {
+			self.submitButton = e.submitter;
+		}
 		if (self.submitButton === undefined) {
 			_.some(formElement.elements, function(input) {
 				if (input.getAttribute('type') === 'submit') {
