@@ -2,7 +2,12 @@
 Django ajax utils
 =================
 
+This is small set of ajax utility functions. It's used mostly in my internal
+projects.
+
 Install
 -------
 
-`pip install https://github.com/mireq/django-ajax-utils.git`
+.. code:: bash
+
+	pip install mireq-django-ajax-utils
