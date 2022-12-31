@@ -1,5 +1,5 @@
 db.sqlite3
-/django_ajax_utils.egg-info
+/mireq_django_ajax_utils.egg-info
 .envrc
 *~
 *.pyc
