@@ -1,2 +1,12 @@
 db.sqlite3
 /django_ajax_utils.egg-info
+.envrc
+*~
+*.pyc
+.ropeproject
+.coverage
+.tox
+build
+/dist
+/htmlcov
+/coverage.xml
