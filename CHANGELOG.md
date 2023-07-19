@@ -1,3 +1,9 @@
+## 0.0.2 (2023-07-19)
+
+### Feat
+
+- Added requestInterceptor
+
 ## 0.0.1 (2022-12-31)
 
 ### Feat
