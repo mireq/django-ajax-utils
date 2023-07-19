@@ -41,7 +41,7 @@ var popState = function(e) {
 
 
 var pjaxLoader = function(options) {
-	var checkUrlSupported = function(url, loader) {
+	function checkUrlSupported(url, loader) {
 		// very simple check for local URLs
 		if (!url) {
 			return false;
@@ -55,34 +55,34 @@ var pjaxLoader = function(options) {
 		else {
 			return false;
 		}
-	};
+	}
 
-	var checkLinkSupported = function(element, loader) {
+	function checkLinkSupported(element, loader) {
 		return true;
-	};
+	}
 
-	var checkFormSupported = function(element, loader) {
+	function checkFormSupported(element, loader) {
 		var method = element.getAttribute('method');
 		var action = element.getAttribute('action');
 		if (method.toLowerCase() !== 'get') {
 			return false;
 		}
 		return self.checkUrlSupported(action, loader);
-	};
+	}
 
-	var onRequest = function(url, loader, options) {
+	function onRequest(url, loader, options) {
 		if (self.bodyLoadingCls !== undefined) {
 			_.addClass(document.body, self.bodyLoadingCls);
 		}
-	};
+	}
 
-	var onResponse = function(status, response, loader, options) {
+	function onResponse(status, response, loader, options) {
 		if (self.bodyLoadingCls !== undefined) {
 			_.removeClass(document.body, self.bodyLoadingCls);
 		}
-	};
+	}
 
-	var onInit = function(loader, options) {
+	function onInit(loader, options) {
 		if (_.id(options.pjaxContainerId) === null) {
 			return;
 		}
@@ -91,7 +91,11 @@ var pjaxLoader = function(options) {
 			url: window.location + '',
 		};
 		window.history.replaceState(state, null, window.location);
-	};
+	}
+
+	function requestInterceptor(makeRequest, options) {
+		return makeRequest(options);
+	}
 
 	var self = {};
 	self.options = _.lightCopy(options || {});
@@ -111,6 +115,7 @@ var pjaxLoader = function(options) {
 	self.onLoaded = self.options.onLoaded || function(response, url,  loader, options) {};
 	self.onRequest = self.options.onRequest || onRequest;
 	self.onResponse = self.options.onResponse || onResponse;
+	self.requestInterceptor = self.options.requestInterceptor || requestInterceptor;
 
 	self.onInit(self, options);
 
@@ -311,7 +316,7 @@ var pjaxLoader = function(options) {
 			pushState(url);
 		}
 		if (pjaxOptions.response === undefined) {
-			_.xhrSend({
+			var options = {
 				url: url,
 				extraHeaders: {
 					'X-Requested-With': 'PJAXRequest',
@@ -352,10 +357,14 @@ var pjaxLoader = function(options) {
 						return;
 					}
 				}
-			});
+			};
+			function makeRequest(options) {
+				return _.xhrSend(options);
+			}
+			return self.requestInterceptor(makeRequest, options);
 		}
 		else {
-			processPjax(pjaxOptions.response, url, pjaxOptions);
+			return processPjax(pjaxOptions.response, url, pjaxOptions);
 		}
 	};
 

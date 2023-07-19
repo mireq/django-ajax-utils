@@ -42,6 +42,21 @@ var xhrSend = function(options) {
 	var req = createXMLHttpRequest();
 	var extraHeaders = options.extraHeaders || {};
 
+	var self = {};
+
+	function dummyAbort() {
+	}
+
+	function abort() {
+		self.abort = dummyAbort;
+		req.onreadystatechange = null;
+		req.abort();
+	}
+
+
+	self.request = req;
+	self.abort = abort;
+
 	if (window._settings && window._settings.debug) {
 		opts.failFn = opts.failFn || ajaxForwardError;
 	}
@@ -101,6 +116,7 @@ var xhrSend = function(options) {
 			}
 		}
 		if (req.readyState != 4) return;
+		self.abort = dummyAbort;
 		if (req.status >= 200 && req.status < 400) {
 			if (opts.successFn !== undefined) {
 				var contentType = req.getResponseHeader('content-type');
@@ -125,6 +141,8 @@ var xhrSend = function(options) {
 		}
 	};
 	req.send(data);
+
+	return self;
 };
 
 window._utils.xhrSend = xhrSend;
