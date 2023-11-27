@@ -140,7 +140,7 @@ var pjaxLoader = function(options) {
 		if (!self.checkUrlSupported(element.getAttribute('href'), self)) {
 			return;
 		}
-		self.load(element.getAttribute('href'));
+		self.load(element.getAttribute('href'), {event: e});
 		e.preventDefault();
 	};
 
