@@ -318,6 +318,7 @@ var pjaxLoader = function(options) {
 		if (pjaxOptions.response === undefined) {
 			var options = {
 				url: url,
+				pjaxOptions: pjaxOptions,
 				extraHeaders: {
 					'X-Requested-With': 'PJAXRequest',
 					'Accept': 'application/pjax.json, */*;q=0.8'
