@@ -1,3 +1,10 @@
+## 0.0.3 (2023-11-27)
+
+### Feat
+
+- Pass pjaxOptions to request interceptor
+- Pass event to pjax load if loaded automatically
+
 ## 0.0.2 (2023-07-19)
 
 ### Feat
