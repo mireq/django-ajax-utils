@@ -53,5 +53,5 @@ include = ["django_ajax_utils*"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.0.3"
+version = "0.0.4"
 tag_format = "$version"

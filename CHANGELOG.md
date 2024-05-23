@@ -1,3 +1,9 @@
+## 0.0.4 (2024-05-23)
+
+### Feat
+
+- Added configurable form row classes
+
 ## 0.0.3 (2023-11-27)
 
 ### Feat
