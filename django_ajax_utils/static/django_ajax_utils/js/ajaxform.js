@@ -363,7 +363,10 @@ var ajaxform = function(formElement, options) {
 	var o = _.lightCopy(options);
 	o.nonFieldErrorsClass = o.nonFieldErrorsClass || _.getData(formElement, 'nonFieldErrorsClass') || 'non-field-errors';
 	o.fieldErrorsClass = o.fieldErrorsClass || _.getData(formElement, 'fieldErrorsClass') || 'field-errors';
+	o.fieldErrorClass = o.fieldErrorClass || _.getData(formElement, 'fieldErrorClass') || 'field-errors';
 	o.rowClass = o.rowClass || _.getData(formElement, 'rowClass') || 'form-row';
+	o.rowHasErrorsClass = o.rowHasErrorsClass || _.getData(formElement, 'rowHasErrorsClass') || 'has-errors';
+	o.rowNoErrorsClass = o.rowNoErrorsClass || _.getData(formElement, 'rowNoErrorsClass') || 'no-errors';
 	if (!_.has(o, 'liveValidate')) { o.liveValidate = (_.getData(formElement, 'liveValidate') !== 'false'); }
 
 	var self = ajaxformBase(formElement, o);
@@ -431,24 +434,23 @@ var ajaxform = function(formElement, options) {
 			errorContainer.appendChild(errorsElement);
 		}
 
-		var errorsElementClassName = o.fieldErrorsClass + ' has-errors count-' + errorList.length;
-		errorsElement.className = errorsElementClassName;
+		errorsElement.className = '';
+		_.addClass(errorsElement, o.fieldErrorsClass);
+		_.addClass(errorsElement, o.fieldErrorsClass + '--count-' + errorList.length);
 
 		_.forEach(errorList, function(error) {
 			var messageElement = _.elem('li', {}, error.message);
+			messageElement.classList.add(self.options.fieldErrorClass);
 			if (error.code) {
-				messageElement.className = 'form-error code-' + error.code;
-			}
-			else {
-				messageElement.className = 'form-error';
+				messageElement.classList.add(self.options.fieldErrorClass + '--code-' + error.code);
 			}
 			errorsElement.appendChild(messageElement);
 		});
 
 		var row = self.findFormRow(errorContainer);
 		if (row !== null) {
-			_.removeClass(row, 'no-errors');
-			_.addClass(row, 'has-errors');
+			_.removeClass(row, self.options.rowNoErrorsClass);
+			_.addClass(row, self.options.rowHasErrorsClass);
 		}
 	};
 
@@ -459,7 +461,7 @@ var ajaxform = function(formElement, options) {
 		}
 		var row = self.findFormRow(errorContainer);
 		if (row !== null) {
-			_.addClass(row, 'no-errors');
+			_.addClass(row, self.options.rowNoErrorsClass);
 		}
 	};
 
@@ -471,8 +473,8 @@ var ajaxform = function(formElement, options) {
 		errorContainer.innerHTML = '';
 		var row = self.findFormRow(errorContainer);
 		if (row !== null) {
-			_.removeClass(row, 'has-errors');
-			_.removeClass(row, 'no-errors');
+			_.removeClass(row, self.options.rowHasErrorsClass);
+			_.removeClass(row, self.options.rowNoErrorsClass);
 		}
 	};
 
@@ -531,6 +533,7 @@ var ajaxform = function(formElement, options) {
 
 	return self;
 };
+
 
 var ajaxformFoundation = function(formElement, options) {
 	var self = ajaxform(formElement, options);
@@ -594,6 +597,7 @@ var ajaxformFoundation = function(formElement, options) {
 
 	return self;
 };
+
 
 
 window._utils.ajaxformBase = ajaxformBase;
