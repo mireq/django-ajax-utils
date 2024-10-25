@@ -44,6 +44,8 @@ class AjaxRedirectMixin(JsonResponseMixin):
 				json_data = {"redirect": url}
 				if getattr(response, 'plain_redirect', False):
 					json_data['plain_redirect'] = True
+				if hasattr(response, 'redirect_data'):
+					json_data.update(response.redirect_data)
 				response = self.render_json_response(json_data)
 				response.cookies = original_response.cookies
 		return response
