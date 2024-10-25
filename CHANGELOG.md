@@ -1,3 +1,9 @@
+## 0.0.5 (2024-10-25)
+
+### Feat
+
+- Allow to pass custom data to ajax redirect mixin
+
 ## 0.0.4 (2024-05-23)
 
 ### Feat
