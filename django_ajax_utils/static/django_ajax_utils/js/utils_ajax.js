@@ -41,6 +41,9 @@ var xhrSend = function(options) {
 	opts.final_url = opts.url;
 	var req = createXMLHttpRequest();
 	var extraHeaders = options.extraHeaders || {};
+	var listeners = {
+		finish: []
+	}
 
 	var self = {};
 
@@ -51,6 +54,19 @@ var xhrSend = function(options) {
 		self.abort = dummyAbort;
 		req.onreadystatechange = null;
 		req.abort();
+	}
+
+	self.on = function(event, callback) {
+		listeners[event].push(callback);
+		return self;
+	};
+
+	self.off = function(event, callback) {
+		var index = listeners[event].indexOf(callback);
+		if (index !== -1) {
+			listeners[event].splice(index, 1);
+		}
+		return self;
 	}
 
 
@@ -139,6 +155,10 @@ var xhrSend = function(options) {
 				opts.failFn(req, options);
 			}
 		}
+
+		listeners.finish.forEach(function(callback) {
+			callback(req, options);
+		});
 	};
 	req.send(data);
 
