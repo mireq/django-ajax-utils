@@ -1,3 +1,10 @@
+## 0.0.6 (2025-03-26)
+
+### Feat
+
+- Abort old request on new request
+- Added finish listener support
+
 ## 0.0.5 (2024-10-25)
 
 ### Feat
