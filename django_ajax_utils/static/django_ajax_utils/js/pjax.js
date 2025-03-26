@@ -117,6 +117,8 @@ var pjaxLoader = function(options) {
 	self.onResponse = self.options.onResponse || onResponse;
 	self.requestInterceptor = self.options.requestInterceptor || requestInterceptor;
 
+	self.currentRequest = undefined;
+
 	self.onInit(self, options);
 
 	var onPjaxLinkClicked = function(e) {
@@ -360,7 +362,15 @@ var pjaxLoader = function(options) {
 				}
 			};
 			function makeRequest(options) {
-				return _.xhrSend(options);
+				var request = _.xhrSend(options);
+				if (self.currentRequest !== undefined) {
+					self.currentRequest.abort();
+				}
+				self.currentRequest = request;
+				request.on('finish', function() {
+					self.currentRequest = undefined;
+				});
+				return request
 			}
 			return self.requestInterceptor(makeRequest, options);
 		}
