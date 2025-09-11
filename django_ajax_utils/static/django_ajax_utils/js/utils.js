@@ -770,22 +770,39 @@ var loaderJs = (function () {
 			});
 		}
 
+		var pathList = []
 		forEach(paths, function(path) {
+			// check if path is object
+			var scriptAttributes = {};
+			if (typeof path === 'object' && path !== null) {
+				if (path.type) {
+					scriptAttributes.type = path.type;
+				}
+				path = path.path;
+			}
+			pathList.push(path);
 			if (registeredPaths.indexOf(path) === -1) {
-				missingPaths.push(path);
+				missingPaths.push([path, scriptAttributes]);
 				registeredPaths.push(path);
 			}
 		});
 
-		waitingCallbacks.push([[callback, error], paths]);
+		waitingCallbacks.push([[callback, error], pathList]);
 
 		var loadMissingPath = function() {
 			if (missingPaths.length === 0) {
 				return;
 			}
-			var path = missingPaths[0];
+			var pathRequest = missingPaths[0];
+			var path = pathRequest[0];
+			var attrs = pathRequest[1];
 			missingPaths = missingPaths.splice(1);
 			var script = document.createElement('SCRIPT');
+			for (var attr in attrs) {
+				if (has(attrs, attr)) {
+					script.setAttribute(attr, attrs[attr]);
+				}
+			}
 			script.onreadystatechange = script.onload = function(path) {
 				return function() {
 					if (scriptIsReady(script.readyState)) {
@@ -817,7 +834,7 @@ var loaderJs = (function () {
 
 		setTimeout(fireCallbacks, 0);
 	};
-}());
+}
 
 window._utils.loaderJs = loaderJs;
 
