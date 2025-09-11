@@ -834,7 +834,7 @@ var loaderJs = (function () {
 
 		setTimeout(fireCallbacks, 0);
 	};
-}
+})();
 
 window._utils.loaderJs = loaderJs;
 
