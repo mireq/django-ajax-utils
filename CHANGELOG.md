@@ -1,3 +1,9 @@
+## 0.0.7 (2025-09-11)
+
+### Feat
+
+- Allow to set custom attributes for script tag
+
 ## 0.0.6 (2025-03-26)
 
 ### Feat
