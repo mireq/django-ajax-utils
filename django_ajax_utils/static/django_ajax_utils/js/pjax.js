@@ -197,7 +197,6 @@ var pjaxLoader = function(options) {
 			}
 			return;
 		}
-		var extrajsRx = /src="([^"]*)"/g;
 		var extrastyleRx = /<link([^>]+)>/g;
 		var extrajsBlocks = [response.blocks[self.extrajsBlock]];
 		var extrastyleBlock = response.blocks[self.extrastyleBlock];
@@ -211,12 +210,17 @@ var pjaxLoader = function(options) {
 
 		_.forEach(extrajsBlocks, function(extrajsBlock) {
 			if (extrajsBlock !== undefined) {
-				do {
-					match = extrajsRx.exec(extrajsBlock);
-					if (match !== null) {
-						extrajs.push(match[1]);
-					}
-				} while (match !== null);
+				var parser = new DOMParser();
+				var doc = parser.parseFromString(extrajsBlock, "text/html");
+				var scriptsWithSrc = doc.querySelectorAll("script[src]");
+				_.forEach(scriptsWithSrc, function(scriptElement) {
+					var attributes = {};
+					_.forEach(scriptElement.attributes, function(attr) {
+						var attributeName = attr.name === 'src' ? 'path' : attr.name;
+						attributes[attributeName] = attr.value;
+					});
+					extrajs.push(attributes);
+				});
 			}
 		});
 		if (extrastyleBlock !== undefined) {

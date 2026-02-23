@@ -775,8 +775,10 @@ var loaderJs = (function () {
 			// check if path is object
 			var scriptAttributes = {};
 			if (typeof path === 'object' && path !== null) {
-				if (path.type) {
-					scriptAttributes.type = path.type;
+				for (var attr in path) {
+					if (has(path, attr) && attr !== 'path') {
+						scriptAttributes[attr] = path[attr];
+					}
 				}
 				path = path.path;
 			}
