@@ -1,3 +1,9 @@
+## 0.0.9 (2026-02-23)
+
+### Feat
+
+- Handle script tags with attributes
+
 ## 0.0.8 (2025-09-11)
 
 ### Fix
