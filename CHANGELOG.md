@@ -1,3 +1,9 @@
+## 0.0.10 (2026-05-08)
+
+### Fix
+
+- Handle + sign from URLs in parameter decoding functions
+
 ## 0.0.9 (2026-02-23)
 
 ### Feat
