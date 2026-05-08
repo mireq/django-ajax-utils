@@ -35,6 +35,10 @@ window._utils.isEqual = isEqual;
 window._utils.deepCopy = deepCopy;
 window._utils.lightCopy = lightCopy;
 
+function decodeQueryParam(val) {
+	return decodeURIComponent(val.replace(/\+/g, " "));
+}
+
 // features
 function checkFeatures(features) {
 	for (var i = 0; i < features.length; ++i) {
@@ -73,7 +77,7 @@ function getCookie(name) {
 			var cookie = cookies[i].trim();
 			// Does this cookie string begin with the name we want?
 			if (cookie.substring(0, name.length + 1) == (name + '=')) {
-				cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+				cookieValue = decodeQueryParam(cookie.substring(name.length + 1));
 				break;
 			}
 		}
@@ -960,7 +964,7 @@ function getUrlParameterByName(name, url) {
 	var nameReg = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
 	var regex = new RegExp("[\\?&]" + nameReg + "=([^&#]*)");
 	var results = regex.exec(location);
-	return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, " "));
+	return results === null ? null : decodeQueryParam(results[1].replace(/\+/g, " "));
 }
 
 function encodeURLParameters(parameters) {
@@ -985,11 +989,11 @@ function decodeURLParameters(data) {
 	forEach(components, function(component) {
 		var separatorPosition = component.indexOf('=');
 		if (separatorPosition === -1) {
-			parameters.push([decodeURIComponent(component), '']);
+			parameters.push([decodeQueryParam(component), '']);
 		}
 		else {
-			var name = decodeURIComponent(component.slice(0, separatorPosition));
-			var value = decodeURIComponent(component.slice(separatorPosition + 1));
+			var name = decodeQueryParam(component.slice(0, separatorPosition));
+			var value = decodeQueryParam(component.slice(separatorPosition + 1));
 			parameters.push([name, value]);
 		}
 	});
